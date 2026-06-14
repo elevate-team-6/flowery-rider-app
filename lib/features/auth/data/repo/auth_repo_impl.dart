@@ -1,0 +1,11 @@
+import 'package:injectable/injectable.dart';
+
+import '../../domain/repo/auth_repo_contract.dart';
+import '../data_sources/auth_remote_data_source_contract.dart';
+
+@Injectable(as: AuthRepoContract)
+class AuthRepoImpl implements AuthRepoContract {
+  final AuthRemoteDataSourceContract _remoteDataSource;
+
+  AuthRepoImpl(this._remoteDataSource);
+}
