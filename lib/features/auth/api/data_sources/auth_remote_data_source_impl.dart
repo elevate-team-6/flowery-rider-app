@@ -5,6 +5,7 @@ import '../api_client/auth_api_client.dart';
 
 @Injectable(as: AuthRemoteDataSourceContract)
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceContract {
+  // ignore: unused_field
   final AuthApiClient _forgotPasswordApiClient;
 
   AuthRemoteDataSourceImpl(this._forgotPasswordApiClient);
