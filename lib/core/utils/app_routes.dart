@@ -1,19 +1,16 @@
+import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
 import 'package:flutter/material.dart';
 
 abstract class AppRoutes {
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
-  static const String login = 'login';
+  static const String mainLayout = '/';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
-      case login:
-        return MaterialPageRoute(
-          builder: (BuildContext context) {
-            return Scaffold();
-          },
-        );
+      case mainLayout:
+        return MaterialPageRoute(builder: (_) => const MainLayout());
 
       default:
         return _unDefinedRoute(settings.name);

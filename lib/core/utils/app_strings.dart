@@ -94,6 +94,7 @@ abstract class AppStrings {
   // Main Layout
   static const String home = 'home';
   static const String profile = 'profile';
+  static const String orders = 'orders';
 
   // Products
   static const String addToCart = 'addToCart';
@@ -213,6 +214,7 @@ abstract class AppStrings {
   static const String deliveredOn = 'delivered_on';
   static const String noActiveOrders = 'no_active_orders';
   static const String noCompletedOrders = 'no_completed_orders';
+
   // ===========================================================================
   // API Constants (Values sent directly to Backend - Do NOT Translate)
   // ===========================================================================
