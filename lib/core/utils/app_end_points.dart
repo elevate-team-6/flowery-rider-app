@@ -4,17 +4,21 @@ abstract class AppEndPoints {
 
   // API EndPoints:-
 
-  // Auth:
-  static const String signup = "$baseUrl/auth/signup";
-  static const String signin = "$baseUrl/auth/signin";
-  static const String forgetPassword = "$baseUrl/auth/forgotPassword";
-  static const String verifyResetCode = "$baseUrl/auth/verifyResetCode";
-  static const String resetPassword = "$baseUrl/auth/resetPassword";
-  static const String changePassword = '$baseUrl/auth/change-password';
-  static const String logout = "$baseUrl/auth/logout";
-  static const String profileData = "$baseUrl/auth/profile-Data";
-  static const String editProfile = "$baseUrl/auth/editProfile";
-  static const String uploadPhoto = "$baseUrl/auth/upload-photo";
+  // Driver Authentication:
+  static const String apply = "$baseUrl/drivers/apply";
+  static const String signin = "$baseUrl/drivers/signin";
+  static const String forgetPassword = "$baseUrl/drivers/forgotPassword";
+  static const String verifyResetCode = "$baseUrl/drivers/verifyResetCode";
+  static const String resetPassword = "$baseUrl/drivers/resetPassword";
+  static const String changePassword = '$baseUrl/drivers/change-password';
+  static const String logout = "$baseUrl/drivers/logout";
+
+  // Driver Profile:
+  static const String profileData = "$baseUrl/drivers/profile-Data";
+  static const String editProfile = "$baseUrl/drivers/editProfile";
+  static const String uploadPhoto = "$baseUrl/drivers/upload-photo";
+
+  // General:
   static const String addresses = "$baseUrl/addresses";
 
   // Web Views:
