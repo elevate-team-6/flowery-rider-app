@@ -23,6 +23,7 @@ abstract class DioModule {
     dio.options.baseUrl = AppEndPoints.baseUrl;
     dio.options.connectTimeout = const Duration(seconds: 30);
     dio.options.receiveTimeout = const Duration(seconds: 30);
+    dio.options.sendTimeout = const Duration(seconds: 30);
 
     dio.options.headers = {
       "Content-Type": "application/json",

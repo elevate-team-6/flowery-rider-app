@@ -1,3 +1,4 @@
+// ignore_for_file: uri_does_not_exist, undefined_identifier
 import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';

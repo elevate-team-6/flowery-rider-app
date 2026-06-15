@@ -1,7 +1,7 @@
 sealed class BaseResponse<T> {}
 
 class SuccessBaseResponse<T> extends BaseResponse<T> {
-  final T data;
+  final T? data;
   SuccessBaseResponse(this.data);
 }
 
