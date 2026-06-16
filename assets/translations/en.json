@@ -1,1 +1,36 @@
-{}
+{
+  "login": "Login",
+  "email": "Email",
+  "password": "Password",
+  "continueText": "Continue",
+  "enterYourEmail": "Enter your email",
+  "enterYourPassword": "Enter your password",
+  "rememberMe": "Remember me",
+  "forgetPasswordQuestion": "Forget password?",
+  "loginSuccess": "Logged in successfully",
+
+  "emailRequired": "Email is required",
+  "invalidEmail": "Please enter a valid email",
+  "passwordRequired": "Password is required",
+  "passwordTooShort": "Password must be at least 8 characters",
+  "passwordLowercase": "Password must contain a lowercase letter",
+  "passwordUppercase": "Password must contain an uppercase letter",
+  "passwordNumber": "Password must contain a number",
+  "passwordSpecialCharacter": "Password must contain a special character",
+
+  "connectionTimeout": "Connection timeout, please try again",
+  "sendTimeout": "Send timeout, please try again",
+  "receiveTimeout": "Receive timeout, please try again",
+  "requestCancelled": "Request was cancelled",
+  "noInternetConnection": "No internet connection",
+  "unexpectedError": "An unexpected error occurred",
+  "unknownError": "An unknown error occurred",
+  "invalidRequest": "Invalid request",
+  "authFailed": "Invalid email or password",
+  "forbidden": "Access forbidden",
+  "notFound": "Not found",
+  "serverError": "Server error, please try again later",
+  "defaultError": "Something went wrong",
+  "defaultErrorTryAgain": "Something went wrong, please try again",
+  "unexpectedErrorTryAgain": "An unexpected error occurred, please try again"
+}

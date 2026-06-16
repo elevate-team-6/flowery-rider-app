@@ -1,1 +1,36 @@
-{}
+{
+  "login": "تسجيل الدخول",
+  "email": "البريد الإلكتروني",
+  "password": "كلمة المرور",
+  "continueText": "متابعة",
+  "enterYourEmail": "أدخل بريدك الإلكتروني",
+  "enterYourPassword": "أدخل كلمة المرور",
+  "rememberMe": "تذكرني",
+  "forgetPasswordQuestion": "نسيت كلمة المرور؟",
+  "loginSuccess": "تم تسجيل الدخول بنجاح",
+
+  "emailRequired": "البريد الإلكتروني مطلوب",
+  "invalidEmail": "من فضلك أدخل بريدًا إلكترونيًا صحيحًا",
+  "passwordRequired": "كلمة المرور مطلوبة",
+  "passwordTooShort": "يجب أن تتكون كلمة المرور من 8 أحرف على الأقل",
+  "passwordLowercase": "يجب أن تحتوي كلمة المرور على حرف صغير",
+  "passwordUppercase": "يجب أن تحتوي كلمة المرور على حرف كبير",
+  "passwordNumber": "يجب أن تحتوي كلمة المرور على رقم",
+  "passwordSpecialCharacter": "يجب أن تحتوي كلمة المرور على رمز خاص",
+
+  "connectionTimeout": "انتهت مهلة الاتصال، حاول مرة أخرى",
+  "sendTimeout": "انتهت مهلة الإرسال، حاول مرة أخرى",
+  "receiveTimeout": "انتهت مهلة الاستقبال، حاول مرة أخرى",
+  "requestCancelled": "تم إلغاء الطلب",
+  "noInternetConnection": "لا يوجد اتصال بالإنترنت",
+  "unexpectedError": "حدث خطأ غير متوقع",
+  "unknownError": "حدث خطأ غير معروف",
+  "invalidRequest": "طلب غير صالح",
+  "authFailed": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
+  "forbidden": "غير مصرح بالوصول",
+  "notFound": "غير موجود",
+  "serverError": "خطأ في الخادم، حاول لاحقًا",
+  "defaultError": "حدث خطأ ما",
+  "defaultErrorTryAgain": "حدث خطأ ما، حاول مرة أخرى",
+  "unexpectedErrorTryAgain": "حدث خطأ غير متوقع، حاول مرة أخرى"
+}
