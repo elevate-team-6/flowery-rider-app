@@ -56,6 +56,7 @@ class MyApp extends StatelessWidget {
           title: 'Flowery Rider App',
           theme: AppTheme.mainTheme,
           navigatorKey: AppRoutes.navigatorKey,
+          initialRoute: isLoggedIn ? AppRoutes.home : AppRoutes.login,
           onGenerateRoute: AppRoutes.onGenerateRoute,
           builder: BotToastInit(),
           navigatorObservers: [BotToastNavigatorObserver()],
