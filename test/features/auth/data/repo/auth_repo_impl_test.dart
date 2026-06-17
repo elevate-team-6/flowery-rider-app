@@ -57,17 +57,19 @@ void main() {
       expect(error.errorMessage, 'invalid credentials');
     });
 
-    test('returns SuccessBaseResponse with null data when response is null',
-        () async {
-      when(
-        mockDataSource.signIn(request),
-      ).thenAnswer((_) async => SuccessBaseResponse(null));
+    test(
+      'returns SuccessBaseResponse with null data when response is null',
+      () async {
+        when(
+          mockDataSource.signIn(request),
+        ).thenAnswer((_) async => SuccessBaseResponse(null));
 
-      final result = await repo.signIn(request);
+        final result = await repo.signIn(request);
 
-      expect(result, isA<SuccessBaseResponse<SignInEntity>>());
-      final success = result as SuccessBaseResponse<SignInEntity>;
-      expect(success.data, isNull);
-    });
+        expect(result, isA<SuccessBaseResponse<SignInEntity>>());
+        final success = result as SuccessBaseResponse<SignInEntity>;
+        expect(success.data, isNull);
+      },
+    );
   });
 }
