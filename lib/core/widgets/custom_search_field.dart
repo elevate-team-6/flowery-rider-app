@@ -33,30 +33,25 @@ class CustomSearchField extends StatelessWidget {
       tag: readOnly ? '${heroTag}_${identityHashCode(this)}' : heroTag,
       child: Material(
         color: Colors.transparent,
-        child: SizedBox(
-          height: 48.h,
-          child: TextField(
-            controller: controller,
-            readOnly: readOnly,
-            onTap: onTap,
-            autofocus: autoFocus,
-            onChanged: onChanged,
-            style: AppTextStyles.black14400,
-            cursorColor: AppColors.primary,
-            decoration: InputDecoration(
-              hintText: AppStrings.search.tr(),
-              prefixIcon: Padding(
-                padding: EdgeInsets.all(12.w),
-                child: SvgPicture.asset(
-                  AppIcons.search,
-                  colorFilter: const ColorFilter.mode(
-                    AppColors.gray,
-                    BlendMode.srcIn,
-                  ),
+        child: TextField(
+          controller: controller,
+          readOnly: readOnly,
+          onTap: onTap,
+          autofocus: autoFocus,
+          onChanged: onChanged,
+          decoration: InputDecoration(
+            hintText: AppStrings.search.tr(),
+            prefixIcon: Padding(
+              padding: EdgeInsets.all(12.w),
+              child: SvgPicture.asset(
+                AppIcons.search,
+                colorFilter: const ColorFilter.mode(
+                  AppColors.gray,
+                  BlendMode.srcIn,
                 ),
               ),
-              suffixIcon: _buildSuffixIcon(),
             ),
+            suffixIcon: _buildSuffixIcon(),
           ),
         ),
       ),
