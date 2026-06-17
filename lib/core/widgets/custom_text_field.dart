@@ -1,7 +1,4 @@
-import 'package:flowery_rider_app/core/utils/app_colors.dart';
-import 'package:flowery_rider_app/core/utils/app_text_styles.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomTextField extends StatelessWidget {
   final String? labelText;
@@ -12,7 +9,10 @@ class CustomTextField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final bool obscureText;
   final Widget? suffixIcon;
+  final Widget? prefixIcon;
   final ValueChanged<String>? onChanged;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   const CustomTextField({
     super.key,
@@ -24,7 +24,10 @@ class CustomTextField extends StatelessWidget {
     this.textInputAction,
     this.obscureText = false,
     this.suffixIcon,
+    this.prefixIcon,
     this.onChanged,
+    this.readOnly = false,
+    this.onTap,
   });
 
   @override
@@ -36,19 +39,14 @@ class CustomTextField extends StatelessWidget {
       textInputAction: textInputAction,
       obscureText: obscureText,
       onChanged: onChanged,
+      readOnly: readOnly,
+      onTap: onTap,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      style: AppTextStyles.black14400,
-      cursorColor: AppColors.primary,
       decoration: InputDecoration(
         labelText: labelText,
         hintText: hintText,
-        hintStyle: AppTextStyles.gray12400,
-        labelStyle: AppTextStyles.black14400,
         suffixIcon: suffixIcon,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(4.r),
-          borderSide: BorderSide(color: AppColors.black, width: 1),
-        ),
+        prefixIcon: prefixIcon,
       ),
     );
   }
