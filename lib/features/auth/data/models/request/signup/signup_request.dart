@@ -1,3 +1,5 @@
+import 'package:flowery_rider_app/core/extensions/app_multipart_file.dart';
+
 class SignUpRequest {
   final String? country;
   final String? firstName;
@@ -10,8 +12,8 @@ class SignUpRequest {
   final String? rePassword;
   final String? gender;
   final String? phone;
-  // final AppMultipartFile? vehicleLicense;
-  // final AppMultipartFile? nidImg;
+  final AppMultipartFile? vehicleLicense;
+  final AppMultipartFile? nidImg;
 
   const SignUpRequest({
     this.country,

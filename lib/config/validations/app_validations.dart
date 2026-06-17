@@ -11,7 +11,34 @@ abstract class AppValidations {
     }
     return null;
   }
+// Vehicle Number
+static String? validateVehicleNumber(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return AppStrings.vehicleNumberRequired.tr();
+  }
+  return null;
+}
 
+// National ID
+static String? validateNationalId(String? value) {
+  if (value == null || value.trim().isEmpty) {
+    return AppStrings.idNumberRequired.tr();
+  }
+
+  if (!RegExp(r'^\d{14}$').hasMatch(value.trim())) {
+    return AppStrings.invalidIdNumber.tr();
+  }
+
+  return null;
+}
+
+// Dropdown
+static String? validateDropdown(String? value, String fieldName) {
+  if (value == null || value.isEmpty) {
+    return '$fieldName ${AppStrings.isRequired.tr()}';
+  }
+  return null;
+}
   // ── Name ──
   static String? validateUserName(String? value) {
     if (value == null || value.trim().isEmpty) {

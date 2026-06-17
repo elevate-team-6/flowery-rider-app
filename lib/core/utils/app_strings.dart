@@ -23,13 +23,30 @@ abstract class AppStrings {
 
   // Sign Up Screen
   static const String userName = 'userName';
+  static const String invalidIdNumber = 'Invalid Id Number';
+  static const String idNumberRequired = 'Id Number Required';
+  static const String isRequired = 'Drop Down is required';
+  static const String vehicleNumberRequired = 'Vehicle Number Required';
+  static const String apply = 'Apply';
+  static const String country = 'Country';
+  static const String welcome = 'Welcome!!';
+  static const String applyDescription = 'You want to be a delivery man?\nJoin our team ';
   static const String enterYourUserName = 'enterYourUserName';
-  static const String firstName = 'firstName';
-  static const String enterFirstName = 'enterFirstName';
-  static const String lastName = 'lastName';
-  static const String enterLastName = 'enterLastName';
+  static const String firstName = 'First legal name';
+  static const String enterFirstName = 'Enter first legal name';
+  static const String secondName = 'Second legal name';
+  static const String enterSecondName = 'Enter second legal name';
   static const String phoneNumber = 'phoneNumber';
+  static const String vehicleNumber = 'Vehicle number';
+  static const String vehicleLicense = 'Vehicle license';
+  static const String uploadVehicleLicense = 'Upload license photo';
+  static const String enterVehicleNumber = 'Enter vehicle number';
+  static const String vehicleType = 'Vehicle type';
   static const String enterPhoneNumber = 'enterPhoneNumber';
+  static const String idNumber = 'ID number';
+  static const String idImage = 'ID image';
+  static const String uploadIdImage = 'Upload ID image';
+  static const String enterIdNumber = 'Enter national ID number';
   static const String alreadyHaveAccount = 'alreadyHaveAccount';
   static const String registerSuccess = 'registerSuccess';
   static const String signupFailedUserIsNull = 'signupFailedUserIsNull';
