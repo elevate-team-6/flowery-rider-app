@@ -1,6 +1,7 @@
 import 'package:flowery_rider_app/config/di/di.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
+import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

@@ -1,16 +1,16 @@
-import 'package:equatable/equatable.dart';
+import 'dart:async';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/cache/secure_cache_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/sign_in_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/sign_in_use_case.dart';
+import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
+import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_side_effect.dart';
+import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-
-part 'login_event.dart';
-part 'login_state.dart';
 
 @injectable
 class LoginCubit extends Cubit<LoginState> {
@@ -24,7 +24,10 @@ class LoginCubit extends Cubit<LoginState> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  /// Single entry point for all UI interactions.
+  final StreamController<LoginSideEffect> _sideEffectController =
+      StreamController<LoginSideEffect>.broadcast();
+  Stream<LoginSideEffect> get sideEffects => _sideEffectController.stream;
+
   void doIntent(LoginEvents event) {
     switch (event) {
       case LoadRememberedEmailEvent():
@@ -59,22 +62,19 @@ class LoginCubit extends Cubit<LoginState> {
   Future<void> _signIn(SignInRequestModel request) async {
     if (!(formKey.currentState?.validate() ?? false)) return;
 
-    emit(state.copyWith(status: LoginStatus.loading));
+    _sideEffectController.add(const ShowLoadingEffect());
 
     final result = await _signInUseCase(request);
+
+    _sideEffectController.add(const HideLoadingEffect());
 
     switch (result) {
       case SuccessBaseResponse<SignInEntity>():
         final entity = result.data ?? const SignInEntity();
         await _cacheUserSession(entity);
-        emit(state.copyWith(status: LoginStatus.success, entity: entity));
+        _sideEffectController.add(const LoginSuccessEffect());
       case ErrorBaseResponse<SignInEntity>():
-        emit(
-          state.copyWith(
-            status: LoginStatus.failure,
-            errorMessage: result.errorMessage,
-          ),
-        );
+        _sideEffectController.add(LoginFailureEffect(result.errorMessage));
     }
   }
 
@@ -88,7 +88,6 @@ class LoginCubit extends Cubit<LoginState> {
       value: state.rememberMe.toString(),
     );
 
-    // Persist the email only while "Remember me" is on, otherwise clear it.
     if (state.rememberMe) {
       await _secureCacheHelper.writeData(
         key: AppKeys.emailKey,
@@ -103,6 +102,7 @@ class LoginCubit extends Cubit<LoginState> {
   Future<void> close() {
     emailController.dispose();
     passwordController.dispose();
+    _sideEffectController.close();
     return super.close();
   }
 }

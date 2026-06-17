@@ -1,4 +1,5 @@
-part of 'login_cubit.dart';
+import 'package:equatable/equatable.dart';
+import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
 
 sealed class LoginEvents extends Equatable {
   const LoginEvents();
