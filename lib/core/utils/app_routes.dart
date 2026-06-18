@@ -1,4 +1,3 @@
-import 'package:flowery_rider_app/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
 import 'package:flutter/material.dart';
 
@@ -15,12 +14,6 @@ abstract class AppRoutes {
         case mainLayout:
           return MaterialPageRoute(
             builder: (_) => const MainLayout(),
-            settings: settings,
-          );
-
-        case onboarding:
-          return MaterialPageRoute(
-            builder: (_) => const OnboardingScreen(),
             settings: settings,
           );
 
