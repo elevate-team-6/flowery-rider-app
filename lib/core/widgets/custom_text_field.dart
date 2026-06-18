@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CustomTextField extends StatelessWidget {
+class CustomTextField extends StatefulWidget {
   final String? labelText;
   final String? hintText;
   final TextEditingController? controller;
@@ -31,22 +31,49 @@ class CustomTextField extends StatelessWidget {
   });
 
   @override
+  State<CustomTextField> createState() => _CustomTextFieldState();
+}
+
+class _CustomTextFieldState extends State<CustomTextField> {
+  late bool _obscureText;
+
+  @override
+  void initState() {
+    super.initState();
+    _obscureText = widget.obscureText;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return TextFormField(
-      controller: controller,
-      validator: validator,
-      keyboardType: keyboardType,
-      textInputAction: textInputAction,
-      obscureText: obscureText,
-      onChanged: onChanged,
-      readOnly: readOnly,
-      onTap: onTap,
+      controller: widget.controller,
+      validator: widget.validator,
+      keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction,
+      obscureText: _obscureText,
+      onChanged: widget.onChanged,
+      readOnly: widget.readOnly,
+      onTap: widget.onTap,
       autovalidateMode: AutovalidateMode.onUserInteraction,
+      onTapOutside: (event) => FocusManager.instance.primaryFocus?.unfocus(),
       decoration: InputDecoration(
-        labelText: labelText,
-        hintText: hintText,
-        suffixIcon: suffixIcon,
-        prefixIcon: prefixIcon,
+        labelText: widget.labelText,
+        hintText: widget.hintText,
+        prefixIcon: widget.prefixIcon,
+        suffixIcon: widget.obscureText
+            ? IconButton(
+                onPressed: () {
+                  setState(() {
+                    _obscureText = !_obscureText;
+                  });
+                },
+                icon: Icon(
+                  _obscureText
+                      ? Icons.visibility_off_outlined
+                      : Icons.visibility_outlined,
+                ),
+              )
+            : widget.suffixIcon,
       ),
     );
   }

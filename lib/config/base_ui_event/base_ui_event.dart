@@ -4,6 +4,8 @@ class ShowLoadingEvent extends BaseUiEvent {}
 
 class HideLoadingEvent extends BaseUiEvent {}
 
+enum NavigationType { push, pushReplacement, pushAndRemoveUntil, pop }
+
 class DisplayErrorEvent extends BaseUiEvent {
   final String errorMessage;
   DisplayErrorEvent(this.errorMessage);
@@ -16,5 +18,14 @@ class DisplaySuccessEvent extends BaseUiEvent {
 
 class NavigateEvent extends BaseUiEvent {
   final String routeName;
-  NavigateEvent(this.routeName);
+  final NavigationType navigationType;
+  final Object? arguments;
+  final bool Function(dynamic)? predicate;
+
+  NavigateEvent(
+    this.routeName, {
+    this.navigationType = NavigationType.push,
+    this.arguments,
+    this.predicate,
+  });
 }
