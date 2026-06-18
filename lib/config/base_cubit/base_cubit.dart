@@ -5,7 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class BaseCubit<State, UiEvent> extends Cubit<State> {
   BaseCubit(super.initialState);
 
-  final StreamController<UiEvent> _eventController = StreamController();
+  final StreamController<UiEvent> _eventController =
+      StreamController.broadcast();
 
   Stream<UiEvent> get eventStream => _eventController.stream;
 
