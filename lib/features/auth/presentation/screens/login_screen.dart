@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
         CustomSnackBar.showSuccessMessage(AppStrings.loginSuccess.tr());
         Navigator.of(
           context,
-        ).pushNamedAndRemoveUntil(AppRoutes.home, (route) => false);
+        ).pushNamedAndRemoveUntil(AppRoutes.mainLayout, (route) => false);
       case LoginFailureEffect(:final message):
         CustomSnackBar.showErrorMessage(
           message ?? AppStrings.defaultError.tr(),
