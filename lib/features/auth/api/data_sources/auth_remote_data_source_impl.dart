@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../data/data_sources/auth_remote_data_source_contract.dart';
 import '../../data/models/request/sign_in_request_model.dart';
+import '../../data/models/response/logout_response_model.dart';
 import '../../data/models/response/sign_in_response_model.dart';
 import '../api_client/auth_api_client.dart';
 
@@ -17,6 +18,13 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceContract {
   Future<BaseResponse<SignInResponseModel>> signIn(SignInRequestModel request) {
     return ErrorHandler.handleApiCall(() {
       return _apiClient.signIn(request);
+    });
+  }
+
+  @override
+  Future<BaseResponse<LogoutResponseModel>> logout() {
+    return ErrorHandler.handleApiCall(() {
+      return _apiClient.logout();
     });
   }
 }
