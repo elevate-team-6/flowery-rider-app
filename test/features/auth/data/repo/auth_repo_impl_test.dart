@@ -1,8 +1,10 @@
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/features/auth/data/data_sources/auth_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/logout_response_model.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/sign_in_response_model.dart';
 import 'package:flowery_rider_app/features/auth/data/repo/auth_repo_impl.dart';
+import 'package:flowery_rider_app/features/auth/domain/entites/logout_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/sign_in_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -25,10 +27,13 @@ void main() {
     token: 'fake_token',
   );
 
+  const fakeLogoutResponse = LogoutResponseModel(message: 'success');
+
   setUp(() {
     mockDataSource = MockAuthRemoteDataSourceContract();
     repo = AuthRepoImpl(mockDataSource);
     provideDummy<BaseResponse<SignInResponseModel>>(ErrorBaseResponse('dummy'));
+    provideDummy<BaseResponse<LogoutResponseModel>>(ErrorBaseResponse('dummy'));
   });
 
   group('AuthRepoImpl', () {
@@ -68,6 +73,47 @@ void main() {
 
         expect(result, isA<SuccessBaseResponse<SignInEntity>>());
         final success = result as SuccessBaseResponse<SignInEntity>;
+        expect(success.data, isNull);
+      },
+    );
+  });
+
+  group('AuthRepoImpl logout', () {
+    test('returns SuccessBaseResponse when data source succeeds', () async {
+      when(
+        mockDataSource.logout(),
+      ).thenAnswer((_) async => SuccessBaseResponse(fakeLogoutResponse));
+
+      final result = await repo.logout();
+
+      expect(result, isA<SuccessBaseResponse<LogoutEntity>>());
+      final success = result as SuccessBaseResponse<LogoutEntity>;
+      expect(success.data?.message, 'success');
+    });
+
+    test('returns ErrorBaseResponse when data source returns error', () async {
+      when(
+        mockDataSource.logout(),
+      ).thenAnswer((_) async => ErrorBaseResponse('logout failed'));
+
+      final result = await repo.logout();
+
+      expect(result, isA<ErrorBaseResponse<LogoutEntity>>());
+      final error = result as ErrorBaseResponse<LogoutEntity>;
+      expect(error.errorMessage, 'logout failed');
+    });
+
+    test(
+      'returns SuccessBaseResponse with null data when response is null',
+      () async {
+        when(
+          mockDataSource.logout(),
+        ).thenAnswer((_) async => SuccessBaseResponse(null));
+
+        final result = await repo.logout();
+
+        expect(result, isA<SuccessBaseResponse<LogoutEntity>>());
+        final success = result as SuccessBaseResponse<LogoutEntity>;
         expect(success.data, isNull);
       },
     );
