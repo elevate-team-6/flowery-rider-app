@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/utils/app_colors.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/home_screen.dart';
@@ -32,8 +33,7 @@ class _MainLayoutState extends State<MainLayout> {
         ),
         child: NavigationBar(
           selectedIndex: currentIndex,
-          backgroundColor: AppColors.white,
-          indicatorColor: Colors.transparent,
+
           elevation: 0,
 
           onDestinationSelected: (index) {
@@ -44,39 +44,21 @@ class _MainLayoutState extends State<MainLayout> {
 
           destinations: [
             NavigationDestination(
-              icon: Icon(
-                Icons.home_outlined,
-                color: currentIndex == 0
-                    ? AppColors.primary
-                    : AppColors.black30,
-              ),
-              selectedIcon: const Icon(Icons.home, color: AppColors.primary),
-              label: AppStrings.home,
+              icon: Icon(Icons.home_outlined),
+              selectedIcon: const Icon(Icons.home),
+              label: AppStrings.home.tr(),
             ),
 
             NavigationDestination(
-              icon: Icon(
-                Icons.fact_check_outlined,
-                color: currentIndex == 1
-                    ? AppColors.primary
-                    : AppColors.black30,
-              ),
-              selectedIcon: const Icon(
-                Icons.fact_check,
-                color: AppColors.primary,
-              ),
-              label: AppStrings.orders,
+              icon: Icon(Icons.fact_check_outlined),
+              selectedIcon: const Icon(Icons.fact_check),
+              label: AppStrings.orders.tr(),
             ),
 
             NavigationDestination(
-              icon: Icon(
-                Icons.person_outline,
-                color: currentIndex == 2
-                    ? AppColors.primary
-                    : AppColors.black30,
-              ),
-              selectedIcon: const Icon(Icons.person, color: AppColors.primary),
-              label: AppStrings.profile,
+              icon: Icon(Icons.person_outline),
+              selectedIcon: const Icon(Icons.person),
+              label: AppStrings.profile.tr(),
             ),
           ],
         ),

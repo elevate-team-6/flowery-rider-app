@@ -39,6 +39,11 @@ abstract class AppStrings {
   static const String pleaseSelectGender = 'pleaseSelectGender';
   static const String creatingAccountAgreement = 'creatingAccountAgreement';
   static const String iAgree = 'iAgree';
+  // Onboarding Screen
+  // In your AppStrings (or similar constants file)
+  static const String welcomeToFloweryRider = 'Welcome to Flowery rider app';
+  static const String applyNow = 'Apply now';
+  static const String versionPlaceholder = 'v 6.3.0 - (446)';
 
   // Forget Password Screen
   static const String forgetPasswordTitle = 'forgetPasswordTitle';
