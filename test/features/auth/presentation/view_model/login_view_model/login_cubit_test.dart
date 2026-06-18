@@ -6,10 +6,9 @@ import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_requ
 import 'package:flowery_rider_app/features/auth/domain/entites/sign_in_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/sign_in_use_case.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
+import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
-import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_side_effect.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_state.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -40,14 +39,6 @@ void main() {
   tearDown(() async {
     if (!cubit.isClosed) await cubit.close();
   });
-
-  Future<void> attachForm(WidgetTester tester) async {
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Form(key: cubit.formKey, child: const SizedBox()),
-      ),
-    );
-  }
 
   group('TogglePasswordVisibilityEvent', () {
     blocTest<LoginCubit, LoginState>(
@@ -110,9 +101,9 @@ void main() {
   });
 
   group('LoginEvent', () {
-    testWidgets(
+    test(
       'emits loading then success side effects on valid credentials',
-      (tester) async {
+      () async {
         when(
           mockUseCase(request),
         ).thenAnswer((_) async => SuccessBaseResponse(fakeEntity));
@@ -123,14 +114,13 @@ void main() {
           mockCache.deleteData(key: anyNamed('key')),
         ).thenAnswer((_) async {});
 
-        await attachForm(tester);
-
         final expectation = expectLater(
-          cubit.sideEffects,
+          cubit.eventStream,
           emitsInOrder([
-            isA<ShowLoadingEffect>(),
-            isA<HideLoadingEffect>(),
-            isA<LoginSuccessEffect>(),
+            isA<ShowLoadingEvent>(),
+            isA<HideLoadingEvent>(),
+            isA<DisplaySuccessEvent>(),
+            isA<NavigateEvent>(),
           ]),
         );
 
@@ -143,23 +133,21 @@ void main() {
       },
     );
 
-    testWidgets(
+    test(
       'emits loading then failure side effects on wrong credentials',
-      (tester) async {
+      () async {
         when(
           mockUseCase(request),
         ).thenAnswer((_) async => ErrorBaseResponse('invalid credentials'));
 
-        await attachForm(tester);
-
         final expectation = expectLater(
-          cubit.sideEffects,
+          cubit.eventStream,
           emitsInOrder([
-            isA<ShowLoadingEffect>(),
-            isA<HideLoadingEffect>(),
-            isA<LoginFailureEffect>().having(
-              (e) => e.message,
-              'message',
+            isA<ShowLoadingEvent>(),
+            isA<HideLoadingEvent>(),
+            isA<DisplayErrorEvent>().having(
+              (e) => e.errorMessage,
+              'errorMessage',
               'invalid credentials',
             ),
           ]),
@@ -169,17 +157,5 @@ void main() {
         await expectation;
       },
     );
-
-    test('emits no side effects when the form is invalid', () async {
-      final emitted = <LoginSideEffect>[];
-      final sub = cubit.sideEffects.listen(emitted.add);
-
-      cubit.doIntent(const LoginEvent(request));
-      await Future<void>.delayed(Duration.zero);
-
-      expect(emitted, isEmpty);
-      verifyNever(mockUseCase(request));
-      await sub.cancel();
-    });
   });
 }

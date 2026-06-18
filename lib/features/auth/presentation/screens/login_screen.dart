@@ -1,14 +1,13 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flowery_rider_app/core/utils/app_routes.dart';
+import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
 import 'package:flowery_rider_app/core/widgets/custom_snack_bar.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
-import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_side_effect.dart';
 import 'package:flowery_rider_app/features/auth/presentation/widgets/login_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,12 +21,13 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  StreamSubscription<LoginSideEffect>? _sideEffectSubscription;
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  StreamSubscription<BaseUiEvent>? _sideEffectSubscription;
 
   @override
   void initState() {
     super.initState();
-    _sideEffectSubscription = context.read<LoginCubit>().sideEffects.listen(
+    _sideEffectSubscription = context.read<LoginCubit>().eventStream.listen(
       _handleSideEffect,
     );
   }
@@ -50,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 LoginForm(
+                  formKey: _formKey,
                   onForgetPasswordTap: () {
                     // TODO: navigate to forget password screen.
                   },
@@ -57,6 +58,8 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(height: 32.h),
                 ElevatedButton(
                   onPressed: () {
+                    if (!(_formKey.currentState?.validate() ?? false)) return;
+
                     final viewModel = context.read<LoginCubit>();
                     viewModel.doIntent(
                       LoginEvent(
@@ -77,21 +80,20 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  void _handleSideEffect(LoginSideEffect effect) {
-    switch (effect) {
-      case ShowLoadingEffect():
+  void _handleSideEffect(BaseUiEvent event) {
+    switch (event) {
+      case ShowLoadingEvent():
         LoadingDialog.show(context: context);
-      case HideLoadingEffect():
+      case HideLoadingEvent():
         LoadingDialog.hide(context: context);
-      case LoginSuccessEffect():
-        CustomSnackBar.showSuccessMessage(AppStrings.loginSuccess.tr());
+      case DisplaySuccessEvent(:final successMessage):
+        CustomSnackBar.showSuccessMessage(successMessage);
+      case DisplayErrorEvent(:final errorMessage):
+        CustomSnackBar.showErrorMessage(errorMessage);
+      case NavigateEvent(:final routeName):
         Navigator.of(
           context,
-        ).pushNamedAndRemoveUntil(AppRoutes.mainLayout, (route) => false);
-      case LoginFailureEffect(:final message):
-        CustomSnackBar.showErrorMessage(
-          message ?? AppStrings.defaultError.tr(),
-        );
+        ).pushNamedAndRemoveUntil(routeName, (route) => false);
     }
   }
 }

@@ -12,20 +12,25 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class LoginForm extends StatelessWidget {
+  static const Key emailFieldKey = Key('login_email_field');
+  static const Key passwordFieldKey = Key('login_password_field');
+
+  final GlobalKey<FormState> formKey;
   final VoidCallback? onForgetPasswordTap;
 
-  const LoginForm({super.key, this.onForgetPasswordTap});
+  const LoginForm({super.key, required this.formKey, this.onForgetPasswordTap});
 
   @override
   Widget build(BuildContext context) {
     final viewModel = context.read<LoginCubit>();
 
     return Form(
-      key: viewModel.formKey,
+      key: formKey,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CustomTextField(
+            key: emailFieldKey,
             controller: viewModel.emailController,
             labelText: AppStrings.email.tr(),
             hintText: AppStrings.enterYourEmail.tr(),
@@ -38,6 +43,7 @@ class LoginForm extends StatelessWidget {
             selector: (state) => state.obscurePassword,
             builder: (context, isObscured) {
               return CustomTextField(
+                key: passwordFieldKey,
                 controller: viewModel.passwordController,
                 labelText: AppStrings.password.tr(),
                 hintText: AppStrings.enterYourPassword.tr(),

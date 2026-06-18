@@ -1,32 +1,29 @@
-import 'dart:async';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
+import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/cache/secure_cache_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
+import 'package:flowery_rider_app/core/utils/app_routes.dart';
+import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/sign_in_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/sign_in_use_case.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
-import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_side_effect.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_state.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
-class LoginCubit extends Cubit<LoginState> {
+class LoginCubit extends BaseCubit<LoginState, BaseUiEvent> {
   final SignInUseCase _signInUseCase;
   final SecureCacheHelper _secureCacheHelper;
 
   LoginCubit(this._signInUseCase, this._secureCacheHelper)
     : super(const LoginState());
 
-  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-
-  final StreamController<LoginSideEffect> _sideEffectController =
-      StreamController<LoginSideEffect>.broadcast();
-  Stream<LoginSideEffect> get sideEffects => _sideEffectController.stream;
 
   void doIntent(LoginEvents event) {
     switch (event) {
@@ -60,21 +57,20 @@ class LoginCubit extends Cubit<LoginState> {
   }
 
   Future<void> _signIn(SignInRequestModel request) async {
-    if (!(formKey.currentState?.validate() ?? false)) return;
-
-    _sideEffectController.add(const ShowLoadingEffect());
+    emitUiEvent(ShowLoadingEvent());
 
     final result = await _signInUseCase(request);
 
-    _sideEffectController.add(const HideLoadingEffect());
+    emitUiEvent(HideLoadingEvent());
 
     switch (result) {
       case SuccessBaseResponse<SignInEntity>():
         final entity = result.data ?? const SignInEntity();
         await _cacheUserSession(entity);
-        _sideEffectController.add(const LoginSuccessEffect());
+        emitUiEvent(DisplaySuccessEvent(AppStrings.loginSuccess.tr()));
+        emitUiEvent(NavigateEvent(AppRoutes.mainLayout));
       case ErrorBaseResponse<SignInEntity>():
-        _sideEffectController.add(LoginFailureEffect(result.errorMessage));
+        emitUiEvent(DisplayErrorEvent(result.errorMessage));
     }
   }
 
@@ -102,7 +98,6 @@ class LoginCubit extends Cubit<LoginState> {
   Future<void> close() {
     emailController.dispose();
     passwordController.dispose();
-    _sideEffectController.close();
     return super.close();
   }
 }
