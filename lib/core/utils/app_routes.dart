@@ -11,7 +11,6 @@ abstract class AppRoutes {
       GlobalKey<NavigatorState>();
 
   static const String login = 'login';
-  static const String home = 'home';
   static const String mainLayout = '/';
   static const String onboarding = '/onboarding';
 
@@ -27,13 +26,6 @@ abstract class AppRoutes {
                       ..doIntent(const LoadRememberedEmailEvent()),
                 child: const LoginScreen(),
               );
-            },
-          );
-
-        case home:
-          return MaterialPageRoute(
-            builder: (BuildContext context) {
-              return const Scaffold(body: Center(child: Text('Home')));
             },
           );
 

@@ -84,6 +84,7 @@ abstract class AppStrings {
   static const String logout = 'logout';
   static const String version = 'version';
   static const String confirmLogout = 'confirmLogout';
+  static const String logoutSuccess = 'logoutSuccess';
 
   // Address Details Screen
   static const String enableLocationServices =

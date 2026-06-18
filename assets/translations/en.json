@@ -33,5 +33,9 @@
   "unexpectedErrorTryAgain": "An unexpected error occurred, please try again",
   "home": "Home",
   "orders": "Orders",
-  "profile": "Profile"
+  "profile": "Profile",
+  "logout": "Logout",
+  "confirmLogout": "Are you sure you want to logout?",
+  "logoutSuccess": "Logged out successfully",
+  "cancel": "Cancel"
 }

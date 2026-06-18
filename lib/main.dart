@@ -2,7 +2,6 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
 import 'config/cache/hive_helper.dart';
 import 'config/di/di.dart';
 import 'config/services/auth_service.dart';
@@ -56,7 +55,7 @@ class MyApp extends StatelessWidget {
           title: 'Flowery Rider App',
           theme: AppTheme.mainTheme,
           navigatorKey: AppRoutes.navigatorKey,
-          initialRoute: isLoggedIn ? AppRoutes.home : AppRoutes.login,
+          initialRoute: isLoggedIn ? AppRoutes.mainLayout : AppRoutes.login,
           onGenerateRoute: AppRoutes.onGenerateRoute,
           builder: BotToastInit(),
           navigatorObservers: [BotToastNavigatorObserver()],
