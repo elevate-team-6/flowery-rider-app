@@ -8,7 +8,6 @@
   "rememberMe": "Remember me",
   "forgetPasswordQuestion": "Forget password?",
   "loginSuccess": "Logged in successfully",
-
   "emailRequired": "Email is required",
   "invalidEmail": "Please enter a valid email",
   "passwordRequired": "Password is required",
@@ -17,7 +16,6 @@
   "passwordUppercase": "Password must contain an uppercase letter",
   "passwordNumber": "Password must contain a number",
   "passwordSpecialCharacter": "Password must contain a special character",
-
   "connectionTimeout": "Connection timeout, please try again",
   "sendTimeout": "Send timeout, please try again",
   "receiveTimeout": "Receive timeout, please try again",
@@ -32,5 +30,8 @@
   "serverError": "Server error, please try again later",
   "defaultError": "Something went wrong",
   "defaultErrorTryAgain": "Something went wrong, please try again",
-  "unexpectedErrorTryAgain": "An unexpected error occurred, please try again"
+  "unexpectedErrorTryAgain": "An unexpected error occurred, please try again",
+  "home": "Home",
+  "orders": "Orders",
+  "profile": "Profile"
 }

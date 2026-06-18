@@ -1,4 +1,4 @@
-sealed class BaseUiEvent {}
+abstract class BaseUiEvent {}
 
 class DisplayErrorEvent extends BaseUiEvent {
   final String errorMessage;

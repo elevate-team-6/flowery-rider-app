@@ -181,6 +181,28 @@ abstract class AppTheme {
           ),
         ),
       ),
+      // Navigation Bar Theme
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.white,
+        indicatorColor: Colors.transparent,
+        elevation: 0,
+
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppTextStyles.primary12400;
+          }
+
+          return AppTextStyles.gray12400;
+        }),
+
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: AppColors.primary);
+          }
+
+          return const IconThemeData(color: AppColors.black30);
+        }),
+      ),
     );
   }
 

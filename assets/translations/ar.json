@@ -8,7 +8,6 @@
   "rememberMe": "تذكرني",
   "forgetPasswordQuestion": "نسيت كلمة المرور؟",
   "loginSuccess": "تم تسجيل الدخول بنجاح",
-
   "emailRequired": "البريد الإلكتروني مطلوب",
   "invalidEmail": "من فضلك أدخل بريدًا إلكترونيًا صحيحًا",
   "passwordRequired": "كلمة المرور مطلوبة",
@@ -17,7 +16,6 @@
   "passwordUppercase": "يجب أن تحتوي كلمة المرور على حرف كبير",
   "passwordNumber": "يجب أن تحتوي كلمة المرور على رقم",
   "passwordSpecialCharacter": "يجب أن تحتوي كلمة المرور على رمز خاص",
-
   "connectionTimeout": "انتهت مهلة الاتصال، حاول مرة أخرى",
   "sendTimeout": "انتهت مهلة الإرسال، حاول مرة أخرى",
   "receiveTimeout": "انتهت مهلة الاستقبال، حاول مرة أخرى",
@@ -32,5 +30,8 @@
   "serverError": "خطأ في الخادم، حاول لاحقًا",
   "defaultError": "حدث خطأ ما",
   "defaultErrorTryAgain": "حدث خطأ ما، حاول مرة أخرى",
-  "unexpectedErrorTryAgain": "حدث خطأ غير متوقع، حاول مرة أخرى"
+  "unexpectedErrorTryAgain": "حدث خطأ غير متوقع، حاول مرة أخرى",
+  "home": "الرئيسية",
+  "orders": "الطلبات",
+  "profile": "الملف الشخصي"
 }

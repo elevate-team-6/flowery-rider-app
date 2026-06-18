@@ -39,6 +39,11 @@ abstract class AppStrings {
   static const String pleaseSelectGender = 'pleaseSelectGender';
   static const String creatingAccountAgreement = 'creatingAccountAgreement';
   static const String iAgree = 'iAgree';
+  // Onboarding Screen
+  // In your AppStrings (or similar constants file)
+  static const String welcomeToFloweryRider = 'Welcome to Flowery rider app';
+  static const String applyNow = 'Apply now';
+  static const String versionPlaceholder = 'v 6.3.0 - (446)';
 
   // Forget Password Screen
   static const String forgetPasswordTitle = 'forgetPasswordTitle';
@@ -94,6 +99,7 @@ abstract class AppStrings {
   // Main Layout
   static const String home = 'home';
   static const String profile = 'profile';
+  static const String orders = 'orders';
 
   // Products
   static const String addToCart = 'addToCart';
@@ -213,6 +219,7 @@ abstract class AppStrings {
   static const String deliveredOn = 'delivered_on';
   static const String noActiveOrders = 'no_active_orders';
   static const String noCompletedOrders = 'no_completed_orders';
+
   // ===========================================================================
   // API Constants (Values sent directly to Backend - Do NOT Translate)
   // ===========================================================================
