@@ -1,5 +1,9 @@
 {
     "home": "الرئيسية",
     "orders": "الطلبات",
-    "profile": "الملف الشخصي"
+    "profile": "الملف الشخصي",
+    "welcomeTo": "اهلا بك في",
+    "floweryRiderApp": "تطبيق سائق الورود",
+    "applyNow": "تقدم الآن",
+    "versionPlaceholder": "v 6.3.0 - (446)"
 }

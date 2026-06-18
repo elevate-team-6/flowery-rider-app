@@ -1,5 +1,9 @@
 {
     "home": "Home",
     "orders": "Orders",
-    "profile": "Profile"
+    "profile": "Profile",
+    "welcomeTo": "Welcome to",
+    "floweryRiderApp": "Flowery Rider App",
+    "applyNow": "Apply now",
+    "versionPlaceholder": "v 6.3.0 - (446)"
 }
