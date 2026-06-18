@@ -1,5 +1,11 @@
+import 'package:flowery_rider_app/config/di/di.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/forget_password_screen.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/reset_password_screen.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/verify_reset_code_screen.dart';
+import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_cubit.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 abstract class AppRoutes {
   static final GlobalKey<NavigatorState> navigatorKey =
@@ -7,6 +13,12 @@ abstract class AppRoutes {
 
   static const String mainLayout = '/';
   static const String onboarding = '/onboarding';
+  static const String login = '/login';
+  static const String forgotPassword = '/forgotPassword';
+  static const String verifyResetCode = '/VerifyResetCode';
+  static const String resetPassword = '/resetPassword';
+
+  static ForgetPasswordCubit? _forgetPasswordCubit;
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
@@ -14,6 +26,34 @@ abstract class AppRoutes {
         case mainLayout:
           return MaterialPageRoute(
             builder: (_) => const MainLayout(),
+            settings: settings,
+          );
+
+        case forgotPassword:
+          _forgetPasswordCubit = getIt<ForgetPasswordCubit>();
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider.value(
+              value: _forgetPasswordCubit!,
+              child: const ForgotPasswordScreen(),
+            ),
+            settings: settings,
+          );
+
+        case verifyResetCode:
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider.value(
+              value: _forgetPasswordCubit!,
+              child: VerifyResetCodeScreen(email: settings.arguments as String),
+            ),
+            settings: settings,
+          );
+
+        case resetPassword:
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider.value(
+              value: _forgetPasswordCubit!,
+              child: ResetPasswordScreen(email: settings.arguments as String),
+            ),
             settings: settings,
           );
 

@@ -1,3 +1,11 @@
+import 'package:flowery_rider_app/config/base_response/base_response.dart';
+import 'package:flowery_rider_app/config/error_handler/error_handler.dart';
+import 'package:flowery_rider_app/features/auth/data/models/request/forgot_password_request.dart';
+import 'package:flowery_rider_app/features/auth/data/models/request/reset_password_request.dart';
+import 'package:flowery_rider_app/features/auth/data/models/request/verify_reset_code_request.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/forgot_password_response.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/reset_password_response.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/verify_reset_code_response.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../data/data_sources/auth_remote_data_source_contract.dart';
@@ -5,8 +13,30 @@ import '../api_client/auth_api_client.dart';
 
 @Injectable(as: AuthRemoteDataSourceContract)
 class AuthRemoteDataSourceImpl implements AuthRemoteDataSourceContract {
-  // ignore: unused_field
   final AuthApiClient _apiClient;
 
   AuthRemoteDataSourceImpl(this._apiClient);
+
+  @override
+  Future<BaseResponse<ForgetPasswordResponse>> forgotPassword(
+    ForgetPasswordRequest request,
+  ) {
+    return ErrorHandler.handleApiCall(() => _apiClient.forgotPassword(request));
+  }
+
+  @override
+  Future<BaseResponse<ResetPasswordResponse>> resetPassword(
+    ResetPasswordRequest request,
+  ) {
+    return ErrorHandler.handleApiCall(() => _apiClient.resetPassword(request));
+  }
+
+  @override
+  Future<BaseResponse<VerifyResetCodeResponse>> verifyResetCode(
+    VerifyResetCodeRequest request,
+  ) {
+    return ErrorHandler.handleApiCall(
+      () => _apiClient.verifyResetCode(request),
+    );
+  }
 }
