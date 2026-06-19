@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
+import 'package:flowery_rider_app/config/validations/app_validations.dart';
 import 'package:flowery_rider_app/config/base_ui_handler/ui_event_handler_mixin.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
@@ -47,6 +48,19 @@ class _LoginScreenState extends State<LoginScreen> with UiEventHandler {
     _emailController.text = text;
   }
 
+  void _onLoginPressed() {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    context.read<LoginCubit>().doIntent(
+      LoginEvent(
+        SignInRequestModel(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,17 +81,23 @@ class _LoginScreenState extends State<LoginScreen> with UiEventHandler {
                   },
                 ),
                 SizedBox(height: 32.h),
-                ElevatedButton(
-                  onPressed: () {
-                    if (!(_formKey.currentState?.validate() ?? false)) return;
+                AnimatedBuilder(
+                  animation: Listenable.merge([
+                    _emailController,
+                    _passwordController,
+                  ]),
+                  builder: (context, child) {
+                    final isFormValid =
+                        AppValidations.validateEmail(_emailController.text) ==
+                            null &&
+                        AppValidations.validatePassword(
+                              _passwordController.text,
+                            ) ==
+                            null;
 
-                    context.read<LoginCubit>().doIntent(
-                      LoginEvent(
-                        SignInRequestModel(
-                          email: _emailController.text.trim(),
-                          password: _passwordController.text,
-                        ),
-                      ),
+                    return ElevatedButton(
+                      onPressed: isFormValid ? _onLoginPressed : null,
+                      child: child,
                     );
                   },
                   child: Text(AppStrings.continueText.tr()),
