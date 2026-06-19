@@ -16,14 +16,20 @@ class LoginForm extends StatelessWidget {
   static const Key passwordFieldKey = Key('login_password_field');
 
   final GlobalKey<FormState> formKey;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
   final VoidCallback? onForgetPasswordTap;
 
-  const LoginForm({super.key, required this.formKey, this.onForgetPasswordTap});
+  const LoginForm({
+    super.key,
+    required this.formKey,
+    required this.emailController,
+    required this.passwordController,
+    this.onForgetPasswordTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.read<LoginCubit>();
-
     return Form(
       key: formKey,
       child: Column(
@@ -31,7 +37,7 @@ class LoginForm extends StatelessWidget {
         children: [
           CustomTextField(
             key: emailFieldKey,
-            controller: viewModel.emailController,
+            controller: emailController,
             labelText: AppStrings.email.tr(),
             hintText: AppStrings.enterYourEmail.tr(),
             keyboardType: TextInputType.emailAddress,
@@ -44,7 +50,7 @@ class LoginForm extends StatelessWidget {
             builder: (context, isObscured) {
               return CustomTextField(
                 key: passwordFieldKey,
-                controller: viewModel.passwordController,
+                controller: passwordController,
                 labelText: AppStrings.password.tr(),
                 hintText: AppStrings.enterYourPassword.tr(),
                 obscureText: isObscured,

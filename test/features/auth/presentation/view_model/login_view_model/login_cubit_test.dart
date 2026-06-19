@@ -67,23 +67,35 @@ void main() {
   });
 
   group('LoadRememberedEmailEvent', () {
-    blocTest<LoginCubit, LoginState>(
-      'restores remembered email and checkbox when remember me is on',
-      setUp: () {
+    test(
+      'restores checkbox and emits fill text field event when remember me is on',
+      () async {
         when(
           mockCache.readData(key: AppKeys.rememberMeKey),
         ).thenAnswer((_) async => 'true');
         when(
           mockCache.readData(key: AppKeys.emailKey),
         ).thenAnswer((_) async => 'test@test.com');
-      },
-      build: () => cubit,
-      act: (cubit) => cubit.doIntent(const LoadRememberedEmailEvent()),
-      expect: () => [
-        isA<LoginState>().having((s) => s.rememberMe, 'rememberMe', true),
-      ],
-      verify: (cubit) {
-        expect(cubit.emailController.text, 'test@test.com');
+
+        final stateExpectation = expectLater(
+          cubit.stream,
+          emits(
+            isA<LoginState>().having((s) => s.rememberMe, 'rememberMe', true),
+          ),
+        );
+        final eventExpectation = expectLater(
+          cubit.eventStream,
+          emits(
+            isA<FillTextFieldEvent>().having(
+              (e) => e.text,
+              'text',
+              'test@test.com',
+            ),
+          ),
+        );
+
+        cubit.doIntent(const LoadRememberedEmailEvent());
+        await Future.wait([stateExpectation, eventExpectation]);
       },
     );
 

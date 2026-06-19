@@ -11,6 +11,13 @@ class DisplayErrorEvent extends BaseUiEvent {
   DisplayErrorEvent(this.errorMessage);
 }
 
+/// Asks the screen to write [text] into its associated text field
+/// (e.g. restoring a remembered value when the screen opens).
+class FillTextFieldEvent extends BaseUiEvent {
+  final String text;
+  FillTextFieldEvent(this.text);
+}
+
 class DisplaySuccessEvent extends BaseUiEvent {
   final String successMessage;
   DisplaySuccessEvent(this.successMessage);

@@ -2,9 +2,8 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
+import 'package:flowery_rider_app/config/base_ui_handler/ui_event_handler_mixin.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
-import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
-import 'package:flowery_rider_app/core/widgets/custom_snack_bar.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
@@ -20,22 +19,32 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen> with UiEventHandler {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   StreamSubscription<BaseUiEvent>? _sideEffectSubscription;
 
   @override
   void initState() {
     super.initState();
     _sideEffectSubscription = context.read<LoginCubit>().eventStream.listen(
-      _handleSideEffect,
+      handleUiEvent,
     );
+    context.read<LoginCubit>().doIntent(const LoadRememberedEmailEvent());
   }
 
   @override
   void dispose() {
     _sideEffectSubscription?.cancel();
+    _emailController.dispose();
+    _passwordController.dispose();
     super.dispose();
+  }
+
+  @override
+  void onFillTextField(String text) {
+    _emailController.text = text;
   }
 
   @override
@@ -51,6 +60,8 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 LoginForm(
                   formKey: _formKey,
+                  emailController: _emailController,
+                  passwordController: _passwordController,
                   onForgetPasswordTap: () {
                     // TODO: navigate to forget password screen.
                   },
@@ -60,12 +71,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-                    final viewModel = context.read<LoginCubit>();
-                    viewModel.doIntent(
+                    context.read<LoginCubit>().doIntent(
                       LoginEvent(
                         SignInRequestModel(
-                          email: viewModel.emailController.text.trim(),
-                          password: viewModel.passwordController.text,
+                          email: _emailController.text.trim(),
+                          password: _passwordController.text,
                         ),
                       ),
                     );
@@ -78,22 +88,5 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
-  }
-
-  void _handleSideEffect(BaseUiEvent event) {
-    switch (event) {
-      case ShowLoadingEvent():
-        LoadingDialog.show(context: context);
-      case HideLoadingEvent():
-        LoadingDialog.hide(context: context);
-      case DisplaySuccessEvent(:final successMessage):
-        CustomSnackBar.showSuccessMessage(successMessage);
-      case DisplayErrorEvent(:final errorMessage):
-        CustomSnackBar.showErrorMessage(errorMessage);
-      case NavigateEvent(:final routeName):
-        Navigator.of(
-          context,
-        ).pushNamedAndRemoveUntil(routeName, (route) => false);
-    }
   }
 }

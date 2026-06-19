@@ -11,7 +11,6 @@ import 'package:flowery_rider_app/features/auth/domain/entites/sign_in_entity.da
 import 'package:flowery_rider_app/features/auth/domain/use_cases/sign_in_use_case.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_state.dart';
-import 'package:flutter/material.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
@@ -21,9 +20,6 @@ class LoginCubit extends BaseCubit<LoginState, BaseUiEvent> {
 
   LoginCubit(this._signInUseCase, this._secureCacheHelper)
     : super(const LoginState());
-
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
 
   void doIntent(LoginEvents event) {
     switch (event) {
@@ -43,9 +39,10 @@ class LoginCubit extends BaseCubit<LoginState, BaseUiEvent> {
         await _secureCacheHelper.readData(key: AppKeys.rememberMeKey) == 'true';
     if (!isRemembered) return;
 
-    emailController.text =
+    final email =
         await _secureCacheHelper.readData(key: AppKeys.emailKey) ?? '';
     emit(state.copyWith(rememberMe: true));
+    emitUiEvent(FillTextFieldEvent(email));
   }
 
   void _togglePasswordVisibility() {
@@ -66,7 +63,7 @@ class LoginCubit extends BaseCubit<LoginState, BaseUiEvent> {
     switch (result) {
       case SuccessBaseResponse<SignInEntity>():
         final entity = result.data ?? const SignInEntity();
-        await _cacheUserSession(entity);
+        await _cacheUserSession(entity, request.email);
         emitUiEvent(DisplaySuccessEvent(AppStrings.loginSuccess.tr()));
         emitUiEvent(NavigateEvent(AppRoutes.mainLayout));
       case ErrorBaseResponse<SignInEntity>():
@@ -74,7 +71,7 @@ class LoginCubit extends BaseCubit<LoginState, BaseUiEvent> {
     }
   }
 
-  Future<void> _cacheUserSession(SignInEntity entity) async {
+  Future<void> _cacheUserSession(SignInEntity entity, String email) async {
     final token = entity.token;
     if (token != null && token.isNotEmpty) {
       await _secureCacheHelper.writeData(key: AppKeys.tokenKey, value: token);
@@ -87,17 +84,10 @@ class LoginCubit extends BaseCubit<LoginState, BaseUiEvent> {
     if (state.rememberMe) {
       await _secureCacheHelper.writeData(
         key: AppKeys.emailKey,
-        value: emailController.text.trim(),
+        value: email.trim(),
       );
     } else {
       await _secureCacheHelper.deleteData(key: AppKeys.emailKey);
     }
-  }
-
-  @override
-  Future<void> close() {
-    emailController.dispose();
-    passwordController.dispose();
-    return super.close();
   }
 }
