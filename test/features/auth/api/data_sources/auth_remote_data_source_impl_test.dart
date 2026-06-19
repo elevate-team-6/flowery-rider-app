@@ -48,20 +48,23 @@ void main() {
       expect(success.data?.message, 'success');
     });
 
-    test('returns ErrorBaseResponse when api call throws DioException', () async {
-      when(mockApiClient.signIn(request)).thenThrow(
-        DioException(
-          requestOptions: RequestOptions(path: ''),
-          type: DioExceptionType.connectionError,
-        ),
-      );
+    test(
+      'returns ErrorBaseResponse when api call throws DioException',
+      () async {
+        when(mockApiClient.signIn(request)).thenThrow(
+          DioException(
+            requestOptions: RequestOptions(path: ''),
+            type: DioExceptionType.connectionError,
+          ),
+        );
 
-      final result = await dataSource.signIn(request);
+        final result = await dataSource.signIn(request);
 
-      expect(result, isA<ErrorBaseResponse<SignInResponseModel>>());
-      final error = result as ErrorBaseResponse<SignInResponseModel>;
-      expect(error.errorMessage, isNotEmpty);
-    });
+        expect(result, isA<ErrorBaseResponse<SignInResponseModel>>());
+        final error = result as ErrorBaseResponse<SignInResponseModel>;
+        expect(error.errorMessage, isNotEmpty);
+      },
+    );
   });
 
   group('AuthRemoteDataSourceImpl - Forget Password', () {
@@ -72,22 +75,32 @@ void main() {
     );
 
     test('should return SuccessBaseResponse when apiClient succeeds', () async {
-      when(mockApiClient.forgotPassword(any)).thenAnswer((_) async => tResponse);
+      when(
+        mockApiClient.forgotPassword(any),
+      ).thenAnswer((_) async => tResponse);
 
       final result = await dataSource.forgotPassword(tRequest);
 
       verify(mockApiClient.forgotPassword(tRequest));
       expect(result, isA<SuccessBaseResponse<ForgetPasswordResponse>>());
-      expect((result as SuccessBaseResponse<ForgetPasswordResponse>).data, tResponse);
+      expect(
+        (result as SuccessBaseResponse<ForgetPasswordResponse>).data,
+        tResponse,
+      );
     });
 
-    test('should return ErrorBaseResponse when apiClient throws Exception', () async {
-      when(mockApiClient.forgotPassword(any)).thenThrow(Exception('Server Error'));
+    test(
+      'should return ErrorBaseResponse when apiClient throws Exception',
+      () async {
+        when(
+          mockApiClient.forgotPassword(any),
+        ).thenThrow(Exception('Server Error'));
 
-      final result = await dataSource.forgotPassword(tRequest);
+        final result = await dataSource.forgotPassword(tRequest);
 
-      expect(result, isA<ErrorBaseResponse<ForgetPasswordResponse>>());
-    });
+        expect(result, isA<ErrorBaseResponse<ForgetPasswordResponse>>());
+      },
+    );
   });
 
   group('AuthRemoteDataSourceImpl - Verify Reset Code', () {
@@ -97,15 +110,23 @@ void main() {
       message: 'Code verified',
     );
 
-    test('should return SuccessBaseResponse when apiClient verifies reset code', () async {
-      when(mockApiClient.verifyResetCode(any)).thenAnswer((_) async => tResponse);
+    test(
+      'should return SuccessBaseResponse when apiClient verifies reset code',
+      () async {
+        when(
+          mockApiClient.verifyResetCode(any),
+        ).thenAnswer((_) async => tResponse);
 
-      final result = await dataSource.verifyResetCode(tRequest);
+        final result = await dataSource.verifyResetCode(tRequest);
 
-      verify(mockApiClient.verifyResetCode(tRequest));
-      expect(result, isA<SuccessBaseResponse<VerifyResetCodeResponse>>());
-      expect((result as SuccessBaseResponse<VerifyResetCodeResponse>).data, tResponse);
-    });
+        verify(mockApiClient.verifyResetCode(tRequest));
+        expect(result, isA<SuccessBaseResponse<VerifyResetCodeResponse>>());
+        expect(
+          (result as SuccessBaseResponse<VerifyResetCodeResponse>).data,
+          tResponse,
+        );
+      },
+    );
   });
 
   group('AuthRemoteDataSourceImpl - Reset Password', () {
@@ -118,14 +139,22 @@ void main() {
       token: 'token123',
     );
 
-    test('should return SuccessBaseResponse when apiClient resets password', () async {
-      when(mockApiClient.resetPassword(any)).thenAnswer((_) async => tResponse);
+    test(
+      'should return SuccessBaseResponse when apiClient resets password',
+      () async {
+        when(
+          mockApiClient.resetPassword(any),
+        ).thenAnswer((_) async => tResponse);
 
-      final result = await dataSource.resetPassword(tRequest);
+        final result = await dataSource.resetPassword(tRequest);
 
-      verify(mockApiClient.resetPassword(tRequest));
-      expect(result, isA<SuccessBaseResponse<ResetPasswordResponse>>());
-      expect((result as SuccessBaseResponse<ResetPasswordResponse>).data, tResponse);
-    });
+        verify(mockApiClient.resetPassword(tRequest));
+        expect(result, isA<SuccessBaseResponse<ResetPasswordResponse>>());
+        expect(
+          (result as SuccessBaseResponse<ResetPasswordResponse>).data,
+          tResponse,
+        );
+      },
+    );
   });
 }

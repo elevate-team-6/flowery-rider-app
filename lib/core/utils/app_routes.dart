@@ -18,6 +18,8 @@ abstract class AppRoutes {
   static const String applyScreen = 'apply';
   static const String mainLayout = 'mainLayout';
   static const String forgotPassword = '/forgotPassword';
+  static const String verifyResetCode = '/VerifyResetCode';
+  static const String resetPassword = '/resetPassword';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
@@ -32,8 +34,9 @@ abstract class AppRoutes {
           return MaterialPageRoute(
             builder: (BuildContext context) {
               return BlocProvider<LoginCubit>(
-                create: (_) => getIt<LoginCubit>()
-                  ..doIntent(const LoadRememberedEmailEvent()),
+                create: (_) =>
+                    getIt<LoginCubit>()
+                      ..doIntent(const LoadRememberedEmailEvent()),
                 child: const LoginScreen(),
               );
             },

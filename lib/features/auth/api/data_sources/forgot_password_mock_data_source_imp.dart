@@ -11,6 +11,9 @@ import '../../data/models/response/forgot_password_response.dart';
 import '../../data/models/response/reset_password_response.dart';
 import '../../data/models/response/verify_reset_code_response.dart';
 
+import '../../data/models/request/sign_in_request_model.dart';
+import '../../data/models/response/sign_in_response_model.dart';
+
 @Named('mock')
 @Injectable(as: AuthRemoteDataSourceContract)
 class ForgetPasswordMockDataSourceImpl implements AuthRemoteDataSourceContract {
@@ -18,6 +21,15 @@ class ForgetPasswordMockDataSourceImpl implements AuthRemoteDataSourceContract {
   Future<T> _simulate<T>(T response) async {
     await Future.delayed(const Duration(seconds: 1));
     return response;
+  }
+
+  @override
+  Future<BaseResponse<SignInResponseModel>> signIn(SignInRequestModel request) {
+    return _simulate(
+      SuccessBaseResponse(
+        const SignInResponseModel(message: 'success', token: 'mock_token'),
+      ),
+    );
   }
 
   @override

@@ -19,10 +19,7 @@ class AuthRepoImpl implements AuthRepoContract {
   final AuthRemoteDataSourceContract _remoteDataSource;
   final AuthRemoteDataSourceContract? _mockDataSource;
 
-  AuthRepoImpl(
-    this._remoteDataSource, [
-    @Optional() @Named('mock') this._mockDataSource,
-  ]);
+  AuthRepoImpl(this._remoteDataSource, [@Named('mock') this._mockDataSource]);
 
   @override
   Future<BaseResponse<SignInEntity>> signIn(SignInRequestModel request) async {

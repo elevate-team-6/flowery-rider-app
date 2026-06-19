@@ -20,7 +20,9 @@ import 'auth_repo_impl_test.mocks.dart';
 @GenerateMocks([AuthRemoteDataSourceContract])
 void main() {
   provideDummy<BaseResponse<ForgetPasswordResponse>>(SuccessBaseResponse(null));
-  provideDummy<BaseResponse<VerifyResetCodeResponse>>(SuccessBaseResponse(null));
+  provideDummy<BaseResponse<VerifyResetCodeResponse>>(
+    SuccessBaseResponse(null),
+  );
   provideDummy<BaseResponse<ResetPasswordResponse>>(SuccessBaseResponse(null));
   provideDummy<BaseResponse<SignInResponseModel>>(ErrorBaseResponse('dummy'));
 
