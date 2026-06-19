@@ -11,9 +11,8 @@ abstract class AppRoutes {
       GlobalKey<NavigatorState>();
 
   static const String login = 'login';
-  static const String mainLayout = '/';
-  static const String onboarding = '/onboarding';
-  static const String login = '/login';
+  static const String mainLayout = 'mainLayout';
+  static const String onboarding = 'onboarding';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
