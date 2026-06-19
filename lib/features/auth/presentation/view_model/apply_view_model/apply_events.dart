@@ -2,20 +2,18 @@ import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
 
-sealed class ApplyEvents extends Equatable {
-  const ApplyEvents();
+sealed class ApplyEvent extends Equatable {
+  const ApplyEvent();
 
   @override
   List<Object?> get props => [];
 }
 
-/// Load Countries From Local Json
-class GetCountriesEvent extends ApplyEvents {
+final class GetCountriesEvent extends ApplyEvent {
   const GetCountriesEvent();
 }
 
-/// Change Selected Country
-class ChangeCountryEvent extends ApplyEvents {
+final class ChangeCountryEvent extends ApplyEvent {
   final CountryEntity country;
 
   const ChangeCountryEvent(this.country);
@@ -24,8 +22,7 @@ class ChangeCountryEvent extends ApplyEvents {
   List<Object?> get props => [country];
 }
 
-/// Change Selected Vehicle Type
-class ChangeVehicleTypeEvent extends ApplyEvents {
+final class ChangeVehicleTypeEvent extends ApplyEvent {
   final String vehicleType;
 
   const ChangeVehicleTypeEvent(this.vehicleType);
@@ -34,8 +31,7 @@ class ChangeVehicleTypeEvent extends ApplyEvents {
   List<Object?> get props => [vehicleType];
 }
 
-/// Change Selected Gender
-class ChangeGenderEvent extends ApplyEvents {
+final class ChangeGenderEvent extends ApplyEvent {
   final String gender;
 
   const ChangeGenderEvent(this.gender);
@@ -44,8 +40,23 @@ class ChangeGenderEvent extends ApplyEvents {
   List<Object?> get props => [gender];
 }
 
-/// Submit Apply Request
-class ApplyDriverEvent extends ApplyEvents {
+final class PickNationalIdImageEvent extends ApplyEvent {
+  const PickNationalIdImageEvent();
+}
+
+final class PickDrivingLicenseImageEvent extends ApplyEvent {
+  const PickDrivingLicenseImageEvent();
+}
+
+final class RemoveNationalIdImageEvent extends ApplyEvent {
+  const RemoveNationalIdImageEvent();
+}
+
+final class RemoveDrivingLicenseImageEvent extends ApplyEvent {
+  const RemoveDrivingLicenseImageEvent();
+}
+
+final class ApplyDriverEvent extends ApplyEvent {
   final SignUpRequest request;
 
   const ApplyDriverEvent(this.request);

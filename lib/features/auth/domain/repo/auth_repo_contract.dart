@@ -5,6 +5,5 @@ import 'package:flowery_rider_app/features/auth/domain/entites/driver_entity.dar
 
 abstract interface class AuthRepoContract {
   Future<BaseResponse<DriverEntity>> signup(SignUpRequest request);
-    Future<List<CountryEntity>> getCountries();
-
+  Future<List<CountryEntity>> getCountries();
 }

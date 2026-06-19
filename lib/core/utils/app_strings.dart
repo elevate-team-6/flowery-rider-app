@@ -9,7 +9,7 @@ abstract class AppStrings {
   static const String signupWithSpace = 'signupWithSpace';
   static const String password = 'password';
   static const String email = 'email';
-  static const String continueText = 'continueText';
+  static const String continueText = 'continue';
   static const String confirmPassword = 'confirmPassword';
 
   // Login Screen
@@ -29,8 +29,13 @@ abstract class AppStrings {
   static const String vehicleNumberRequired = 'Vehicle Number Required';
   static const String apply = 'Apply';
   static const String country = 'Country';
+  static const String uploadImageRequired = 'Please upload required images';
   static const String welcome = 'Welcome!!';
-  static const String applyDescription = 'You want to be a delivery man?\nJoin our team ';
+  static const String applyDescription =
+      'You want to be a delivery man?\nJoin our team ';
+  static const String submitSuccess = 'Your application has been\n submitted!';
+  static const String submitDescription =
+      'Thank you for providing your application,\n we will review your application and will\n get back to you soon.';
   static const String enterYourUserName = 'enterYourUserName';
   static const String firstName = 'First legal name';
   static const String enterFirstName = 'Enter first legal name';

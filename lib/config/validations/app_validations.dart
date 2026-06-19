@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 
@@ -33,10 +35,18 @@ static String? validateNationalId(String? value) {
 }
 
 // Dropdown
-static String? validateDropdown(String? value, String fieldName) {
-  if (value == null || value.isEmpty) {
+static String? validateDropdown<T>(
+  T? value,
+  String fieldName,
+) {
+  if (value == null) {
     return '$fieldName ${AppStrings.isRequired.tr()}';
   }
+
+  if (value is String && value.trim().isEmpty) {
+    return '$fieldName ${AppStrings.isRequired.tr()}';
+  }
+
   return null;
 }
   // ── Name ──
@@ -52,7 +62,19 @@ static String? validateDropdown(String? value, String fieldName) {
     }
     return null;
   }
+  static String? nationalIdImage(File? image) {
+    if (image == null) {
+      return 'Please upload your national ID';
+    }
+    return null;
+  }
 
+  static String? drivingLicenseImage(File? image) {
+    if (image == null) {
+      return 'Please upload your driving license';
+    }
+    return null;
+  }
   static String? validateFirstName(String? value) {
     if (value == null || value.trim().isEmpty) {
       return AppStrings.firstNameRequired.tr();

@@ -13,8 +13,8 @@ import 'package:injectable/injectable.dart';
 @Injectable(as: AuthRepoContract)
 class AuthRepoImpl implements AuthRepoContract {
   final AuthRemoteDataSourceContract _remoteDataSource;
-    final AuthLocalDataSourceContract localDataSource;
-  const AuthRepoImpl(this._remoteDataSource,this.localDataSource);
+  final AuthLocalDataSourceContract localDataSource;
+  const AuthRepoImpl(this._remoteDataSource, this.localDataSource);
 
   @override
   Future<BaseResponse<DriverEntity>> signup(SignUpRequest request) async {
@@ -30,9 +30,7 @@ class AuthRepoImpl implements AuthRepoContract {
     }
   }
 
-@override
-Future<List<CountryEntity>> getCountries() async =>
-    (await localDataSource.getCountries())
-        .map((e) => e.toDomain())
-        .toList();
+  @override
+  Future<List<CountryEntity>> getCountries() async =>
+      (await localDataSource.getCountries()).map((e) => e.toDomain()).toList();
 }

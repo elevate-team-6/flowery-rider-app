@@ -5,9 +5,9 @@ import 'package:flowery_rider_app/features/auth/domain/repo/auth_repo_contract.d
 import 'package:injectable/injectable.dart';
 
 @injectable
-class SignupUseCase {
+class ApplyUseCase {
   final AuthRepoContract _authRepo;
-  const SignupUseCase(this._authRepo);
+  const ApplyUseCase(this._authRepo);
   Future<BaseResponse<DriverEntity>> call(SignUpRequest request) {
     return _authRepo.signup(request);
   }

@@ -1,6 +1,5 @@
 import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flowery_rider_app/features/auth/presentation/screens/apply_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -56,7 +55,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Flowery Rider App',
           theme: AppTheme.mainTheme,
-          home: ApplyPage(),
+          initialRoute: isLoggedIn ? AppRoutes.apply : AppRoutes.apply,
           navigatorKey: AppRoutes.navigatorKey,
           onGenerateRoute: AppRoutes.onGenerateRoute,
           builder: BotToastInit(),

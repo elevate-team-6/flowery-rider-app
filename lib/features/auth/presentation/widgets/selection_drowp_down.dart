@@ -22,16 +22,18 @@ class AppDropdownField<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField<T>(
-      value: value,
+      initialValue: value,
       isExpanded: true,
-      decoration: InputDecoration(
-        labelText: label,
-      ),
+      decoration: InputDecoration(labelText: label),
       hint: Text(hint),
       items: items,
       onChanged: onChanged,
       validator: validator,
-      icon: Icon(Icons.keyboard_arrow_down_outlined,size: 30,color: AppColors.black30,),
+      icon: Icon(
+        Icons.keyboard_arrow_down_outlined,
+        size: 30,
+        color: AppColors.black30,
+      ),
     );
   }
 }
