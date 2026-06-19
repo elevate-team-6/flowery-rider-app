@@ -3,8 +3,9 @@ import 'package:flowery_rider_app/core/utils/app_colors.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/home_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/orders_screen.dart';
-import 'package:flowery_rider_app/features/profile/presentation/profile_screen.dart';
 import 'package:flutter/material.dart';
+
+import '../../profile/presentation/screens/profile_screen.dart';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});

@@ -67,5 +67,9 @@
     "unexpectedErrorTryAgain": "Unexpected error. Please try again",
     "userAlreadyExists": "User already exists",
     "invalidGender": "Invalid gender",
-    "invalidPhoneFormat": "Invalid phone number format"
+    "invalidPhoneFormat": "Invalid phone number format",
+    "cancel": "Cancel",
+    "logout": "Logout",
+    "logoutSuccess": "Logout successfully",
+    "confirmLogout": "Confirm Logout"
 }

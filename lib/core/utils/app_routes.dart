@@ -13,6 +13,7 @@ abstract class AppRoutes {
   static const String login = 'login';
   static const String mainLayout = '/';
   static const String onboarding = '/onboarding';
+  static const String login = '/login';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
