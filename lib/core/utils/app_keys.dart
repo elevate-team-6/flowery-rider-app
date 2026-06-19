@@ -1,6 +1,7 @@
 abstract class AppKeys {
   static const String tokenKey = 'token';
   static const String userIdKey = 'userId';
+  static const String emailKey = 'email';
   static const String rememberMeKey = 'remember_me';
   static const String index = 'index';
   static const String authorizationKey = 'Authorization';
