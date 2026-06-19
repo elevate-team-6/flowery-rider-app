@@ -231,13 +231,7 @@ void main() {
 
       // The button stays disabled until both fields are valid, so the empty
       // form can never trigger a sign-in.
-<<<<<<< HEAD
       final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
-=======
-      final button = tester.widget<ElevatedButton>(
-        find.byType(ElevatedButton),
-      );
->>>>>>> f057837edb92fc8ae6725c5c9b9bc41656768ff1
       expect(button.onPressed, isNull);
 
       await tester.tap(find.text(AppStrings.continueText.tr()));
