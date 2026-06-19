@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
-import 'package:flowery_rider_app/config/validations/app_validations.dart';
 import 'package:flowery_rider_app/config/base_ui_handler/ui_event_handler_mixin.dart';
+import 'package:flowery_rider_app/config/validations/app_validations.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
@@ -12,6 +12,8 @@ import 'package:flowery_rider_app/features/auth/presentation/widgets/login_form.
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../../core/utils/app_routes.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -77,7 +79,7 @@ class _LoginScreenState extends State<LoginScreen> with UiEventHandler {
                   emailController: _emailController,
                   passwordController: _passwordController,
                   onForgetPasswordTap: () {
-                    // TODO: navigate to forget password screen.
+                    Navigator.pushNamed(context, AppRoutes.forgetPassword);
                   },
                 ),
                 SizedBox(height: 32.h),

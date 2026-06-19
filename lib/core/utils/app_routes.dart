@@ -1,12 +1,13 @@
 import 'package:flowery_rider_app/config/di/di.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/forget_password_screen.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/onboarding_screen.dart';
+import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '../../features/auth/presentation/screens/login_screen.dart';
-import '../../features/auth/presentation/screens/onboarding_screen.dart';
 
 abstract class AppRoutes {
   static final GlobalKey<NavigatorState> navigatorKey =
@@ -16,6 +17,9 @@ abstract class AppRoutes {
   static const String login = 'login';
   static const String applyScreen = 'apply';
   static const String mainLayout = 'mainLayout';
+  static const String forgetPassword = '/forgotPassword';
+  static const String verifyResetCode = '/VerifyResetCode';
+  static const String resetPassword = '/resetPassword';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
@@ -36,11 +40,21 @@ abstract class AppRoutes {
                 child: const LoginScreen(),
               );
             },
+            settings: settings,
           );
 
         case mainLayout:
           return MaterialPageRoute(
             builder: (_) => const MainLayout(),
+            settings: settings,
+          );
+
+        case forgetPassword:
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (context) => getIt<ForgetPasswordCubit>(),
+              child: const ForgotPasswordScreen(),
+            ),
             settings: settings,
           );
 
