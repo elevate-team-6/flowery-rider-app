@@ -17,6 +17,7 @@ class ProfileRepoImpl implements ProfileRepoContract {
   Future<BaseResponse<void>> logout() async {
     final result = await _remoteDataSource.logout();
     await _secureCacheHelper.deleteData(key: AppKeys.tokenKey);
+    await _secureCacheHelper.deleteData(key: AppKeys.onboardingKey);
     return result;
   }
 }

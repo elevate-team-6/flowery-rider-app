@@ -23,6 +23,7 @@ Future<void> main() async {
   await getIt<HiveHelper>().init();
 
   final isLoggedIn = await AuthService.isLoggedIn();
+  final isOnboardingCompleted = await AuthService.isOnboardingCompleted();
   runApp(
     EasyLocalization(
       supportedLocales: const [
@@ -31,15 +32,23 @@ Future<void> main() async {
       ],
       path: AppConstants.translationsPath,
       fallbackLocale: const Locale('en'),
-      child: MyApp(isLoggedIn: isLoggedIn),
+      child: MyApp(
+        isLoggedIn: isLoggedIn,
+        isOnboardingCompleted: isOnboardingCompleted,
+      ),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
   final bool isLoggedIn;
+  final bool isOnboardingCompleted;
 
-  const MyApp({super.key, this.isLoggedIn = true});
+  const MyApp({
+    super.key,
+    this.isLoggedIn = true,
+    this.isOnboardingCompleted = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +65,11 @@ class MyApp extends StatelessWidget {
           title: 'Flowery Rider App',
           theme: AppTheme.mainTheme,
           navigatorKey: AppRoutes.navigatorKey,
-          initialRoute: isLoggedIn ? AppRoutes.mainLayout : AppRoutes.login,
+          initialRoute: isLoggedIn
+              ? AppRoutes.mainLayout
+              : (isOnboardingCompleted
+                    ? AppRoutes.login
+                    : AppRoutes.onboarding),
           onGenerateRoute: AppRoutes.onGenerateRoute,
           builder: BotToastInit(),
           navigatorObservers: [BotToastNavigatorObserver()],
