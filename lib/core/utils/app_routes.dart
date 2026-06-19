@@ -17,7 +17,7 @@ abstract class AppRoutes {
   static const String login = 'login';
   static const String applyScreen = 'apply';
   static const String mainLayout = 'mainLayout';
-  static const String forgotPassword = '/forgotPassword';
+  static const String forgetPassword = '/forgotPassword';
   static const String verifyResetCode = '/VerifyResetCode';
   static const String resetPassword = '/resetPassword';
 
@@ -49,7 +49,7 @@ abstract class AppRoutes {
             settings: settings,
           );
 
-        case forgotPassword:
+        case forgetPassword:
           return MaterialPageRoute(
             builder: (_) => BlocProvider(
               create: (context) => getIt<ForgetPasswordCubit>(),
