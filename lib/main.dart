@@ -57,6 +57,7 @@ class MyApp extends StatelessWidget {
           theme: AppTheme.mainTheme,
           navigatorKey: AppRoutes.navigatorKey,
           onGenerateRoute: AppRoutes.onGenerateRoute,
+          initialRoute: AppRoutes.forgotPassword,
           builder: BotToastInit(),
           navigatorObservers: [BotToastNavigatorObserver()],
         );

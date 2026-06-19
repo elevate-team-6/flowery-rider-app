@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_ui_handler/ui_event_handler_mixin.dart';
-import 'package:flowery_rider_app/core/widgets/custom_text_field.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/widgets/email_step_widget.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/widgets/otp_step_widget.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/widgets/reset_password_step_widget.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_cubit.dart';
-import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../../config/base_ui_event/base_ui_event.dart';
-import '../../../../config/validations/app_validations.dart';
+import '../../../../core/utils/app_routes.dart';
 import '../../../../core/utils/app_strings.dart';
-import '../../../../core/utils/app_text_styles.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -22,9 +22,9 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     with UiEventHandler {
-  final emailController = TextEditingController();
-  final emailFormKey = GlobalKey<FormState>();
+  final PageController _pageController = PageController();
   StreamSubscription<BaseUiEvent>? _uiEventSubscription;
+  String _email = '';
 
   @override
   void initState() {
@@ -32,13 +32,33 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     _uiEventSubscription = context
         .read<ForgetPasswordCubit>()
         .eventStream
-        .listen(handleUiEvent);
+        .listen(_handleLocalUiEvent);
+  }
+
+  void _handleLocalUiEvent(BaseUiEvent event) {
+    if (event is NavigateEvent) {
+      if (event.routeName == AppRoutes.verifyResetCode) {
+        _email = event.arguments as String;
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+        return;
+      } else if (event.routeName == AppRoutes.resetPassword) {
+        _pageController.nextPage(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+        return;
+      }
+    }
+    handleUiEvent(event);
   }
 
   @override
   void dispose() {
     _uiEventSubscription?.cancel();
-    emailController.dispose();
+    _pageController.dispose();
     super.dispose();
   }
 
@@ -47,61 +67,28 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () {
+            if (_pageController.page == 0) {
+              Navigator.pop(context);
+            } else {
+              _pageController.previousPage(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOut,
+              );
+            }
+          },
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
         title: Text(AppStrings.password.tr()),
       ),
-      body: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            SizedBox(height: 24),
-            Text(
-              AppStrings.forgetPasswordTitle.tr(),
-              style: AppTextStyles.black18500,
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 8),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 44),
-              child: Text(
-                AppStrings.forgetPasswordSubtitle.tr(),
-                style: AppTextStyles.black14400,
-                textAlign: TextAlign.center,
-              ),
-            ),
-            SizedBox(height: 32),
-            Form(
-              key: emailFormKey,
-              child: Column(
-                children: [
-                  CustomTextField(
-                    controller: emailController,
-                    labelText: AppStrings.email.tr(),
-                    hintText: AppStrings.enterYourEmail.tr(),
-                    keyboardType: TextInputType.emailAddress,
-                    textInputAction: TextInputAction.done,
-                    validator: (value) => AppValidations.validateEmail(value),
-                  ),
-                  SizedBox(height: 50),
-                  ElevatedButton(
-                    onPressed: () {
-                      if (emailFormKey.currentState!.validate()) {
-                        context.read<ForgetPasswordCubit>().doEvent(
-                          ForgetPasswordEvent(
-                            email: emailController.text.trim(),
-                          ),
-                        );
-                      }
-                    },
-                    child: Text(AppStrings.confirm.tr()),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
+      body: PageView(
+        controller: _pageController,
+        physics: const NeverScrollableScrollPhysics(),
+        children: [
+          const EmailStepWidget(),
+          OtpStepWidget(email: _email),
+          ResetPasswordStepWidget(email: _email),
+        ],
       ),
     );
   }

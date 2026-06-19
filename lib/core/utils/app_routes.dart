@@ -1,7 +1,5 @@
 import 'package:flowery_rider_app/config/di/di.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/forget_password_screen.dart';
-import 'package:flowery_rider_app/features/auth/presentation/screens/reset_password_screen.dart';
-import 'package:flowery_rider_app/features/auth/presentation/screens/verify_reset_code_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_cubit.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
 import 'package:flutter/material.dart';
@@ -18,8 +16,6 @@ abstract class AppRoutes {
   static const String verifyResetCode = '/VerifyResetCode';
   static const String resetPassword = '/resetPassword';
 
-  static ForgetPasswordCubit? _forgetPasswordCubit;
-
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
       switch (settings.name) {
@@ -30,29 +26,10 @@ abstract class AppRoutes {
           );
 
         case forgotPassword:
-          _forgetPasswordCubit = getIt<ForgetPasswordCubit>();
           return MaterialPageRoute(
-            builder: (_) => BlocProvider.value(
-              value: _forgetPasswordCubit!,
+            builder: (_) => BlocProvider(
+              create: (context) => getIt<ForgetPasswordCubit>(),
               child: const ForgotPasswordScreen(),
-            ),
-            settings: settings,
-          );
-
-        case verifyResetCode:
-          return MaterialPageRoute(
-            builder: (_) => BlocProvider.value(
-              value: _forgetPasswordCubit!,
-              child: VerifyResetCodeScreen(email: settings.arguments as String),
-            ),
-            settings: settings,
-          );
-
-        case resetPassword:
-          return MaterialPageRoute(
-            builder: (_) => BlocProvider.value(
-              value: _forgetPasswordCubit!,
-              child: ResetPasswordScreen(email: settings.arguments as String),
             ),
             settings: settings,
           );
