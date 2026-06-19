@@ -15,8 +15,13 @@ class VerifyResetCodeResponse extends Equatable {
     );
   }
 
-  ForgetPasswordEntity toEntity() =>
-      ForgetPasswordEntity(status: status, message: message);
+  ForgetPasswordEntity toEntity() => ForgetPasswordEntity(
+    status: status ?? '',
+    message: message ?? '',
+    info: '',
+    statusMsg: '',
+    token: '',
+  );
 
   @override
   List<Object?> get props => [status, message];

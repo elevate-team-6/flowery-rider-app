@@ -15,8 +15,13 @@ class ResetPasswordResponse extends Equatable {
     );
   }
 
-  ForgetPasswordEntity toEntity() =>
-      ForgetPasswordEntity(message: message, token: token);
+  ForgetPasswordEntity toEntity() => ForgetPasswordEntity(
+    message: message ?? '',
+    token: token ?? '',
+    info: '',
+    statusMsg: '',
+    status: '',
+  );
 
   @override
   List<Object?> get props => [message, token];
