@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/validations/app_validations.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_type_model.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
 import 'package:flowery_rider_app/features/auth/presentation/widgets/selection_drowp_down.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +21,6 @@ class ApplyForm extends StatelessWidget {
     required this.nidController,
     required this.passwordController,
     required this.confirmPasswordController,
-    required this.nationalIdController,
-    required this.drivingLicenseController,
     required this.nationalIdImage,
     required this.drivingLicenseImage,
     required this.onPickNationalIdImage,
@@ -41,9 +40,6 @@ class ApplyForm extends StatelessWidget {
 
   final GlobalKey<FormState> formKey;
 
-  final TextEditingController nationalIdController;
-  final TextEditingController drivingLicenseController;
-
   final TextEditingController firstNameController;
   final TextEditingController lastNameController;
   final TextEditingController vehicleNumberController;
@@ -57,15 +53,15 @@ class ApplyForm extends StatelessWidget {
   final CountryEntity? selectedCountry;
   final ValueChanged<CountryEntity?> onCountryChanged;
 
-  final String? selectedVehicleType;
-  final ValueChanged<String?> onVehicleTypeChanged;
+  final VehicleType? selectedVehicleType;
+  final ValueChanged<VehicleType?> onVehicleTypeChanged;
 
-  static const List<String> vehicleTypes = [
-    'Bike',
-    'Motorcycle',
-    'Car',
-    'Van',
-    'Truck',
+  static const List<VehicleType> vehicleTypes = [
+    VehicleType(id: '6856f4a1c8e2ab1234567890', name: 'Bike'),
+    VehicleType(id: '6856f4a1c8e2ab1234567891', name: 'Motorcycle'),
+    VehicleType(id: '6856f4a1c8e2ab1234567892', name: 'Car'),
+    VehicleType(id: '6856f4a1c8e2ab1234567893', name: 'Van'),
+    VehicleType(id: '6856f4a1c8e2ab1234567894', name: 'Truck'),
   ];
 
   @override
@@ -74,7 +70,6 @@ class ApplyForm extends StatelessWidget {
       key: formKey,
       child: Column(
         children: [
-          /// Country
           AppDropdownField<CountryEntity>(
             label: AppStrings.country,
             hint: AppStrings.country,
@@ -126,8 +121,7 @@ class ApplyForm extends StatelessWidget {
 
           SizedBox(height: 16.h),
 
-          /// Vehicle Type
-          AppDropdownField<String>(
+          AppDropdownField<VehicleType>(
             label: AppStrings.vehicleType.tr(),
             hint: AppStrings.vehicleType.tr(),
 
@@ -135,8 +129,10 @@ class ApplyForm extends StatelessWidget {
 
             items: vehicleTypes
                 .map(
-                  (type) =>
-                      DropdownMenuItem<String>(value: type, child: Text(type)),
+                  (vehicle) => DropdownMenuItem<VehicleType>(
+                    value: vehicle,
+                    child: Text(vehicle.name),
+                  ),
                 )
                 .toList(),
 
@@ -164,14 +160,15 @@ class ApplyForm extends StatelessWidget {
           SizedBox(height: 16.h),
 
           TextFormField(
-            controller: drivingLicenseController,
             readOnly: true,
             onTap: onPickDrivingLicenseImage,
             validator: (_) =>
                 AppValidations.drivingLicenseImage(drivingLicenseImage),
             decoration: InputDecoration(
               labelText: AppStrings.vehicleLicense.tr(),
-              hintText: AppStrings.uploadVehicleLicense.tr(),
+              hintText: drivingLicenseImage == null
+                  ? AppStrings.uploadVehicleLicense.tr()
+                  : drivingLicenseImage!.path.split('/').last,
               suffixIcon: const Icon(Icons.cloud_upload_outlined),
             ),
           ),
@@ -221,17 +218,17 @@ class ApplyForm extends StatelessWidget {
           SizedBox(height: 16.h),
 
           TextFormField(
-            controller: nationalIdController,
             readOnly: true,
             onTap: onPickNationalIdImage,
             validator: (_) => AppValidations.nationalIdImage(nationalIdImage),
             decoration: InputDecoration(
               labelText: AppStrings.idImage.tr(),
-              hintText: AppStrings.uploadIdImage.tr(),
+              hintText: nationalIdImage == null
+                  ? AppStrings.uploadIdImage.tr()
+                  : nationalIdImage!.path.split('/').last,
               suffixIcon: const Icon(Icons.cloud_upload_outlined),
             ),
           ),
-
           SizedBox(height: 16.h),
 
           Row(

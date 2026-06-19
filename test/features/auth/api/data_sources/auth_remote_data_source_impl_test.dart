@@ -1,3 +1,4 @@
+import 'package:flowery_rider_app/config/services/multi_part_service.dart';
 import 'package:flowery_rider_app/features/auth/api/api_client/auth_api_client.dart';
 import 'package:flowery_rider_app/features/auth/api/data_sources/auth_remote_data_source_impl.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -9,34 +10,29 @@ import 'package:mockito/mockito.dart';
 
 import 'auth_remote_data_source_impl_test.mocks.dart';
 
-@GenerateMocks([AuthApiClient])
+@GenerateMocks([AuthApiClient, MultipartService])
 void main() {
   late MockAuthApiClient mockApiClient;
+  late MockMultipartService mockMultipartService;
   late AuthRemoteDataSourceImpl dataSource;
 
   setUp(() {
     mockApiClient = MockAuthApiClient();
-    dataSource = AuthRemoteDataSourceImpl(mockApiClient);
+    mockMultipartService = MockMultipartService();
+    dataSource = AuthRemoteDataSourceImpl(mockApiClient, mockMultipartService);
   });
 
   test('should call signup api and return success response', () async {
-    final request = SignUpRequest(
-      email: 'test@test.com',
-      password: '123456',
-    );
+    final request = SignUpRequest(email: 'test@test.com', password: '123456');
 
     final response = SignUpResponse();
 
-    when(
-      mockApiClient.signup(any),
-    ).thenAnswer((_) async => response);
+    when(mockApiClient.signup(any)).thenAnswer((_) async => response);
 
     final result = await dataSource.signup(request);
 
     expect(result, isA<SuccessBaseResponse<SignUpResponse>>());
 
-    verify(
-      mockApiClient.signup(any),
-    ).called(1);
+    verify(mockApiClient.signup(any)).called(1);
   });
 }

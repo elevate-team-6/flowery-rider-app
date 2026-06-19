@@ -57,7 +57,7 @@ class DriverModel {
     );
   }
 
-  DriverEntity toDomain() => DriverEntity(
+  DriverEntity toEntity() => DriverEntity(
     country: country ?? '',
     firstName: firstName ?? '',
     lastName: lastName ?? '',

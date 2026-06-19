@@ -21,10 +21,12 @@ class AuthRepoImpl implements AuthRepoContract {
     final response = await _remoteDataSource.signup(request);
     switch (response) {
       case SuccessBaseResponse<SignUpResponse>():
-        if (response.data!.driver == null) {
-          return ErrorBaseResponse(AppStrings.signupFailedUserIsNull.tr());
-        }
-        return SuccessBaseResponse(response.data!.driver!.toDomain());
+  if (response.data == null || response.data!.driver == null) {
+    return ErrorBaseResponse(
+      AppStrings.signupFailedUserIsNull.tr(),
+    );
+  }
+        return SuccessBaseResponse(response.data!.driver!.toEntity());
       case ErrorBaseResponse<SignUpResponse>():
         return ErrorBaseResponse(response.errorMessage.tr());
     }
@@ -32,5 +34,5 @@ class AuthRepoImpl implements AuthRepoContract {
 
   @override
   Future<List<CountryEntity>> getCountries() async =>
-      (await localDataSource.getCountries()).map((e) => e.toDomain()).toList();
+      (await localDataSource.getCountries()).map((e) => e.toEntity()).toList();
 }

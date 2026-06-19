@@ -1,6 +1,6 @@
 import 'package:flowery_rider_app/config/di/di.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/apply_page.dart';
-import 'package:flowery_rider_app/features/auth/presentation/screens/submit_screen.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/success_apply_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/apply_view_model/apply_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -22,7 +22,7 @@ abstract class AppRoutes {
           ),
         );
       case submit:
-        return MaterialPageRoute(builder: (_) => const SubmitScreen());
+        return MaterialPageRoute(builder: (_) => const SuccessApplyScreen());
 
       default:
         return _unDefinedRoute(settings.name);

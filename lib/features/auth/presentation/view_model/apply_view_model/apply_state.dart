@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_type_model.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/driver_entity.dart';
 
@@ -10,7 +11,7 @@ class ApplyState extends Equatable {
   final BaseState<DriverEntity> applyState;
 
   final CountryEntity? selectedCountry;
-  final String? selectedVehicleType;
+  final VehicleType? selectedVehicleType;
   final String? selectedGender;
 
   final File? nationalIdImage;
@@ -30,7 +31,7 @@ class ApplyState extends Equatable {
     BaseState<List<CountryEntity>>? countriesState,
     BaseState<DriverEntity>? applyState,
     CountryEntity? selectedCountry,
-    String? selectedVehicleType,
+    VehicleType? selectedVehicleType,
     String? selectedGender,
     File? nationalIdImage,
     File? drivingLicenseImage,

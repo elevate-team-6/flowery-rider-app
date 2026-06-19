@@ -1,21 +1,38 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImagePickerHelper {
-  static Future<File?> pickFromGallery() async {
-    final image = await ImagePicker().pickImage(
-      source: ImageSource.gallery,
-    );
+  static final ImagePicker _picker = ImagePicker();
 
-    return image != null ? File(image.path) : null;
+  static Future<File?> pickFromGallery() async {
+    try {
+      final image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 70,
+        maxWidth: 1280,
+      );
+
+      return image != null ? File(image.path) : null;
+    } on PlatformException catch (e) {
+      throw Exception(e.message ?? AppStrings.failedPickImageGallery.tr());
+    }
   }
 
   static Future<File?> pickFromCamera() async {
-    final image = await ImagePicker().pickImage(
-      source: ImageSource.camera,
-    );
+    try {
+      final image = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 70,
+        maxWidth: 1280,
+      );
 
-    return image != null ? File(image.path) : null;
+      return image != null ? File(image.path) : null;
+    } on PlatformException catch (e) {
+      throw Exception(e.message ?? AppStrings.failedCaptureImage.tr());
+    }
   }
 }

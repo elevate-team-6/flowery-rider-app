@@ -28,8 +28,6 @@ class _ApplyPageState extends State<ApplyPage> {
   final formKey = GlobalKey<FormState>();
 
   final firstNameController = TextEditingController();
-  final nationalIdController = TextEditingController();
-  final drivingLicenseController = TextEditingController();
   final lastNameController = TextEditingController();
   final vehicleNumberController = TextEditingController();
   final emailController = TextEditingController();
@@ -63,8 +61,6 @@ class _ApplyPageState extends State<ApplyPage> {
   void dispose() {
     _eventSubscription?.cancel();
     firstNameController.dispose();
-    nationalIdController.dispose();
-    drivingLicenseController.dispose();
     lastNameController.dispose();
     vehicleNumberController.dispose();
     emailController.dispose();
@@ -95,15 +91,8 @@ class _ApplyPageState extends State<ApplyPage> {
                 style: AppTextStyles.gray16400,
               ),
               SizedBox(height: 32.h),
-
               BlocBuilder<ApplyCubit, ApplyState>(
                 builder: (context, state) {
-                  nationalIdController.text =
-                      state.nationalIdImage?.path.split('/').last ?? '';
-
-                  drivingLicenseController.text =
-                      state.drivingLicenseImage?.path.split('/').last ?? '';
-
                   return ApplyForm(
                     formKey: formKey,
                     nationalIdImage: state.nationalIdImage,
@@ -143,8 +132,6 @@ class _ApplyPageState extends State<ApplyPage> {
                     nidController: nidController,
                     passwordController: passwordController,
                     confirmPasswordController: confirmPasswordController,
-                    nationalIdController: nationalIdController,
-                    drivingLicenseController: drivingLicenseController,
                   );
                 },
               ),
@@ -183,21 +170,13 @@ class _ApplyPageState extends State<ApplyPage> {
                               return;
                             }
 
-                            if (state.nationalIdImage == null ||
-                                state.drivingLicenseImage == null) {
-                              CustomSnackBar.showErrorMessage(
-                                AppStrings.uploadImageRequired.tr(),
-                              );
-                              return;
-                            }
-
                             context.read<ApplyCubit>().doIntent(
                               ApplyDriverEvent(
                                 SignUpRequest(
                                   country: state.selectedCountry?.name,
                                   firstName: firstNameController.text,
                                   lastName: lastNameController.text,
-                                  vehicleType: '6856f4a1c8e2ab1234567890',
+                                  vehicleType: state.selectedVehicleType?.id,
                                   vehicleNumber: vehicleNumberController.text,
                                   nid: nidController.text,
                                   email: emailController.text,
@@ -217,7 +196,7 @@ class _ApplyPageState extends State<ApplyPage> {
                           },
                     child: state.applyState.isLoading
                         ? const CircularProgressIndicator()
-                        : Text(AppStrings.continueText),
+                        : Text(AppStrings.continueText.tr()),
                   );
                 },
               ),

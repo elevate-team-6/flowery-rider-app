@@ -64,14 +64,14 @@ static String? validateDropdown<T>(
   }
   static String? nationalIdImage(File? image) {
     if (image == null) {
-      return 'Please upload your national ID';
+      return AppStrings.pleaseUploadNationalId.tr();
     }
     return null;
   }
 
   static String? drivingLicenseImage(File? image) {
     if (image == null) {
-      return 'Please upload your driving license';
+      return AppStrings.pleaseUploadDrivingLicense.tr();
     }
     return null;
   }

@@ -55,12 +55,15 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
 
   Future<void> _getCountries() async {
     emit(state.copyWith(countriesState: const BaseState(isLoading: true)));
-    final countries = await getCountriesUseCase();
     try {
+      final countries = await getCountriesUseCase();
+
       emit(state.copyWith(countriesState: BaseState(data: countries)));
     } catch (e) {
       emit(
-        state.copyWith(countriesState: BaseState(errorMessage: e.toString().tr())),
+        state.copyWith(
+          countriesState: BaseState(errorMessage: e.toString().tr()),
+        ),
       );
 
       emitEvent(DisplayErrorEvent(e.toString().tr()));
@@ -68,19 +71,27 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
   }
 
   Future<void> _pickNationalIdImage() async {
-    final image = await ImagePickerHelper.pickFromGallery();
+    try {
+      final image = await ImagePickerHelper.pickFromGallery();
 
-    if (image == null) return;
+      if (image == null) return;
 
-    emit(state.copyWith(nationalIdImage: image));
+      emit(state.copyWith(nationalIdImage: image));
+    } catch (e) {
+      emitEvent(DisplayErrorEvent(e.toString()));
+    }
   }
 
   Future<void> _pickDrivingLicenseImage() async {
-    final image = await ImagePickerHelper.pickFromGallery();
+    try {
+      final image = await ImagePickerHelper.pickFromGallery();
 
-    if (image == null) return;
+      if (image == null) return;
 
-    emit(state.copyWith(drivingLicenseImage: image));
+      emit(state.copyWith(drivingLicenseImage: image));
+    } catch (e) {
+      emitEvent(DisplayErrorEvent(e.toString()));
+    }
   }
 
   Future<void> _apply(SignUpRequest request) async {

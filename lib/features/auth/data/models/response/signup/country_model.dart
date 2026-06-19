@@ -29,7 +29,7 @@ class CountryModel {
     );
   }
 
-  CountryEntity toDomain() {
+  CountryEntity toEntity() {
     return CountryEntity(
       isoCode: isoCode,
       name: name,

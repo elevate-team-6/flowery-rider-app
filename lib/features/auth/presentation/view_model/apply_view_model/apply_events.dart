@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_type_model.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
 
 sealed class ApplyEvent extends Equatable {
@@ -23,7 +24,7 @@ final class ChangeCountryEvent extends ApplyEvent {
 }
 
 final class ChangeVehicleTypeEvent extends ApplyEvent {
-  final String vehicleType;
+  final VehicleType vehicleType;
 
   const ChangeVehicleTypeEvent(this.vehicleType);
 
