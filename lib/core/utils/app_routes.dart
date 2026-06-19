@@ -1,10 +1,12 @@
 import 'package:flowery_rider_app/config/di/di.dart';
-import 'package:flowery_rider_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../features/auth/presentation/screens/login_screen.dart';
+import '../../features/auth/presentation/screens/onboarding_screen.dart';
 
 abstract class AppRoutes {
   static final GlobalKey<NavigatorState> navigatorKey =
@@ -18,6 +20,12 @@ abstract class AppRoutes {
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
       switch (settings.name) {
+        case onboarding:
+          return MaterialPageRoute(
+            builder: (_) => const OnboardingScreen(),
+            settings: settings,
+          );
+
         case login:
           return MaterialPageRoute(
             builder: (BuildContext context) {
