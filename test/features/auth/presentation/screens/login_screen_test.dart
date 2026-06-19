@@ -74,6 +74,14 @@ void main() {
   setUp(() {
     mockUseCase = MockSignInUseCase();
     mockCache = MockSecureCacheHelper();
+
+    // LoginScreen.initState dispatches LoadRememberedEmailEvent, which reads
+    // the remembered-session keys. Default to "nothing cached" so the cubit
+    // short-circuits; individual tests can override as needed.
+    when(
+      mockCache.readData(key: anyNamed('key')),
+    ).thenAnswer((_) async => null);
+
     cubit = LoginCubit(mockUseCase, mockCache);
 
     provideDummy<BaseResponse<SignInEntity>>(ErrorBaseResponse('dummy'));
@@ -217,15 +225,20 @@ void main() {
   });
 
   group('Continue (sign in)', () {
-    testWidgets('shows validation errors and does not call the use case '
+    testWidgets('disables the continue button and does not call the use case '
         'when fields are empty', (tester) async {
       await pumpLoginScreen(tester);
+
+      // The button stays disabled until both fields are valid, so the empty
+      // form can never trigger a sign-in.
+      final button = tester.widget<ElevatedButton>(
+        find.byType(ElevatedButton),
+      );
+      expect(button.onPressed, isNull);
 
       await tester.tap(find.text(AppStrings.continueText.tr()));
       await tester.pump();
 
-      expect(find.text(AppStrings.emailRequired.tr()), findsOneWidget);
-      expect(find.text(AppStrings.passwordRequired.tr()), findsOneWidget);
       verifyNever(mockUseCase(any));
     });
 
@@ -242,6 +255,9 @@ void main() {
         find.byKey(LoginForm.passwordFieldKey),
         validPassword,
       );
+      // Let the AnimatedBuilder rebuild so the now-valid form enables the
+      // continue button before it is tapped.
+      await tester.pump();
 
       await tester.tap(find.text(AppStrings.continueText.tr()));
       await tester.pump();
@@ -267,6 +283,9 @@ void main() {
         find.byKey(LoginForm.passwordFieldKey),
         validPassword,
       );
+      // Let the AnimatedBuilder rebuild so the now-valid form enables the
+      // continue button before it is tapped.
+      await tester.pump();
 
       await tester.tap(find.text(AppStrings.continueText.tr()));
       // Drain the async sign-in flow and the error toast entrance animation.
