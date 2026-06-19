@@ -82,6 +82,7 @@ abstract class AppStrings {
   static const String english = 'english';
   static const String aboutUs = 'aboutUs';
   static const String logout = 'logout';
+  static const String logoutSuccess = 'logoutSuccess';
   static const String version = 'version';
   static const String confirmLogout = 'confirmLogout';
 
