@@ -1,7 +1,6 @@
 {
     "home": "Home",
     "orders": "Orders",
-    "profile": "Profile",
 
     "login": "Login",
     "email": "Email",
@@ -71,5 +70,10 @@
     "cancel": "Cancel",
     "logout": "Logout",
     "logoutSuccess": "Logout successfully",
-    "confirmLogout": "Confirm Logout"
+    "confirmLogout": "Confirm Logout",
+    "profile": "Profile",
+    "welcomeTo": "Welcome to",
+    "floweryRiderApp": "Flowery Rider App",
+    "applyNow": "Apply now",
+    "versionPlaceholder": "v 6.3.0 - (446)"
 }
