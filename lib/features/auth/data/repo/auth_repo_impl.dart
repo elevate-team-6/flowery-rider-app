@@ -1,6 +1,9 @@
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
+import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/reset_password_response.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/sign_in_response_model.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/verify_reset_code_response.dart';
+import 'package:flowery_rider_app/features/auth/domain/entites/sign_in_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/forget_password_entity.dart';
 import 'package:injectable/injectable.dart';
 
@@ -13,17 +16,33 @@ import '../models/response/forgot_password_response.dart';
 
 @Injectable(as: AuthRepoContract)
 class AuthRepoImpl implements AuthRepoContract {
-  // ignore: unused_field
   final AuthRemoteDataSourceContract _remoteDataSource;
-  final AuthRemoteDataSourceContract _mockDataSource;
+  final AuthRemoteDataSourceContract? _mockDataSource;
 
-  AuthRepoImpl(this._remoteDataSource, @Named('mock') this._mockDataSource);
+  AuthRepoImpl(
+    this._remoteDataSource, [
+    @Optional() @Named('mock') this._mockDataSource,
+  ]);
+
+  @override
+  Future<BaseResponse<SignInEntity>> signIn(SignInRequestModel request) async {
+    final result = await _remoteDataSource.signIn(request);
+    return switch (result) {
+      SuccessBaseResponse<SignInResponseModel>() => SuccessBaseResponse(
+        result.data?.toEntity(),
+      ),
+      ErrorBaseResponse<SignInResponseModel>() => ErrorBaseResponse(
+        result.errorMessage,
+      ),
+    };
+  }
 
   @override
   Future<BaseResponse<ForgetPasswordEntity>> forgotPassword({
     required String email,
   }) async {
-    final response = await _mockDataSource.forgotPassword(
+    final dataSource = _mockDataSource ?? _remoteDataSource;
+    final response = await dataSource.forgotPassword(
       ForgetPasswordRequest(email: email),
     );
     switch (response) {
@@ -40,7 +59,8 @@ class AuthRepoImpl implements AuthRepoContract {
   Future<BaseResponse<ForgetPasswordEntity>> verifyResetCode({
     required String resetCode,
   }) async {
-    final response = await _mockDataSource.verifyResetCode(
+    final dataSource = _mockDataSource ?? _remoteDataSource;
+    final response = await dataSource.verifyResetCode(
       VerifyResetCodeRequest(resetCode: resetCode),
     );
     switch (response) {
@@ -58,7 +78,8 @@ class AuthRepoImpl implements AuthRepoContract {
     required String email,
     required String newPassword,
   }) async {
-    final response = await _mockDataSource.resetPassword(
+    final dataSource = _mockDataSource ?? _remoteDataSource;
+    final response = await dataSource.resetPassword(
       ResetPasswordRequest(email: email, newPassword: newPassword),
     );
     switch (response) {

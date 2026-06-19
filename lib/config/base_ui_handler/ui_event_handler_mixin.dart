@@ -39,6 +39,16 @@ mixin UiEventHandler<T extends StatefulWidget> on State<T> {
         LoadingDialog.show(context: context);
       case HideLoadingEvent():
         LoadingDialog.hide(context: context);
+<<<<<<< HEAD
     }
   }
+=======
+      case FillTextFieldEvent():
+        onFillTextField(event.text);
+    }
+  }
+
+  /// Override in screens that own a text field to be filled by the cubit.
+  void onFillTextField(String text) {}
+>>>>>>> origin/develop
 }

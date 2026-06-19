@@ -1,15 +1,18 @@
 {
     "home": "الرئيسية",
     "orders": "الطلبات",
-    "profile": "الملف الشخصي",
 
+    "login": "تسجيل الدخول",
     "email": "البريد الإلكتروني",
     "password": "كلمة المرور",
     "confirm": "تأكيد",
     "resend": "إعادة إرسال",
     "continueText": "تأكيد",
+    "rememberMe": "تذكرني",
+    "loginSuccess": "تم تسجيل الدخول بنجاح",
 
     "forgetPasswordTitle": "نسيت كلمة المرور",
+    "forgetPasswordQuestion": "نسيت كلمة المرور؟",
     "forgetPasswordSubtitle": "من فضلك أدخل بريدك الإلكتروني المرتبط بحسابك",
     "enterYourEmail": "أدخل بريدك الإلكتروني",
     "emailVerification": "التحقق من البريد الإلكتروني",
@@ -63,5 +66,10 @@
     "unexpectedErrorTryAgain": "خطأ غير متوقع. يرجى المحاولة مرة أخرى",
     "userAlreadyExists": "المستخدم موجود بالفعل",
     "invalidGender": "جنس غير صالح",
-    "invalidPhoneFormat": "تنسيق رقم الهاتف غير صالح"
+    "invalidPhoneFormat": "تنسيق رقم الهاتف غير صالح",
+    "profile": "الملف الشخصي",
+    "welcomeTo": "اهلا بك في",
+    "floweryRiderApp": "تطبيق سائق الورود",
+    "applyNow": "تقدم الآن",
+    "versionPlaceholder": "v 6.3.0 - (446)"
 }

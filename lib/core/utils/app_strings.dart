@@ -40,10 +40,12 @@ abstract class AppStrings {
   static const String creatingAccountAgreement = 'creatingAccountAgreement';
   static const String iAgree = 'iAgree';
   // Onboarding Screen
-  // In your AppStrings (or similar constants file)
+
   static const String welcomeToFloweryRider = 'Welcome to Flowery rider app';
   static const String applyNow = 'Apply now';
   static const String versionPlaceholder = 'v 6.3.0 - (446)';
+  static const String welcomeTo = 'welcomeTo';
+  static const String floweryRiderApp = 'floweryRiderApp';
 
   // Forget Password Screen
   static const String forgetPasswordTitle = 'forgetPasswordTitle';
@@ -82,6 +84,7 @@ abstract class AppStrings {
   static const String english = 'english';
   static const String aboutUs = 'aboutUs';
   static const String logout = 'logout';
+  static const String logoutSuccess = 'logoutSuccess';
   static const String version = 'version';
   static const String confirmLogout = 'confirmLogout';
 

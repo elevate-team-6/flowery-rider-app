@@ -1,15 +1,18 @@
 {
     "home": "Home",
     "orders": "Orders",
-    "profile": "Profile",
 
+    "login": "Login",
     "email": "Email",
     "password": "Password",
     "confirm": "Confirm",
     "resend": "Resend",
     "continueText": "Confirm",
+    "rememberMe": "Remember me",
+    "loginSuccess": "Logged in successfully",
 
     "forgetPasswordTitle": "Forget password",
+    "forgetPasswordQuestion": "Forget password?",
     "forgetPasswordSubtitle": "Please enter your email associated to your account",
     "enterYourEmail": "Enter your email",
     "emailVerification": "Email verification",
@@ -63,5 +66,14 @@
     "unexpectedErrorTryAgain": "Unexpected error. Please try again",
     "userAlreadyExists": "User already exists",
     "invalidGender": "Invalid gender",
-    "invalidPhoneFormat": "Invalid phone number format"
+    "invalidPhoneFormat": "Invalid phone number format",
+    "cancel": "Cancel",
+    "logout": "Logout",
+    "logoutSuccess": "Logout successfully",
+    "confirmLogout": "Confirm Logout",
+    "profile": "Profile",
+    "welcomeTo": "Welcome to",
+    "floweryRiderApp": "Flowery Rider App",
+    "applyNow": "Apply now",
+    "versionPlaceholder": "v 6.3.0 - (446)"
 }

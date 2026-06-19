@@ -50,6 +50,7 @@ abstract class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
           disabledBackgroundColor: AppColors.black30,
+          disabledForegroundColor: AppColors.white,
           elevation: 0,
           minimumSize: Size(double.infinity, 48.h),
           shape: RoundedRectangleBorder(

@@ -1,6 +1,10 @@
 import 'package:flowery_rider_app/config/di/di.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/forget_password_screen.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/login_screen.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/onboarding_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_cubit.dart';
+import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
+import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,16 +13,33 @@ abstract class AppRoutes {
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
-  static const String mainLayout = '/';
-  static const String onboarding = '/onboarding';
-  static const String login = '/login';
+  static const String onboarding = 'onboarding';
+  static const String login = 'login';
+  static const String applyScreen = 'apply';
+  static const String mainLayout = 'mainLayout';
   static const String forgotPassword = '/forgotPassword';
-  static const String verifyResetCode = '/VerifyResetCode';
-  static const String resetPassword = '/resetPassword';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
       switch (settings.name) {
+        case onboarding:
+          return MaterialPageRoute(
+            builder: (_) => const OnboardingScreen(),
+            settings: settings,
+          );
+
+        case login:
+          return MaterialPageRoute(
+            builder: (BuildContext context) {
+              return BlocProvider<LoginCubit>(
+                create: (_) => getIt<LoginCubit>()
+                  ..doIntent(const LoadRememberedEmailEvent()),
+                child: const LoginScreen(),
+              );
+            },
+            settings: settings,
+          );
+
         case mainLayout:
           return MaterialPageRoute(
             builder: (_) => const MainLayout(),
