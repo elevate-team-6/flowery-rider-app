@@ -3,13 +3,17 @@
     "orders": "الطلبات",
     "profile": "الملف الشخصي",
 
+    "login": "تسجيل الدخول",
     "email": "البريد الإلكتروني",
     "password": "كلمة المرور",
     "confirm": "تأكيد",
     "resend": "إعادة إرسال",
     "continueText": "تأكيد",
+    "rememberMe": "تذكرني",
+    "loginSuccess": "تم تسجيل الدخول بنجاح",
 
     "forgetPasswordTitle": "نسيت كلمة المرور",
+    "forgetPasswordQuestion": "نسيت كلمة المرور؟",
     "forgetPasswordSubtitle": "من فضلك أدخل بريدك الإلكتروني المرتبط بحسابك",
     "enterYourEmail": "أدخل بريدك الإلكتروني",
     "emailVerification": "التحقق من البريد الإلكتروني",

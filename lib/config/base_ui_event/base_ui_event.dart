@@ -1,14 +1,21 @@
-abstract class BaseUiEvent {}
-
-enum NavigationType { push, pushReplacement, pushAndRemoveUntil, pop }
+sealed class BaseUiEvent {}
 
 class ShowLoadingEvent extends BaseUiEvent {}
 
 class HideLoadingEvent extends BaseUiEvent {}
 
+enum NavigationType { push, pushReplacement, pushAndRemoveUntil, pop }
+
 class DisplayErrorEvent extends BaseUiEvent {
   final String errorMessage;
   DisplayErrorEvent(this.errorMessage);
+}
+
+/// Asks the screen to write [text] into its associated text field
+/// (e.g. restoring a remembered value when the screen opens).
+class FillTextFieldEvent extends BaseUiEvent {
+  final String text;
+  FillTextFieldEvent(this.text);
 }
 
 class DisplaySuccessEvent extends BaseUiEvent {

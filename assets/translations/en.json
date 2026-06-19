@@ -3,13 +3,17 @@
     "orders": "Orders",
     "profile": "Profile",
 
+    "login": "Login",
     "email": "Email",
     "password": "Password",
     "confirm": "Confirm",
     "resend": "Resend",
     "continueText": "Confirm",
+    "rememberMe": "Remember me",
+    "loginSuccess": "Logged in successfully",
 
     "forgetPasswordTitle": "Forget password",
+    "forgetPasswordQuestion": "Forget password?",
     "forgetPasswordSubtitle": "Please enter your email associated to your account",
     "enterYourEmail": "Enter your email",
     "emailVerification": "Email verification",

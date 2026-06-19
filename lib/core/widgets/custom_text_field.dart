@@ -45,12 +45,18 @@ class _CustomTextFieldState extends State<CustomTextField> {
 
   @override
   Widget build(BuildContext context) {
+    // When the parent supplies a suffixIcon it owns the visibility toggle
+    // (e.g. driven by a cubit), so respect its `obscureText`. Otherwise the
+    // field self-manages a built-in toggle for any obscured field.
+    final hasExternalSuffix = widget.suffixIcon != null;
+    final isObscured = hasExternalSuffix ? widget.obscureText : _obscureText;
+
     return TextFormField(
       controller: widget.controller,
       validator: widget.validator,
       keyboardType: widget.keyboardType,
       textInputAction: widget.textInputAction,
-      obscureText: _obscureText,
+      obscureText: isObscured,
       onChanged: widget.onChanged,
       readOnly: widget.readOnly,
       onTap: widget.onTap,
@@ -60,7 +66,9 @@ class _CustomTextFieldState extends State<CustomTextField> {
         labelText: widget.labelText,
         hintText: widget.hintText,
         prefixIcon: widget.prefixIcon,
-        suffixIcon: widget.obscureText
+        suffixIcon: hasExternalSuffix
+            ? widget.suffixIcon
+            : widget.obscureText
             ? IconButton(
                 onPressed: () {
                   setState(() {
@@ -73,7 +81,7 @@ class _CustomTextFieldState extends State<CustomTextField> {
                       : Icons.visibility_outlined,
                 ),
               )
-            : widget.suffixIcon,
+            : null,
       ),
     );
   }
