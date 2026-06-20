@@ -1,5 +1,4 @@
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flowery_rider_app/config/services/auth_service.dart';
 import 'package:flowery_rider_app/core/utils/app_assets.dart';
 import 'package:flowery_rider_app/core/utils/app_colors.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
@@ -59,12 +58,7 @@ class OnboardingScreen extends StatelessWidget {
                 children: [
                   ElevatedButton(
                     onPressed: () {
-                      AuthService.setOnboardingCompleted();
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        AppRoutes.login,
-                        (route) => false,
-                      );
+                      Navigator.pushNamed(context, AppRoutes.login);
                     },
                     child: Text(AppStrings.login.tr()),
                   ),
@@ -73,12 +67,7 @@ class OnboardingScreen extends StatelessWidget {
 
                   OutlinedButton(
                     onPressed: () {
-                      AuthService.setOnboardingCompleted();
-                      Navigator.pushNamedAndRemoveUntil(
-                        context,
-                        AppRoutes.applyScreen,
-                        (route) => false,
-                      );
+                      Navigator.pushNamed(context, AppRoutes.applyScreen);
                     },
                     child: Text(
                       AppStrings.applyNow.tr(),

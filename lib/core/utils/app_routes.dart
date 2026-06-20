@@ -14,7 +14,7 @@ abstract class AppRoutes {
       GlobalKey<NavigatorState>();
 
   static const String onboarding = 'onboarding';
-  static const String login = 'login';
+  static const String login = '/login';
   static const String applyScreen = 'apply';
   static const String mainLayout = 'mainLayout';
   static const String forgetPassword = '/forgotPassword';

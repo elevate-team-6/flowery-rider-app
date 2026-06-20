@@ -20,7 +20,6 @@ Future<void> main() async {
   await getIt<HiveHelper>().init();
 
   final isLoggedIn = await AuthService.isLoggedIn();
-  final isOnboardingCompleted = await AuthService.isOnboardingCompleted();
   runApp(
     EasyLocalization(
       supportedLocales: const [
@@ -29,23 +28,15 @@ Future<void> main() async {
       ],
       path: AppConstants.translationsPath,
       fallbackLocale: const Locale('en'),
-      child: MyApp(
-        isLoggedIn: isLoggedIn,
-        isOnboardingCompleted: isOnboardingCompleted,
-      ),
+      child: MyApp(isLoggedIn: isLoggedIn),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
   final bool isLoggedIn;
-  final bool isOnboardingCompleted;
 
-  const MyApp({
-    super.key,
-    this.isLoggedIn = true,
-    this.isOnboardingCompleted = false,
-  });
+  const MyApp({super.key, this.isLoggedIn = true});
 
   @override
   Widget build(BuildContext context) {
@@ -64,9 +55,7 @@ class MyApp extends StatelessWidget {
           navigatorKey: AppRoutes.navigatorKey,
           initialRoute: isLoggedIn
               ? AppRoutes.mainLayout
-              : (isOnboardingCompleted
-                    ? AppRoutes.login
-                    : AppRoutes.onboarding),
+              : AppRoutes.onboarding,
           onGenerateRoute: AppRoutes.onGenerateRoute,
           builder: BotToastInit(),
           navigatorObservers: [BotToastNavigatorObserver()],

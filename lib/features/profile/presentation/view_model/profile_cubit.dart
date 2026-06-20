@@ -28,7 +28,7 @@ class ProfileCubit extends BaseCubit<ProfileStates, BaseUiEvent> {
     final response = await _logoutUseCase.call();
     emit(state.copyWith(logoutState: BaseState()));
     emitUiEvent(
-      NavigateEvent(AppRoutes.login, navigationType: NavigationType.pop),
+      NavigateEvent(AppRoutes.onboarding, navigationType: NavigationType.pop),
     );
     switch (response) {
       case SuccessBaseResponse():
@@ -38,7 +38,7 @@ class ProfileCubit extends BaseCubit<ProfileStates, BaseUiEvent> {
     }
     emitUiEvent(
       NavigateEvent(
-        AppRoutes.login,
+        AppRoutes.onboarding,
         navigationType: NavigationType.pushAndRemoveUntil,
       ),
     );
