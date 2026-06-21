@@ -49,7 +49,7 @@ class PetalsPainter extends CustomPainter {
       final double rotation = petal.rotation + (progress * math.pi * 2);
 
       final Paint paint = Paint()
-        ..color = petal.color.withOpacity(0.75)
+        ..color = petal.color.withValues(alpha: 0.75)
         ..style = PaintingStyle.fill;
 
       canvas.save();
