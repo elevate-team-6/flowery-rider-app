@@ -46,6 +46,8 @@ abstract class AppStrings {
   static const String versionPlaceholder = 'v 6.3.0 - (446)';
   static const String welcomeTo = 'welcomeTo';
   static const String floweryRiderApp = 'floweryRiderApp';
+  static const String floweryRider = 'Flowery Rider';
+  static const String splashSubtitle = 'We ride, flowers inside';
 
   // Forget Password Screen
   static const String forgetPasswordTitle = 'forgetPasswordTitle';

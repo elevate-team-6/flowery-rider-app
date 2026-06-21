@@ -188,4 +188,18 @@ abstract class AppTextStyles {
     fontWeight: FontWeight.w400,
     color: AppColors.green,
   );
+
+  // Splash Styles
+  static TextStyle get primary38700Playfair => GoogleFonts.playfairDisplay(
+    fontSize: _sp(38),
+    fontWeight: FontWeight.w700,
+    color: AppColors.primary,
+  );
+
+  static TextStyle get gray14400PoppinsSpacing => GoogleFonts.poppins(
+    fontSize: _sp(14),
+    fontWeight: FontWeight.w400,
+    color: AppColors.gray,
+    letterSpacing: 1.5,
+  );
 }

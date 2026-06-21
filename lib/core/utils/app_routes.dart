@@ -6,6 +6,7 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_p
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
+import 'package:flowery_rider_app/features/splash/presentation/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,6 +14,7 @@ abstract class AppRoutes {
   static final GlobalKey<NavigatorState> navigatorKey =
       GlobalKey<NavigatorState>();
 
+  static const String splash = '/';
   static const String onboarding = 'onboarding';
   static const String login = '/login';
   static const String applyScreen = 'apply';
@@ -24,6 +26,12 @@ abstract class AppRoutes {
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
       switch (settings.name) {
+        case splash:
+          return MaterialPageRoute(
+            builder: (_) => const SplashScreen(),
+            settings: settings,
+          );
+
         case onboarding:
           return MaterialPageRoute(
             builder: (_) => const OnboardingScreen(),

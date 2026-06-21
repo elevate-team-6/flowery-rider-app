@@ -36,6 +36,8 @@ abstract class AppImages {
   static const String imageDefault = '${_imagesPath}Image_default.png';
   static const String appImage = '${_imagesPath}app_image.svg';
   static const String defaultImage = '${_imagesPath}Image_default.png';
+  static const String scooterBody = '${_imagesPath}scooter_body.png';
+  static const String flowerWheel = '${_imagesPath}flower_wheel.png';
 }
 
 abstract class AppLottie {
