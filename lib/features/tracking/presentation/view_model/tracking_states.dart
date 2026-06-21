@@ -1,14 +1,21 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../../config/base_state/base_state.dart';
+import '../../domain/entites/order_entity.dart';
 
 class TrackingStates extends Equatable {
-  const TrackingStates();
+  final BaseState<PendingOrdersEntity> pendingOrdersState;
 
-  TrackingStates copyWith({BaseState<void>? logoutState}) {
-    return TrackingStates();
+  const TrackingStates({this.pendingOrdersState = const BaseState()});
+
+  TrackingStates copyWith({
+    BaseState<PendingOrdersEntity>? pendingOrdersState,
+  }) {
+    return TrackingStates(
+      pendingOrdersState: pendingOrdersState ?? this.pendingOrdersState,
+    );
   }
 
   @override
-  List<Object?> get props => [];
+  List<Object?> get props => [pendingOrdersState];
 }

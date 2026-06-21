@@ -119,6 +119,15 @@ abstract class AppStrings {
 
   // home
   static const String flowery = 'flowery';
+  static const String floweryRiderTitle = 'flowery_rider_title';
+  static const String flowerOrder = 'flower_order';
+  static const String pickupAddress = 'pickup_address';
+  static const String userAddress = 'user_address';
+  static const String accept = 'accept';
+  static const String reject = 'reject';
+  static const String egp = 'egp';
+  static const String noPendingOrders = 'no_pending_orders';
+  static const String noPendingOrdersSubtitle = 'no_pending_orders_subtitle';
 
   // Placeholder/Generic
   static const String icon = 'icon';

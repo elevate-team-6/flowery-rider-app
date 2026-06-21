@@ -2,6 +2,16 @@
     "home": "Home",
     "orders": "Orders",
 
+    "flowery_rider_title": "Flowery rider",
+    "flower_order": "Flower order",
+    "pickup_address": "Pickup address",
+    "user_address": "User address",
+    "accept": "Accept",
+    "reject": "Reject",
+    "egp": "EGP",
+    "no_pending_orders": "No pending orders",
+    "no_pending_orders_subtitle": "New orders will appear here. Pull down to refresh.",
+
     "login": "Login",
     "email": "Email",
     "password": "Password",
