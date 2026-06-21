@@ -67,6 +67,8 @@ dependencies:
   intl: ^0.20.2
   stream_transform: ^2.1.1
   webview_flutter: ^4.10.0
+  flutter_launcher_icons: ^0.14.4
+  flutter_native_splash: ^2.4.7
 
 
 dev_dependencies:
@@ -107,28 +109,18 @@ flutter:
     - assets/translations/
     - assets/json/
 
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/to/resolution-aware-images
+flutter_native_splash:
+  color: "#FAFAFA"
+  image: null
+  android_12:
+    color: "#FAFAFA"
+    icon_background_color: "#FAFAFA"
+    image: null
 
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/to/asset-from-package
 
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
-  #   - family: Trajan Pro
-  #     fonts:
-  #       - asset: fonts/TrajanPro.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/images/flowery_rider_logo.png"
+  adaptive_icon_background: "#FAFAFA"
+  adaptive_icon_foreground: "assets/images/flowery_rider_logo.png"
