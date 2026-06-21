@@ -75,5 +75,7 @@
     "welcomeTo": "Welcome to",
     "floweryRiderApp": "Flowery Rider App",
     "applyNow": "Apply now",
-    "versionPlaceholder": "v 6.3.0 - (446)"
+    "versionPlaceholder": "v 6.3.0 - (446)",
+    "success": "On its way! 🛵",
+    "oops": "Oops!"
 }

@@ -71,5 +71,7 @@
     "welcomeTo": "اهلا بك في",
     "floweryRiderApp": "تطبيق سائق الورود",
     "applyNow": "تقدم الآن",
-    "versionPlaceholder": "v 6.3.0 - (446)"
+    "versionPlaceholder": "v 6.3.0 - (446)",
+    "success": "في الطريق! 🛵",
+    "oops": "عذراً!"
 }
