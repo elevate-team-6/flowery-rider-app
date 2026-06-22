@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flowery_rider_app/features/tracking/domain/entites/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 
 class StoreModel extends Equatable {
   final String? name;
@@ -33,7 +33,7 @@ class StoreModel extends Equatable {
       image: image,
       address: address,
       phoneNumber: phoneNumber,
-      lat: latLngList != null && latLngList.length > 0 ? latLngList[0] : null,
+      lat: latLngList != null && latLngList.isNotEmpty ? latLngList[0] : null,
       long: latLngList != null && latLngList.length > 1 ? latLngList[1] : null,
     );
   }

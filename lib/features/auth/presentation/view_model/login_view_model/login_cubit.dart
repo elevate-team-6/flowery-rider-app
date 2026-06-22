@@ -7,7 +7,7 @@ import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/sign_in_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/sign_in_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/sign_in_use_case.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_state.dart';

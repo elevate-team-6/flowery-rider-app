@@ -1,5 +1,5 @@
 import 'package:flowery_rider_app/core/utils/app_params.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/sign_in_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/sign_in_entity.dart';
 
 class SignInResponseModel {
   final String? message;

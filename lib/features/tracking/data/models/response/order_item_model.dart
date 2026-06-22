@@ -1,5 +1,5 @@
 import 'package:equatable/equatable.dart';
-import 'package:flowery_rider_app/features/tracking/domain/entites/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 
 import 'product_model.dart';
 
