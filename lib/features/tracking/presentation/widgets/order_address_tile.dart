@@ -22,7 +22,7 @@ class OrderAddressTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(8.r),
         boxShadow: [
           BoxShadow(
-            color: AppColors.white90.withOpacity(0.25),
+            color: AppColors.white90.withValues(alpha: 0.25),
             blurRadius: 4.r,
           ),
         ],
