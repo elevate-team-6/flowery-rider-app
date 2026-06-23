@@ -22,6 +22,7 @@ abstract class AppRoutes {
   static const String forgetPassword = '/forgotPassword';
   static const String verifyResetCode = '/VerifyResetCode';
   static const String resetPassword = '/resetPassword';
+  static const String orderDetails = 'orderDetails';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
