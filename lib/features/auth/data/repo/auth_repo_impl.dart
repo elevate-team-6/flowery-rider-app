@@ -3,8 +3,8 @@ import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_requ
 import 'package:flowery_rider_app/features/auth/data/models/response/reset_password_response.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/sign_in_response_model.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/verify_reset_code_response.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/sign_in_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/forget_password_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/sign_in_entity.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../domain/repo/auth_repo_contract.dart';

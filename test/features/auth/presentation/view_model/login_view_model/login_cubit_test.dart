@@ -1,12 +1,12 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
+import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/cache/secure_cache_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/sign_in_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/sign_in_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/sign_in_use_case.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
-import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_state.dart';
 import 'package:flutter_test/flutter_test.dart';
