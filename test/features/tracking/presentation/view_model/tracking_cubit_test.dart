@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
@@ -61,6 +63,25 @@ void main() {
       ],
       verify: (_) => verify(mockUseCase.call(page: 1)).called(1),
     );
+
+    test('doEvent does not complete until the use case finishes, so the '
+        'RefreshIndicator keeps spinning until loading is done', () async {
+      final completer = Completer<BaseResponse<PendingOrdersEntity>>();
+      when(
+        mockUseCase.call(page: anyNamed('page')),
+      ).thenAnswer((_) => completer.future);
+
+      final future = cubit.doEvent(const GetPendingOrdersEvent());
+      var completed = false;
+      unawaited(future.then((_) => completed = true));
+
+      await Future<void>.delayed(Duration.zero);
+      expect(completed, isFalse);
+
+      completer.complete(SuccessBaseResponse(fakeEntity));
+      await future;
+      expect(completed, isTrue);
+    });
 
     blocTest<TrackingCubit, TrackingStates>(
       'emits loading then error message on failure',

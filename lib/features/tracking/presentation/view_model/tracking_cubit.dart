@@ -15,10 +15,10 @@ class TrackingCubit extends BaseCubit<TrackingStates, BaseUiEvent> {
 
   TrackingCubit(this._getPendingOrdersUseCase) : super(const TrackingStates());
 
-  void doEvent(TrackingEvents event) {
+  Future<void> doEvent(TrackingEvents event) async {
     switch (event) {
       case GetPendingOrdersEvent():
-        _getPendingOrders(event.page);
+        await _getPendingOrders(event.page);
       case AcceptOrderEvent():
         _acceptOrder(event.order);
       case RejectOrderEvent():
@@ -26,7 +26,7 @@ class TrackingCubit extends BaseCubit<TrackingStates, BaseUiEvent> {
     }
   }
 
-  void _getPendingOrders(int? page) async {
+  Future<void> _getPendingOrders(int? page) async {
     emit(state.copyWith(pendingOrdersState: const BaseState(isLoading: true)));
     final response = await _getPendingOrdersUseCase.call(page: page);
     switch (response) {

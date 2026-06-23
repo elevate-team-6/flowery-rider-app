@@ -56,7 +56,7 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
     super.dispose();
   }
 
-  void _loadOrders() =>
+  Future<void> _loadOrders() =>
       context.read<TrackingCubit>().doEvent(const GetPendingOrdersEvent());
 
   @override
@@ -76,6 +76,8 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
         ),
       ),
       body: BlocBuilder<TrackingCubit, TrackingStates>(
+        buildWhen: (previous, current) =>
+            previous.pendingOrdersState != current.pendingOrdersState,
         builder: (context, state) {
           final ordersState = state.pendingOrdersState;
 
@@ -94,11 +96,11 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
 
           final orders = ordersState.data?.orders ?? [];
           if (orders.isEmpty) {
-            return EmptyOrdersState(onRefresh: () async => _loadOrders());
+            return EmptyOrdersState(onRefresh: _loadOrders);
           }
 
           return RefreshIndicator(
-            onRefresh: () async => _loadOrders(),
+            onRefresh: _loadOrders,
             child: ListView.separated(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: EdgeInsets.all(16.w),
