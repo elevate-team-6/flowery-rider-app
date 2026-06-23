@@ -3,7 +3,7 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
-import 'package:flowery_rider_app/features/tracking/domain/entites/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_pending_orders_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/tracking_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/tracking_events.dart';

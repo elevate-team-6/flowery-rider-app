@@ -4,7 +4,7 @@ import 'package:flowery_rider_app/features/tracking/data/data_sources/tracking_r
 import 'package:flowery_rider_app/features/tracking/data/models/response/order_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/pending_orders_response_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/repo/tracking_repo_impl.dart';
-import 'package:flowery_rider_app/features/tracking/domain/entites/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';

@@ -9,7 +9,7 @@ import 'package:flowery_rider_app/config/di/di.dart';
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/widgets/custom_error_state.dart';
-import 'package:flowery_rider_app/features/tracking/domain/entites/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_pending_orders_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/home_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/tracking_cubit.dart';

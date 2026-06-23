@@ -2,7 +2,7 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../config/cache/secure_cache_helper.dart';
-import '../../domain/entites/order_entity.dart';
+import '../../domain/entities/order_entity.dart';
 import '../../domain/repo/tracking_repo_contract.dart';
 import '../data_sources/tracking_remote_data_source_contract.dart';
 import '../models/response/pending_orders_response_model.dart';

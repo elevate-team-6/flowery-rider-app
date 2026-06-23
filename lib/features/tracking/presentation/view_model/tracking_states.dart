@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../../config/base_state/base_state.dart';
-import '../../domain/entites/order_entity.dart';
+import '../../domain/entities/order_entity.dart';
 
 class TrackingStates extends Equatable {
   final BaseState<PendingOrdersEntity> pendingOrdersState;

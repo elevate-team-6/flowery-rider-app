@@ -1,4 +1,4 @@
-import '../../domain/entites/order_entity.dart';
+import '../../domain/entities/order_entity.dart';
 
 sealed class TrackingEvents {
   const TrackingEvents();

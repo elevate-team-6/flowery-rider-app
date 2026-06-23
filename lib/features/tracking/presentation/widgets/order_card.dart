@@ -6,7 +6,7 @@ import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/app_text_styles.dart';
-import '../../domain/entites/order_entity.dart';
+import '../../domain/entities/order_entity.dart';
 import 'order_address_tile.dart';
 
 class OrderCard extends StatelessWidget {
