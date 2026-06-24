@@ -7,6 +7,10 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/login_vi
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
 import 'package:flowery_rider_app/features/splash/presentation/pages/splash_screen.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/screens/order_success_screen.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -23,6 +27,8 @@ abstract class AppRoutes {
   static const String verifyResetCode = '/VerifyResetCode';
   static const String resetPassword = '/resetPassword';
   static const String orderDetails = 'orderDetails';
+  static const String orderSuccess = 'orderSuccess';
+  static const String mapScreen = 'mapScreen';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
@@ -64,6 +70,22 @@ abstract class AppRoutes {
               create: (context) => getIt<ForgetPasswordCubit>(),
               child: const ForgotPasswordScreen(),
             ),
+            settings: settings,
+          );
+
+        case orderDetails:
+          final order = settings.arguments as OrderEntity;
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (context) => getIt<OrderDetailsCubit>(),
+              child: OrderDetailsScreen(order: order),
+            ),
+            settings: settings,
+          );
+
+        case orderSuccess:
+          return MaterialPageRoute(
+            builder: (_) => const OrderSuccessScreen(),
             settings: settings,
           );
 

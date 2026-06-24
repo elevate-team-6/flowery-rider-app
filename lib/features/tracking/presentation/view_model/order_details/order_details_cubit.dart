@@ -2,8 +2,10 @@ import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
+import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/start_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_order_state_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart';
@@ -16,66 +18,135 @@ import '../../../../../config/base_state/base_state.dart';
 class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   final UpdateOrderStateUseCase _updateOrderStateUseCase;
   final StartOrderUseCase _startOrderUseCase;
+  final OpenCommunicationUseCase _openCommunicationUseCase;
 
-  OrderDetailsCubit(this._updateOrderStateUseCase, this._startOrderUseCase)
-    : super(const OrderDetailsState());
+  OrderDetailsCubit(
+    this._updateOrderStateUseCase,
+    this._startOrderUseCase,
+    this._openCommunicationUseCase,
+  ) : super(const OrderDetailsState());
 
   void doEvent(OrderDetailsEvents event) {
     switch (event) {
       case InitializeOrderDetailsEvent():
-        _onInitialize(event.orderId);
-      case UpdateOrderStateEvent():
-        _onUpdateOrderState(event.newStatus);
+        _onInitialize(event.order);
+      case NextStepEvent():
+        _onNextStep();
       case ConfirmBackButtonPressedEvent():
         _onBackButtonPressed();
       case RevertOrderToPendingEvent():
         _onRevertToPending(event.orderId);
       case NavigateToMapEvent():
         _onNavigateToMap(event.locationType);
+      case CallPhoneEvent():
+        _onCallPhone(event.phoneNumber);
+      case OpenWhatsAppEvent():
+        _onOpenWhatsApp(event.phoneNumber);
     }
   }
 
-  Future<void> _onInitialize(String orderId) async {
-    emitUiEvent(ShowLoadingEvent());
+  Future<void> _onInitialize(OrderEntity order) async {
+    final initialBackendStatus = OrderStatus.fromString(order.state);
+    int initialStep = 1;
+    if (initialBackendStatus == OrderStatus.completed) {
+      initialStep = 6;
+    } else if (initialBackendStatus == OrderStatus.inProgress) {
+      initialStep = 1;
+    }
 
-    BaseResponse<OrderEntity> startResult = await _startOrderUseCase(orderId);
+    emit(
+      state.copyWith(
+        orderDetailsState: BaseState(data: order),
+        orderStatus: initialBackendStatus,
+        uiStep: initialStep,
+      ),
+    );
 
-    if (startResult is ErrorBaseResponse) {
-      emitUiEvent(HideLoadingEvent());
-      emit(
-        state.copyWith(
-          orderDetailsState: BaseState(
-            errorMessage: (startResult as ErrorBaseResponse).errorMessage,
-          ),
-        ),
+    if (order.id != null) {
+      BaseResponse<OrderEntity> startResult = await _startOrderUseCase(
+        order.id!,
       );
-      return;
+
+      if (startResult is SuccessBaseResponse<OrderEntity>) {
+        final updatedOrder = startResult.data;
+        // Merge: Keep the rich data (user/store) from passed entity if API response is partial
+        final mergedOrder = _mergeOrders(order, updatedOrder);
+
+        emit(
+          state.copyWith(
+            orderDetailsState: BaseState(data: mergedOrder),
+            orderStatus: OrderStatus.fromString(mergedOrder.state),
+          ),
+        );
+      }
     }
-    emitUiEvent(HideLoadingEvent());
-    _onUpdateOrderState(OrderStatus.accepted);
   }
 
-  Future<void> _onUpdateOrderState(OrderStatus newStatus) async {
-    final orderId = state.data?.id;
+  Future<void> _onNextStep() async {
+    final currentStep = state.uiStep;
+    if (currentStep >= 6) return;
+
+    final nextStep = currentStep + 1;
+    final currentOrder = state.orderDetailsState.data;
+    final orderId = currentOrder?.id;
     if (orderId == null) return;
 
+    OrderStatus backendStatus = (nextStep == 6)
+        ? OrderStatus.completed
+        : OrderStatus.inProgress;
+
     emitUiEvent(ShowLoadingEvent());
-
-    final result = await _updateOrderStateUseCase(orderId, newStatus);
-
+    final result = await _updateOrderStateUseCase(orderId, backendStatus);
     emitUiEvent(HideLoadingEvent());
 
     switch (result) {
       case SuccessBaseResponse<OrderEntity>():
+        // Merge to prevent losing user/store details
+        final mergedOrder = _mergeOrders(currentOrder!, result.data);
+
         emit(
           state.copyWith(
-            orderDetailsState: BaseState(data: result.data),
-            orderStatus: newStatus,
+            orderDetailsState: BaseState(data: mergedOrder),
+            orderStatus: backendStatus,
+            uiStep: nextStep,
           ),
         );
+        if (nextStep == 6) {
+          emitUiEvent(
+            NavigateEvent(
+              AppRoutes.orderSuccess,
+              navigationType: NavigationType.pushReplacement,
+            ),
+          );
+        }
       case ErrorBaseResponse<OrderEntity>():
         emitUiEvent(DisplayErrorEvent(result.errorMessage));
     }
+  }
+
+  /// Merges partial order data from API with rich local data (User/Store)
+  OrderEntity _mergeOrders(OrderEntity local, OrderEntity? remote) {
+    if (remote == null) return local;
+
+    return OrderEntity(
+      id: remote.id ?? local.id,
+      orderNumber: remote.orderNumber ?? local.orderNumber,
+      totalPrice: remote.totalPrice ?? local.totalPrice,
+      state: remote.state ?? local.state,
+      createdAt: remote.createdAt ?? local.createdAt,
+      paymentType: remote.paymentType ?? local.paymentType,
+      // Priority to local rich entities if remote only has ID (or is null)
+      user: (remote.user?.fullName != null && remote.user!.fullName!.isNotEmpty)
+          ? remote.user
+          : local.user,
+      store: (remote.store?.name != null && remote.store!.name!.isNotEmpty)
+          ? remote.store
+          : local.store,
+      orderItems: (remote.orderItems != null && remote.orderItems!.isNotEmpty)
+          ? remote.orderItems
+          : local.orderItems,
+      shippingAddress: remote.shippingAddress ?? local.shippingAddress,
+    );
   }
 
   void _onBackButtonPressed() {
@@ -107,16 +178,46 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   }
 
   void _onNavigateToMap(LocationType type) {
-    // Preparation for next sprint: extract coordinates and navigate
+    final order = state.orderDetailsState.data;
     final lat = type == LocationType.store
-        ? state.data?.store?.lat
-        : state.data?.shippingAddress?.lat;
+        ? order?.store?.lat
+        : order?.shippingAddress?.lat;
     final long = type == LocationType.store
-        ? state.data?.store?.long
-        : state.data?.shippingAddress?.long;
+        ? order?.store?.long
+        : order?.shippingAddress?.long;
 
-    if (lat != null && long != null) {
-      // emitUiEvent(NavigateToMapScreenEvent(lat, long));
+    if (lat != null && long != null && order != null) {
+      emitUiEvent(
+        NavigateEvent(
+          AppRoutes.mapScreen,
+          arguments: {
+            'targetLat': lat,
+            'targetLong': long,
+            'locationType': type,
+            'order': order,
+          },
+        ),
+      );
+    }
+  }
+
+  Future<void> _onCallPhone(String phoneNumber) async {
+    final success = await _openCommunicationUseCase(
+      phoneNumber,
+      CommunicationType.phone,
+    );
+    if (!success) {
+      emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
+    }
+  }
+
+  Future<void> _onOpenWhatsApp(String phoneNumber) async {
+    final success = await _openCommunicationUseCase(
+      phoneNumber,
+      CommunicationType.whatsapp,
+    );
+    if (!success) {
+      emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
     }
   }
 }
