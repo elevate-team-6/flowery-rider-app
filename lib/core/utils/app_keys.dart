@@ -7,4 +7,5 @@ abstract class AppKeys {
   static const String authorizationKey = 'Authorization';
   static const String bearerPrefix = 'Bearer';
   static const String cacheDurationHours = 'cache_duration_hours';
+  static const String activeOrderKey = 'active_order';
 }

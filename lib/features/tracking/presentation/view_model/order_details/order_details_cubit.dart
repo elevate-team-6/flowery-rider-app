@@ -1,6 +1,10 @@
+import 'dart:convert';
+
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
+import 'package:flowery_rider_app/config/cache/hive_helper.dart';
+import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
@@ -19,11 +23,13 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   final UpdateOrderStateUseCase _updateOrderStateUseCase;
   final StartOrderUseCase _startOrderUseCase;
   final OpenCommunicationUseCase _openCommunicationUseCase;
+  final HiveHelper _hiveHelper;
 
   OrderDetailsCubit(
     this._updateOrderStateUseCase,
     this._startOrderUseCase,
     this._openCommunicationUseCase,
+    this._hiveHelper,
   ) : super(const OrderDetailsState());
 
   void doEvent(OrderDetailsEvents event) {
@@ -78,6 +84,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
             orderStatus: OrderStatus.fromString(mergedOrder.state),
           ),
         );
+        _cacheOrder(mergedOrder);
       }
     }
   }
@@ -112,12 +119,15 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
           ),
         );
         if (nextStep == 6) {
+          _clearCache();
           emitUiEvent(
             NavigateEvent(
               AppRoutes.orderSuccess,
               navigationType: NavigationType.pushReplacement,
             ),
           );
+        } else {
+          _cacheOrder(mergedOrder);
         }
       case ErrorBaseResponse<OrderEntity>():
         emitUiEvent(DisplayErrorEvent(result.errorMessage));
@@ -149,6 +159,21 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     );
   }
 
+  void _cacheOrder(OrderEntity order) {
+    _hiveHelper.cacheData(
+      boxName: AppKeys.activeOrderKey,
+      key: AppKeys.activeOrderKey,
+      value: jsonEncode(order.toJson()),
+    );
+  }
+
+  void _clearCache() {
+    _hiveHelper.deleteData(
+      boxName: AppKeys.activeOrderKey,
+      key: AppKeys.activeOrderKey,
+    );
+  }
+
   void _onBackButtonPressed() {
     emitUiEvent(ShowConfirmationDialogEvent());
   }
@@ -162,6 +187,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     emit(state.copyWith(canselOrderState: BaseState()));
     switch (result) {
       case SuccessBaseResponse<OrderEntity>():
+        _clearCache();
         emitUiEvent(
           NavigateEvent(
             AppRoutes.mainLayout,
