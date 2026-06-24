@@ -7,19 +7,19 @@ import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_pending_orders_use_case.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/view_model/tracking_cubit.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/view_model/tracking_events.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/view_model/tracking_states.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_cubit.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_events.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_states.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 
-import 'tracking_cubit_test.mocks.dart';
+import 'home_cubit_test.mocks.dart';
 
 @GenerateMocks([GetPendingOrdersUseCase])
 void main() {
   late MockGetPendingOrdersUseCase mockUseCase;
-  late TrackingCubit cubit;
+  late HomeCubit cubit;
 
   const order1 = OrderEntity(id: '1', orderNumber: 'ORD-1');
   const order2 = OrderEntity(id: '2', orderNumber: 'ORD-2');
@@ -30,7 +30,7 @@ void main() {
 
   setUp(() {
     mockUseCase = MockGetPendingOrdersUseCase();
-    cubit = TrackingCubit(mockUseCase);
+    cubit = HomeCubit(mockUseCase);
 
     provideDummy<BaseResponse<PendingOrdersEntity>>(ErrorBaseResponse('dummy'));
   });
@@ -40,7 +40,7 @@ void main() {
   });
 
   group('GetPendingOrdersEvent', () {
-    blocTest<TrackingCubit, TrackingStates>(
+    blocTest<HomeCubit, HomeStates>(
       'emits loading then data on success',
       setUp: () {
         when(
@@ -50,12 +50,12 @@ void main() {
       build: () => cubit,
       act: (cubit) => cubit.doEvent(const GetPendingOrdersEvent(page: 1)),
       expect: () => [
-        isA<TrackingStates>().having(
+        isA<HomeStates>().having(
           (s) => s.pendingOrdersState.isLoading,
           'isLoading',
           true,
         ),
-        isA<TrackingStates>().having(
+        isA<HomeStates>().having(
           (s) => s.pendingOrdersState.data,
           'data',
           fakeEntity,
@@ -83,7 +83,7 @@ void main() {
       expect(completed, isTrue);
     });
 
-    blocTest<TrackingCubit, TrackingStates>(
+    blocTest<HomeCubit, HomeStates>(
       'emits loading then error message on failure',
       setUp: () {
         when(
@@ -93,12 +93,12 @@ void main() {
       build: () => cubit,
       act: (cubit) => cubit.doEvent(const GetPendingOrdersEvent()),
       expect: () => [
-        isA<TrackingStates>().having(
+        isA<HomeStates>().having(
           (s) => s.pendingOrdersState.isLoading,
           'isLoading',
           true,
         ),
-        isA<TrackingStates>().having(
+        isA<HomeStates>().having(
           (s) => s.pendingOrdersState.errorMessage,
           'errorMessage',
           'network error',
@@ -127,14 +127,14 @@ void main() {
   });
 
   group('RejectOrderEvent', () {
-    blocTest<TrackingCubit, TrackingStates>(
+    blocTest<HomeCubit, HomeStates>(
       'removes the rejected order from the current list',
       seed: () =>
-          const TrackingStates(pendingOrdersState: BaseState(data: fakeEntity)),
+          const HomeStates(pendingOrdersState: BaseState(data: fakeEntity)),
       build: () => cubit,
       act: (cubit) => cubit.doEvent(const RejectOrderEvent('1')),
       expect: () => [
-        isA<TrackingStates>().having(
+        isA<HomeStates>().having(
           (s) => s.pendingOrdersState.data?.orders,
           'orders',
           [order2],
@@ -142,7 +142,7 @@ void main() {
       ],
     );
 
-    blocTest<TrackingCubit, TrackingStates>(
+    blocTest<HomeCubit, HomeStates>(
       'emits nothing when there is no data loaded',
       build: () => cubit,
       act: (cubit) => cubit.doEvent(const RejectOrderEvent('1')),

@@ -14,9 +14,9 @@ import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/app_text_styles.dart';
 import '../../../../core/widgets/custom_error_state.dart';
-import '../view_model/tracking_cubit.dart';
-import '../view_model/tracking_events.dart';
-import '../view_model/tracking_states.dart';
+import '../view_model/home_view_model/home_cubit.dart';
+import '../view_model/home_view_model/home_events.dart';
+import '../view_model/home_view_model/home_states.dart';
 import '../widgets/empty_orders_state.dart';
 import '../widgets/order_card.dart';
 
@@ -26,7 +26,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => getIt<TrackingCubit>(),
+      create: (context) => getIt<HomeCubit>(),
       child: const _HomeBody(),
     );
   }
@@ -45,7 +45,7 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
   @override
   void initState() {
     super.initState();
-    final cubit = context.read<TrackingCubit>();
+    final cubit = context.read<HomeCubit>();
     _uiEventSubscription = cubit.eventStream.listen(handleUiEvent);
     cubit.doEvent(const GetPendingOrdersEvent());
   }
@@ -57,7 +57,7 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
   }
 
   Future<void> _loadOrders() =>
-      context.read<TrackingCubit>().doEvent(const GetPendingOrdersEvent());
+      context.read<HomeCubit>().doEvent(const GetPendingOrdersEvent());
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +75,7 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
           ],
         ),
       ),
-      body: BlocBuilder<TrackingCubit, TrackingStates>(
+      body: BlocBuilder<HomeCubit, HomeStates>(
         buildWhen: (previous, current) =>
             previous.pendingOrdersState != current.pendingOrdersState,
         builder: (context, state) {
@@ -108,7 +108,7 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
               separatorBuilder: (context, index) => SizedBox(height: 16.h),
               itemBuilder: (context, index) {
                 final order = orders[index];
-                final cubit = context.read<TrackingCubit>();
+                final cubit = context.read<HomeCubit>();
                 return OrderCard(
                   order: order,
                   onAccept: () => cubit.doEvent(AcceptOrderEvent(order)),
