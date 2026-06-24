@@ -238,6 +238,32 @@ abstract class AppStrings {
   static const String noActiveOrders = 'no_active_orders';
   static const String noCompletedOrders = 'no_completed_orders';
 
+  // Order Details
+  static const String orderDetails = 'order_details';
+  static const String status = 'status';
+  static const String orderID = 'order_id';
+  static const String accepted = 'accepted';
+  static const String arrivedAtPickup = 'arrived_at_pickup';
+  static const String picked = 'picked';
+  static const String outForDelivery = 'out_for_delivery';
+  static const String arrived = 'arrived';
+  static const String delivered = 'delivered';
+  static const String paymentMethod = 'payment_method';
+  static const String cashOnDelivery = 'cash_on_delivery';
+  static const String total = 'total';
+  static const String arrivedAtPickupPoint = 'arrived_at_pickup_point';
+  static const String startDeliver = 'start_deliver';
+  static const String arrivedToTheUser = 'arrived_to_the_user';
+  static const String deliveredToTheUser = 'delivered_to_the_user';
+  static const String thankYou = 'thank_you';
+  static const String orderDeliveredSuccessfully =
+      'order_delivered_successfully';
+  static const String done = 'done';
+  static const String confirmCancelOrderTitle = 'confirm_cancel_order_title';
+  static const String confirmCancelOrderMessage =
+      'confirm_cancel_order_message';
+  static const String couldNotLaunchUrl = 'could_not_launch_url';
+
   // ===========================================================================
   // API Constants (Values sent directly to Backend - Do NOT Translate)
   // ===========================================================================
