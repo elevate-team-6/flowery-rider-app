@@ -1,4 +1,4 @@
-import 'dart:async';
+import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,10 +7,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/utils/app_assets.dart';
 import '../../../../../core/utils/app_colors.dart';
+import '../../../../../core/utils/app_keys.dart';
 import '../../../../../core/utils/app_routes.dart';
 import '../../../../../core/utils/app_strings.dart';
 import '../../../../../core/utils/app_text_styles.dart';
+import '../../../../config/cache/hive_helper.dart';
+import '../../../../config/di/di.dart';
 import '../../../../config/services/auth_service.dart';
+import '../../../tracking/domain/entities/order_entity.dart';
 import '../widgets/petals_painter.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -145,12 +149,33 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _navigateToNext() async {
     final isLoggedIn = await AuthService.isLoggedIn();
+    OrderEntity? cachedOrder;
+
+    if (isLoggedIn) {
+      final hiveHelper = getIt<HiveHelper>();
+      final String? orderJson = await hiveHelper.getData(
+        boxName: AppKeys.activeOrderKey,
+        key: AppKeys.activeOrderKey,
+      );
+      if (orderJson != null) {
+        cachedOrder = OrderEntity.fromJson(jsonDecode(orderJson));
+      }
+    }
+
     await Future.delayed(const Duration(milliseconds: 4000));
     if (mounted) {
-      Navigator.pushReplacementNamed(
-        context,
-        isLoggedIn ? AppRoutes.mainLayout : AppRoutes.onboarding,
-      );
+      if (cachedOrder != null) {
+        Navigator.pushReplacementNamed(
+          context,
+          AppRoutes.orderDetails,
+          arguments: cachedOrder,
+        );
+      } else {
+        Navigator.pushReplacementNamed(
+          context,
+          isLoggedIn ? AppRoutes.mainLayout : AppRoutes.onboarding,
+        );
+      }
     }
   }
 
