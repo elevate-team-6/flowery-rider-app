@@ -22,8 +22,9 @@ import '../widgets/order_summary_section.dart';
 
 class OrderDetailsScreen extends StatefulWidget {
   final OrderEntity order;
+  final int? initialStep;
 
-  const OrderDetailsScreen({super.key, required this.order});
+  const OrderDetailsScreen({super.key, required this.order, this.initialStep});
 
   @override
   State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
@@ -44,7 +45,10 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     Future.microtask(() {
       if (mounted) {
         context.read<OrderDetailsCubit>().doEvent(
-          InitializeOrderDetailsEvent(widget.order),
+          InitializeOrderDetailsEvent(
+            widget.order,
+            initialStep: widget.initialStep,
+          ),
         );
       }
     });

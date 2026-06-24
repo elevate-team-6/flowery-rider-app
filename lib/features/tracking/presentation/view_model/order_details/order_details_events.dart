@@ -4,8 +4,9 @@ sealed class OrderDetailsEvents {}
 
 class InitializeOrderDetailsEvent extends OrderDetailsEvents {
   final OrderEntity order;
+  final int? initialStep;
 
-  InitializeOrderDetailsEvent(this.order);
+  InitializeOrderDetailsEvent(this.order, {this.initialStep});
 }
 
 class NextStepEvent extends OrderDetailsEvents {}

@@ -1,4 +1,5 @@
 import 'package:flowery_rider_app/config/di/di.dart';
+import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/forget_password_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/onboarding_screen.dart';
@@ -74,11 +75,21 @@ abstract class AppRoutes {
           );
 
         case orderDetails:
-          final order = settings.arguments as OrderEntity;
+          OrderEntity order;
+          int? initialStep;
+
+          if (settings.arguments is OrderEntity) {
+            order = settings.arguments as OrderEntity;
+          } else {
+            final map = settings.arguments as Map<String, dynamic>;
+            order = map[AppKeys.order] as OrderEntity;
+            initialStep = map[AppKeys.uiStep] as int?;
+          }
+
           return MaterialPageRoute(
             builder: (_) => BlocProvider(
               create: (context) => getIt<OrderDetailsCubit>(),
-              child: OrderDetailsScreen(order: order),
+              child: OrderDetailsScreen(order: order, initialStep: initialStep),
             ),
             settings: settings,
           );

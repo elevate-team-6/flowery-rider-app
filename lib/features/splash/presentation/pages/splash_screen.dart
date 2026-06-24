@@ -150,15 +150,18 @@ class _SplashScreenState extends State<SplashScreen>
   void _navigateToNext() async {
     final isLoggedIn = await AuthService.isLoggedIn();
     OrderEntity? cachedOrder;
+    int? cachedStep;
 
     if (isLoggedIn) {
       final hiveHelper = getIt<HiveHelper>();
-      final String? orderJson = await hiveHelper.getData(
-        boxName: AppKeys.activeOrderKey,
+      final String? cachedJson = await hiveHelper.getData(
+        boxName: AppKeys.activeOrderBox,
         key: AppKeys.activeOrderKey,
       );
-      if (orderJson != null) {
-        cachedOrder = OrderEntity.fromJson(jsonDecode(orderJson));
+      if (cachedJson != null) {
+        final Map<String, dynamic> data = jsonDecode(cachedJson);
+        cachedOrder = OrderEntity.fromJson(data[AppKeys.order]);
+        cachedStep = data[AppKeys.uiStep];
       }
     }
 
@@ -168,7 +171,7 @@ class _SplashScreenState extends State<SplashScreen>
         Navigator.pushReplacementNamed(
           context,
           AppRoutes.orderDetails,
-          arguments: cachedOrder,
+          arguments: {'order': cachedOrder, 'uiStep': cachedStep},
         );
       } else {
         Navigator.pushReplacementNamed(

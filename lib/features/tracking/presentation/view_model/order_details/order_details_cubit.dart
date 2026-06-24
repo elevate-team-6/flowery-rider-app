@@ -35,7 +35,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   void doEvent(OrderDetailsEvents event) {
     switch (event) {
       case InitializeOrderDetailsEvent():
-        _onInitialize(event.order);
+        _onInitialize(event.order, initialStep: event.initialStep);
       case NextStepEvent():
         _onNextStep();
       case ConfirmBackButtonPressedEvent():
@@ -51,20 +51,24 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     }
   }
 
-  Future<void> _onInitialize(OrderEntity order) async {
+  Future<void> _onInitialize(OrderEntity order, {int? initialStep}) async {
     final initialBackendStatus = OrderStatus.fromString(order.state);
-    int initialStep = 1;
-    if (initialBackendStatus == OrderStatus.completed) {
-      initialStep = 6;
-    } else if (initialBackendStatus == OrderStatus.inProgress) {
-      initialStep = 1;
+    int step = initialStep ?? 1;
+
+    // If no initialStep is provided, fallback to basic logic
+    if (initialStep == null) {
+      if (initialBackendStatus == OrderStatus.completed) {
+        step = 6;
+      } else if (initialBackendStatus == OrderStatus.inProgress) {
+        step = 1;
+      }
     }
 
     emit(
       state.copyWith(
         orderDetailsState: BaseState(data: order),
         orderStatus: initialBackendStatus,
-        uiStep: initialStep,
+        uiStep: step,
       ),
     );
 
@@ -160,16 +164,21 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   }
 
   void _cacheOrder(OrderEntity order) {
+    final cacheData = {
+      AppKeys.order: order.toJson(),
+      AppKeys.uiStep: state.uiStep,
+    };
+
     _hiveHelper.cacheData(
-      boxName: AppKeys.activeOrderKey,
+      boxName: AppKeys.activeOrderBox,
       key: AppKeys.activeOrderKey,
-      value: jsonEncode(order.toJson()),
+      value: jsonEncode(cacheData),
     );
   }
 
   void _clearCache() {
     _hiveHelper.deleteData(
-      boxName: AppKeys.activeOrderKey,
+      boxName: AppKeys.activeOrderBox,
       key: AppKeys.activeOrderKey,
     );
   }
