@@ -1,5 +1,4 @@
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
-import 'package:flowery_rider_app/config/cache/secure_cache_helper.dart';
 import 'package:flowery_rider_app/features/tracking/data/data_sources/tracking_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/order_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/pending_orders_response_model.dart';
@@ -11,7 +10,7 @@ import 'package:mockito/mockito.dart';
 
 import 'tracking_repo_impl_test.mocks.dart';
 
-@GenerateMocks([TrackingRemoteDataSourceContract, SecureCacheHelper])
+@GenerateMocks([TrackingRemoteDataSourceContract])
 void main() {
   provideDummy<BaseResponse<PendingOrdersResponseModel>>(
     ErrorBaseResponse('dummy'),
@@ -19,12 +18,10 @@ void main() {
 
   late TrackingRepoImpl repo;
   late MockTrackingRemoteDataSourceContract mockRemoteDataSource;
-  late MockSecureCacheHelper mockCache;
 
   setUp(() {
     mockRemoteDataSource = MockTrackingRemoteDataSourceContract();
-    mockCache = MockSecureCacheHelper();
-    repo = TrackingRepoImpl(mockRemoteDataSource, mockCache);
+    repo = TrackingRepoImpl(mockRemoteDataSource);
   });
 
   const fakeResponse = PendingOrdersResponseModel(

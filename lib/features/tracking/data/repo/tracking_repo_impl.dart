@@ -1,5 +1,4 @@
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
-import 'package:flowery_rider_app/config/cache/secure_cache_helper.dart';
 import 'package:flowery_rider_app/features/tracking/data/data_sources/tracking_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/driver_orders_response_model.dart';
@@ -8,12 +7,12 @@ import 'package:flowery_rider_app/features/tracking/data/models/response/pending
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/repo/tracking_repo_contract.dart';
 import 'package:injectable/injectable.dart';
+
 @Injectable(as: TrackingRepoContract)
 class TrackingRepoImpl implements TrackingRepoContract {
   final TrackingRemoteDataSourceContract _remoteDataSource;
-  final SecureCacheHelper _secureCacheHelper;
 
-  TrackingRepoImpl(this._remoteDataSource, this._secureCacheHelper);
+  TrackingRepoImpl(this._remoteDataSource);
 
   @override
   Future<BaseResponse<List<OrderEntity>>> getDriverOrders() async {

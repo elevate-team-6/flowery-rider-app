@@ -19,4 +19,3 @@ abstract interface class TrackingRemoteDataSourceContract {
     int? page,
   });
 }
-}

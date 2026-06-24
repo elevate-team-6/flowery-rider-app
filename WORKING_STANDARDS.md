@@ -51,6 +51,13 @@ Every feature MUST be divided into exactly these 4 layers with these exact folde
 - **Mandatory Utils**: 
     - Use `lib/core/utils/` for routes, strings, colors, and assets.
     - Use `ScreenUtil` for ALL dimensions (h, w, sp, r).
+- **Strict Adherence to `AppTheme`**:
+    - MANDATORY use of `AppTheme.mainTheme` for all component styling (Buttons, Dialogs, Inputs, Cards).
+    - PROHIBITED to hardcode styling properties (padding, border radius, colors) in UI files if they are already defined in the global theme.
+    - If a design requires a new global style, it MUST be added to `lib/core/utils/app_theme.dart` first.
+- **Color & Opacity Standard**:
+    - STRICT PROHIBITION of `withOpacity()`.
+    - ALWAYS use `.withValues(alpha: ...)` for transparency to prevent precision loss and ensure compatibility with modern Flutter standards.
 - **Side Effect Handling**: Screens MUST use `UiEventHandler` mixin from `lib/config/base_ui_handler/ui_event_handler_mixin.dart`.
 - **File Size**: Screens MUST be split into small widgets located in the feature's `presentation/widgets/` folder.
 
@@ -62,6 +69,11 @@ Every feature MUST be divided into exactly these 4 layers with these exact folde
 - **DI**: Use `@injectable` for all Cubits, Repos, and DataSources.
 - **Logging**: NO `print()`. Use the `logger` package.
 - **Strong Typing**: `dynamic` is forbidden.
+- **Modern API Usage**: 
+    - NEVER use deprecated Flutter/Dart APIs.
+    - Always prefer `withValues()` over `withOpacity()`.
+    - Ensure all code is compatible with the latest stable version of Flutter and Dart.
+- **Clean Code**: Follow SOLID principles and keep methods small and focused.
 
 ## 7. Mandatory Feature Documentation (The "Docs" Rule)
 Before starting ANY feature, the developer/AI MUST ensure there is a documentation file in `docs/feature_name.md`. If it doesn't exist, it MUST be created.

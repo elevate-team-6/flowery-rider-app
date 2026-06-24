@@ -14,4 +14,3 @@ abstract interface class TrackingRepoContract {
 
   Future<BaseResponse<PendingOrdersEntity>> getPendingOrders({int? page});
 }
-}

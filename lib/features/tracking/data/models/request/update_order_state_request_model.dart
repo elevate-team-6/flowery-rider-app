@@ -1,19 +1,34 @@
 enum OrderStatus {
-  accepted,
+  pending,
   inProgress,
   completed,
   canceled;
 
   String get value {
     switch (this) {
-      case OrderStatus.accepted:
-        return 'accepted';
+      case OrderStatus.pending:
+        return 'pending';
       case OrderStatus.inProgress:
         return 'inProgress';
       case OrderStatus.completed:
         return 'completed';
       case OrderStatus.canceled:
         return 'canceled';
+    }
+  }
+
+  static OrderStatus fromString(String? state) {
+    switch (state) {
+      case 'pending':
+        return OrderStatus.pending;
+      case 'inProgress':
+        return OrderStatus.inProgress;
+      case 'completed':
+        return OrderStatus.completed;
+      case 'canceled':
+        return OrderStatus.canceled;
+      default:
+        return OrderStatus.inProgress;
     }
   }
 }
