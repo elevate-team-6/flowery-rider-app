@@ -286,10 +286,14 @@ void main() {
       await tester.pump();
 
       await tester.tap(find.text(AppStrings.continueText.tr()));
-      // Drain the async sign-in flow and the error toast entrance animation.
+      // Drain the async sign-in flow and dispatch the error toast.
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
-      await tester.pump(const Duration(milliseconds: 500));
+      // Insert the BotToast overlay entry.
+      await tester.pump();
+      // Play the morph entrance until the card surfaces the message text. The
+      // message Text only mounts once the morph animation passes ~0.4 progress,
+      // which lands near 950ms into the 1400ms entrance controller.
+      await tester.pump(const Duration(milliseconds: 1200));
 
       verify(mockUseCase(any)).called(1);
       // The error notification surfaces the failure message; no session is
@@ -298,6 +302,14 @@ void main() {
       verifyNever(
         mockCache.writeData(key: anyNamed('key'), value: anyNamed('value')),
       );
+
+      // Tear the toast out of the tree first, then advance past its entrance/
+      // dismiss timers (~4.2s). With the toast disposed its pending
+      // Future.delayed callbacks fire as no-ops (they guard on `mounted`) and no
+      // longer trip the "Timer still pending" invariant on teardown.
+      BotToast.cleanAll();
+      await tester.pump();
+      await tester.pump(const Duration(seconds: 5));
     });
   });
 }

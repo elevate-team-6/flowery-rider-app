@@ -20,8 +20,14 @@ abstract class AppEndPoints {
 
   // Tracking:
   static const String driverOrders = "$baseUrl/drivers/all-orders";
-  static const String startOrder = '/orders/start/';
-  static const String updateOrderState = '/orders/state/';
+  static const String startOrder = '$baseUrl/orders/start/';
+  static const String updateOrderState = '$baseUrl/orders/state/';
+
+  // Orders:
+  static const String pendingOrders = "$baseUrl/orders/pending-orders";
+
+  // General:
+  static const String addresses = "$baseUrl/addresses";
 
   // Web Views:
   static const String termsAndConditionsUrl =

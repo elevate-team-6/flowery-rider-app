@@ -2,6 +2,16 @@
     "home": "الرئيسية",
     "orders": "الطلبات",
 
+    "flowery_rider_title": "فلاورى رايدر",
+    "flower_order": "طلب ورود",
+    "pickup_address": "عنوان الاستلام",
+    "user_address": "عنوان العميل",
+    "accept": "قبول",
+    "reject": "رفض",
+    "egp": "ج.م",
+    "no_pending_orders": "لا توجد طلبات معلقة",
+    "no_pending_orders_subtitle": "الطلبات الجديدة ستظهر هنا. اسحب لأسفل للتحديث.",
+
     "login": "تسجيل الدخول",
     "email": "البريد الإلكتروني",
     "password": "كلمة المرور",
