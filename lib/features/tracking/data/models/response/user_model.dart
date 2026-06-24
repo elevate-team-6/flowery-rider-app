@@ -1,7 +1,12 @@
 import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'user_model.g.dart';
+
+@JsonSerializable()
 class UserModel extends Equatable {
+  @JsonKey(name: '_id')
   final String? id;
   final String? firstName;
   final String? lastName;
@@ -24,19 +29,10 @@ class UserModel extends Equatable {
     this.resetCodeVerified,
   });
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
-    return UserModel(
-      id: json['_id'] as String?,
-      firstName: json['firstName'] as String?,
-      lastName: json['lastName'] as String?,
-      email: json['email'] as String?,
-      gender: json['gender'] as String?,
-      phone: json['phone'] as String?,
-      photo: json['photo'] as String?,
-      passwordChangedAt: json['passwordChangedAt'] as String?,
-      resetCodeVerified: json['resetCodeVerified'] as bool?,
-    );
-  }
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
   UserEntity toEntity() => UserEntity(
     id: id,

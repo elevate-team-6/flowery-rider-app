@@ -1,6 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'store_model.g.dart';
+
+@JsonSerializable()
 class StoreModel extends Equatable {
   final String? name;
   final String? image;
@@ -16,15 +20,10 @@ class StoreModel extends Equatable {
     this.latLong,
   });
 
-  factory StoreModel.fromJson(Map<String, dynamic> json) {
-    return StoreModel(
-      name: json['name'] as String?,
-      image: json['image'] as String?,
-      address: json['address'] as String?,
-      phoneNumber: json['phoneNumber'] as String?,
-      latLong: json['latLong'] as String?,
-    );
-  }
+  factory StoreModel.fromJson(Map<String, dynamic> json) =>
+      _$StoreModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$StoreModelToJson(this);
 
   StoreEntity toEntity() {
     List<String>? latLngList = latLong?.split(',');

@@ -1,28 +1,29 @@
 import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'order_action_response_model.g.dart';
+
+@JsonSerializable()
 class OrderActionResponseModel extends Equatable {
   final String? message;
+  @JsonKey(name: 'orders')
   final OrderActionDataModel? order;
 
   const OrderActionResponseModel({this.message, this.order});
 
-  factory OrderActionResponseModel.fromJson(Map<String, dynamic> json) {
-    return OrderActionResponseModel(
-      message: json['message'] as String?,
-      order: json['orders'] != null
-          ? OrderActionDataModel.fromJson(
-              json['orders'] as Map<String, dynamic>,
-            )
-          : null,
-    );
-  }
+  factory OrderActionResponseModel.fromJson(Map<String, dynamic> json) =>
+      _$OrderActionResponseModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$OrderActionResponseModelToJson(this);
 
   @override
   List<Object?> get props => [message, order];
 }
 
+@JsonSerializable()
 class OrderActionDataModel extends Equatable {
+  @JsonKey(name: '_id')
   final String? id;
   final String? user;
   final List<OrderActionItemModel>? orderItems;
@@ -35,6 +36,7 @@ class OrderActionDataModel extends Equatable {
   final String? createdAt;
   final String? updatedAt;
   final String? orderNumber;
+  @JsonKey(name: '__v')
   final int? v;
   final OrderActionShippingAddressModel? shippingAddress;
 
@@ -55,30 +57,10 @@ class OrderActionDataModel extends Equatable {
     this.shippingAddress,
   });
 
-  factory OrderActionDataModel.fromJson(Map<String, dynamic> json) {
-    return OrderActionDataModel(
-      id: json['_id'] as String?,
-      user: json['user'] as String?,
-      orderItems: (json['orderItems'] as List<dynamic>?)
-          ?.map((e) => OrderActionItemModel.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      totalPrice: json['totalPrice'] as num?,
-      paymentType: json['paymentType'] as String?,
-      isPaid: json['isPaid'] as bool?,
-      paidAt: json['paidAt'] as String?,
-      isDelivered: json['isDelivered'] as bool?,
-      state: json['state'] as String?,
-      createdAt: json['createdAt'] as String?,
-      updatedAt: json['updatedAt'] as String?,
-      orderNumber: json['orderNumber'] as String?,
-      v: json['__v'] as int?,
-      shippingAddress: json['shippingAddress'] != null
-          ? OrderActionShippingAddressModel.fromJson(
-              json['shippingAddress'] as Map<String, dynamic>,
-            )
-          : null,
-    );
-  }
+  factory OrderActionDataModel.fromJson(Map<String, dynamic> json) =>
+      _$OrderActionDataModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$OrderActionDataModelToJson(this);
 
   OrderEntity toEntity() => OrderEntity(
     id: id,
@@ -111,10 +93,12 @@ class OrderActionDataModel extends Equatable {
   ];
 }
 
+@JsonSerializable()
 class OrderActionItemModel extends Equatable {
   final String? product;
   final num? price;
   final int? quantity;
+  @JsonKey(name: '_id')
   final String? id;
 
   const OrderActionItemModel({
@@ -124,14 +108,10 @@ class OrderActionItemModel extends Equatable {
     this.id,
   });
 
-  factory OrderActionItemModel.fromJson(Map<String, dynamic> json) {
-    return OrderActionItemModel(
-      product: json['product'] as String?,
-      price: json['price'] as num?,
-      quantity: json['quantity'] as int?,
-      id: json['_id'] as String?,
-    );
-  }
+  factory OrderActionItemModel.fromJson(Map<String, dynamic> json) =>
+      _$OrderActionItemModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$OrderActionItemModelToJson(this);
 
   OrderItemEntity toEntity() => OrderItemEntity(
     productName: product, // ID because only ID is returned
@@ -143,6 +123,7 @@ class OrderActionItemModel extends Equatable {
   List<Object?> get props => [product, price, quantity, id];
 }
 
+@JsonSerializable()
 class OrderActionShippingAddressModel extends Equatable {
   final String? street;
   final String? city;
@@ -158,15 +139,11 @@ class OrderActionShippingAddressModel extends Equatable {
     this.long,
   });
 
-  factory OrderActionShippingAddressModel.fromJson(Map<String, dynamic> json) {
-    return OrderActionShippingAddressModel(
-      street: json['street'] as String?,
-      city: json['city'] as String?,
-      phone: json['phone'] as String?,
-      lat: json['lat'] as String?,
-      long: json['long'] as String?,
-    );
-  }
+  factory OrderActionShippingAddressModel.fromJson(Map<String, dynamic> json) =>
+      _$OrderActionShippingAddressModelFromJson(json);
+
+  Map<String, dynamic> toJson() =>
+      _$OrderActionShippingAddressModelToJson(this);
 
   ShippingAddressEntity toEntity() => ShippingAddressEntity(
     street: street,

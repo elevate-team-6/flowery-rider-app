@@ -1,6 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'shipping_address_model.g.dart';
+
+@JsonSerializable()
 class ShippingAddressModel extends Equatable {
   final String? street;
   final String? city;
@@ -16,15 +20,10 @@ class ShippingAddressModel extends Equatable {
     this.long,
   });
 
-  factory ShippingAddressModel.fromJson(Map<String, dynamic> json) {
-    return ShippingAddressModel(
-      street: json['street'] as String?,
-      city: json['city'] as String?,
-      phone: json['phone'] as String?,
-      lat: json['lat'] as String?,
-      long: json['long'] as String?,
-    );
-  }
+  factory ShippingAddressModel.fromJson(Map<String, dynamic> json) =>
+      _$ShippingAddressModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ShippingAddressModelToJson(this);
 
   ShippingAddressEntity toEntity() => ShippingAddressEntity(
     street: street,
