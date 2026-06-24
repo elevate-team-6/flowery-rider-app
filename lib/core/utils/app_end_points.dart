@@ -18,8 +18,10 @@ abstract class AppEndPoints {
   static const String editProfile = "$baseUrl/drivers/editProfile";
   static const String uploadPhoto = "$baseUrl/drivers/upload-photo";
 
-  // General:
-  static const String addresses = "$baseUrl/addresses";
+  // Tracking:
+  static const String driverOrders = "$baseUrl/drivers/all-orders";
+  static const String startOrder = '/orders/start/';
+  static const String updateOrderState = '/orders/state/';
 
   // Web Views:
   static const String termsAndConditionsUrl =
