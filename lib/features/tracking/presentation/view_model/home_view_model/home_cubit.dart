@@ -5,17 +5,17 @@ import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_pending_orders_use_case.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/view_model/tracking_events.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/view_model/tracking_states.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_events.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_states.dart';
 import 'package:injectable/injectable.dart';
 
 @injectable
-class TrackingCubit extends BaseCubit<TrackingStates, BaseUiEvent> {
+class HomeCubit extends BaseCubit<HomeStates, BaseUiEvent> {
   final GetPendingOrdersUseCase _getPendingOrdersUseCase;
 
-  TrackingCubit(this._getPendingOrdersUseCase) : super(const TrackingStates());
+  HomeCubit(this._getPendingOrdersUseCase) : super(const HomeStates());
 
-  Future<void> doEvent(TrackingEvents event) async {
+  Future<void> doEvent(HomeEvents event) async {
     switch (event) {
       case GetPendingOrdersEvent():
         await _getPendingOrders(event.page);

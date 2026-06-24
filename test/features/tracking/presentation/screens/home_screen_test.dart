@@ -3,7 +3,6 @@ import 'dart:convert';
 
 import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/di/di.dart';
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
@@ -12,10 +11,11 @@ import 'package:flowery_rider_app/core/widgets/custom_error_state.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_pending_orders_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/home_screen.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/view_model/tracking_cubit.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/widgets/empty_orders_state.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/widgets/order_card.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -92,15 +92,15 @@ void main() {
 
     // HomeScreen builds its cubit from the service locator, so register one
     // backed by the mocked use case for the duration of each test.
-    if (getIt.isRegistered<TrackingCubit>()) {
-      getIt.unregister<TrackingCubit>();
+    if (getIt.isRegistered<HomeCubit>()) {
+      getIt.unregister<HomeCubit>();
     }
-    getIt.registerFactory<TrackingCubit>(() => TrackingCubit(mockUseCase));
+    getIt.registerFactory<HomeCubit>(() => HomeCubit(mockUseCase));
   });
 
   tearDown(() {
-    if (getIt.isRegistered<TrackingCubit>()) {
-      getIt.unregister<TrackingCubit>();
+    if (getIt.isRegistered<HomeCubit>()) {
+      getIt.unregister<HomeCubit>();
     }
   });
 
