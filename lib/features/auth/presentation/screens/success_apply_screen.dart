@@ -15,52 +15,48 @@ class SuccessApplyScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 25.w),
-                  child: Column(
-                    children: [
-                      Spacer(),
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: 25.w),
+            child: Column(
+              children: [
+                SizedBox(height: 120.h),
 
-                      SvgPicture.asset(AppIcons.success),
+                SvgPicture.asset(AppIcons.success),
 
-                      SizedBox(height: 24.h),
+                SizedBox(height: 24.h),
 
-                      Text(
-                        AppStrings.submitSuccess.tr(),
-                        style: AppTextStyles.black18600,
-                        textAlign: TextAlign.center,
-                      ),
-
-                      SizedBox(height: 8.h),
-
-                      Text(
-                        AppStrings.submitDescription.tr(),
-                        style: AppTextStyles.gray16400,
-                        textAlign: TextAlign.center,
-                      ),
-
-                      SizedBox(height: 24.h),
-
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pushNamedAndRemoveUntil(
-                            context,
-                            AppRoutes.login,
-                            (route) => false,
-                          );
-                        },
-                        child: Text(AppStrings.login.tr()),
-                      ),
-                    ],
-                  ),
+                Text(
+                  AppStrings.submitSuccess.tr(),
+                  style: AppTextStyles.black18600,
+                  textAlign: TextAlign.center,
                 ),
-              ),
 
-              SvgPicture.asset(AppIcons.submitIcon),
-            ],
+                SizedBox(height: 8.h),
+
+                Text(
+                  AppStrings.submitDescription.tr(),
+                  style: AppTextStyles.gray16400,
+                  textAlign: TextAlign.center,
+                ),
+
+                SizedBox(height: 24.h),
+
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pushNamedAndRemoveUntil(
+                      context,
+                      AppRoutes.login,
+                      (route) => false,
+                    );
+                  },
+                  child: Text(AppStrings.login.tr()),
+                ),
+
+                SizedBox(height: 40.h),
+
+                SvgPicture.asset(AppIcons.submitIcon),
+              ],
+            ),
           ),
         ),
       ),

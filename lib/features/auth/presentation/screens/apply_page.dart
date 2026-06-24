@@ -42,6 +42,7 @@ class _ApplyPageState extends State<ApplyPage> {
   void initState() {
     super.initState();
     final cubit = context.read<ApplyCubit>();
+    cubit.doIntent(const GetVehicleTypesEvent());
     cubit.doIntent(const GetCountriesEvent());
     _eventSubscription = cubit.eventStream.listen(_handleUiEvent);
   }
@@ -94,6 +95,7 @@ class _ApplyPageState extends State<ApplyPage> {
               BlocBuilder<ApplyCubit, ApplyState>(
                 builder: (context, state) {
                   return ApplyForm(
+                    vehicleTypes: state.vehicleTypesState.data ?? [],
                     formKey: formKey,
                     nationalIdImage: state.nationalIdImage,
                     drivingLicenseImage: state.drivingLicenseImage,
@@ -173,22 +175,23 @@ class _ApplyPageState extends State<ApplyPage> {
                             context.read<ApplyCubit>().doIntent(
                               ApplyDriverEvent(
                                 SignUpRequest(
-                                  country: state.selectedCountry?.name,
+                                  country: state.selectedCountry!.name,
                                   firstName: firstNameController.text,
                                   lastName: lastNameController.text,
-                                  vehicleType: state.selectedVehicleType?.id,
+                                  vehicleType: state.selectedVehicleType!.id,
                                   vehicleNumber: vehicleNumberController.text,
                                   nid: nidController.text,
                                   email: emailController.text,
                                   password: passwordController.text,
                                   rePassword: confirmPasswordController.text,
-                                  gender: state.selectedGender,
+                                  gender: state.selectedGender ?? '',
                                   phone: phoneController.text.toEgyptianPhone(),
-                                  vehicleLicense: AppMultipartFile(
-                                    path: state.drivingLicenseImage!.path,
+                                  vehicleLicense: AppMultipartFile.fromPath(
+                                    state.drivingLicenseImage!.path,
                                   ),
-                                  nidImg: AppMultipartFile(
-                                    path: state.nationalIdImage!.path,
+
+                                  nidImg: AppMultipartFile.fromPath(
+                                    state.nationalIdImage!.path,
                                   ),
                                 ),
                               ),

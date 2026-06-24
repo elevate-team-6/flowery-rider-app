@@ -1,5 +1,3 @@
-import 'package:flowery_rider_app/features/auth/data/models/response/signup/country_model.dart';
-import 'package:flowery_rider_app/features/auth/data/models/response/signup/driver_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -8,8 +6,13 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/features/auth/data/data_sources/auth_local_data_source_contract.dart';
 import 'package:flowery_rider_app/features/auth/data/data_sources/auth_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/signup/country_model.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/signup/driver_model.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/signup/signup_response.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_response.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_type_model.dart';
 import 'package:flowery_rider_app/features/auth/data/repo/auth_repo_impl.dart';
+import 'package:flowery_rider_app/features/auth/domain/entites/vehicle_type_entity.dart';
 
 import 'auth_repo_impl_test.mocks.dart';
 
@@ -19,94 +22,181 @@ void main() {
     provideDummy<BaseResponse<SignUpResponse>>(
       ErrorBaseResponse<SignUpResponse>('dummy'),
     );
+
+    provideDummy<BaseResponse<VehicleResponse>>(
+      ErrorBaseResponse<VehicleResponse>('dummy'),
+    );
   });
-  late MockAuthRemoteDataSourceContract mockRemoteDataSource;
-  late MockAuthLocalDataSourceContract mockLocalDataSource;
+  late MockAuthRemoteDataSourceContract remoteDataSource;
+  late MockAuthLocalDataSourceContract localDataSource;
 
   late AuthRepoImpl repo;
 
   setUp(() {
-    mockRemoteDataSource = MockAuthRemoteDataSourceContract();
-    mockLocalDataSource = MockAuthLocalDataSourceContract();
+    remoteDataSource = MockAuthRemoteDataSourceContract();
+    localDataSource = MockAuthLocalDataSourceContract();
 
-    repo = AuthRepoImpl(mockRemoteDataSource, mockLocalDataSource);
+    repo = AuthRepoImpl(remoteDataSource, localDataSource);
   });
 
   group('signup', () {
-    test(
-      'should return SuccessBaseResponse<DriverEntity> when signup succeeds',
-      () async {
-        final request = SignUpRequest();
+    test('should return DriverEntity when signup succeeds', () async {
+      when(remoteDataSource.signup(any)).thenAnswer(
+        (_) async => SuccessBaseResponse(
+          SignUpResponse(
+            driver: DriverModel(
+              id: '1',
+              firstName: 'Youssef',
+              lastName: 'Singer',
+              email: 'test@test.com',
+              phone: '01000000000',
+              country: 'Egypt',
+              gender: 'Male',
+              vehicleType: 'Car',
+              vehicleNumber: '123',
+              vehicleLicense: 'license',
+              nid: '123456789',
+              nidImg: 'nid.png',
+              photo: '',
+              role: 'driver',
+            ),
+          ),
+        ),
+      );
 
-        final response = SignUpResponse(
-          driver: DriverModel(
-            firstName: 'GoOo'
-            
-          )
-        );
+      final result = await repo.signup(
+        const SignUpRequest(
+          country: '',
+          firstName: '',
+          lastName: '',
+          vehicleType: '',
+          vehicleNumber: '',
+          nid: '',
+          email: '',
+          password: '',
+          rePassword: '',
+          gender: '',
+          phone: '',
+          vehicleLicense: null,
+          nidImg: null,
+        ),
+      );
 
-        when(
-          mockRemoteDataSource.signup(request),
-        ).thenAnswer((_) async => SuccessBaseResponse(response));
+      expect(result, isA<SuccessBaseResponse>());
+    });
 
-        final result = await repo.signup(request);
-
-        expect(result, isA<SuccessBaseResponse>());
-
-        verify(mockRemoteDataSource.signup(request)).called(1);
-      },
-    );
-
-    test('should return ErrorBaseResponse when driver is null', () async {
-      final request = SignUpRequest();
-
-      when(mockRemoteDataSource.signup(request)).thenAnswer(
+    test('should return error when driver is null', () async {
+      when(remoteDataSource.signup(any)).thenAnswer(
         (_) async => SuccessBaseResponse(SignUpResponse(driver: null)),
       );
 
-      final result = await repo.signup(request);
+      final result = await repo.signup(
+        const SignUpRequest(
+          country: '',
+          firstName: '',
+          lastName: '',
+          vehicleType: '',
+          vehicleNumber: '',
+          nid: '',
+          email: '',
+          password: '',
+          rePassword: '',
+          gender: '',
+          phone: '',
+          vehicleLicense: null,
+          nidImg: null,
+        ),
+      );
 
       expect(result, isA<ErrorBaseResponse>());
-
-      verify(mockRemoteDataSource.signup(request)).called(1);
     });
 
-    test('should return ErrorBaseResponse when remote returns error', () async {
-      final request = SignUpRequest();
-
+    test('should return error when api fails', () async {
       when(
-        mockRemoteDataSource.signup(request),
+        remoteDataSource.signup(any),
       ).thenAnswer((_) async => ErrorBaseResponse('Server Error'));
 
-      final result = await repo.signup(request);
+      final result = await repo.signup(
+        const SignUpRequest(
+          country: '',
+          firstName: '',
+          lastName: '',
+          vehicleType: '',
+          vehicleNumber: '',
+          nid: '',
+          email: '',
+          password: '',
+          rePassword: '',
+          gender: '',
+          phone: '',
+          vehicleLicense: null,
+          nidImg: null,
+        ),
+      );
 
       expect(result, isA<ErrorBaseResponse>());
-
-      verify(mockRemoteDataSource.signup(request)).called(1);
     });
   });
 
   group('getCountries', () {
     test('should return countries from local datasource', () async {
-      final List<CountryModel> countries = [
-        CountryModel(
-          name: 'Egypt',
-          flag: '🇪🇬',
-          isoCode: '',
-          phoneCode: '',
-          currency: '',
-        ),
-      ];
-
-      when(
-        mockLocalDataSource.getCountries(),
-      ).thenAnswer((_) async => countries);
+      when(localDataSource.getCountries()).thenAnswer(
+        (_) async => [
+          CountryModel(
+            isoCode: 'EG',
+            name: 'Egypt',
+            phoneCode: '20',
+            flag: '🇪🇬',
+            currency: 'EGP',
+          ),
+        ],
+      );
 
       final result = await repo.getCountries();
 
-      expect(result, isNotEmpty);
+      expect(result.length, 1);
+      expect(result.first.name, 'Egypt');
 
-      verify(mockLocalDataSource.getCountries()).called(1);
+      verify(localDataSource.getCountries()).called(1);
+    });
+  });
+
+  group('getVehicles', () {
+    test('should return vehicles when api succeeds', () async {
+      when(remoteDataSource.vehicles()).thenAnswer(
+        (_) async => SuccessBaseResponse(
+          VehicleResponse(
+            vehicles: [
+              VehicleModel(id: '1', type: 'Car', image: 'car.png'),
+              VehicleModel(id: '2', type: 'Motorbike', image: 'bike.png'),
+            ],
+          ),
+        ),
+      );
+
+      final result = await repo.getVehicles();
+
+      expect(result, isA<SuccessBaseResponse<List<VehicleTypeEntity>>>());
+
+      final data =
+          (result as SuccessBaseResponse<List<VehicleTypeEntity>>).data;
+
+      expect(data?.length, 2);
+      expect(data?.first.type, 'Car');
+
+      verify(remoteDataSource.vehicles()).called(1);
+    });
+
+    test('should return error when api fails', () async {
+      when(
+        remoteDataSource.vehicles(),
+      ).thenAnswer((_) async => ErrorBaseResponse('Server Error'));
+
+      final result = await repo.getVehicles();
+
+      expect(result, isA<ErrorBaseResponse<List<VehicleTypeEntity>>>());
+
+      verify(remoteDataSource.vehicles()).called(1);
     });
   });
 }

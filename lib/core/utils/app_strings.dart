@@ -59,10 +59,12 @@ abstract class AppStrings {
   static const String female = 'female';
   static const String male = 'male';
   static const String failedCaptureImage = 'Failed to capture image';
-  static const String failedPickImageGallery = 'Failed to pick image from gallery';
+  static const String failedPickImageGallery =
+      'Failed to pick image from gallery';
   static const String pleaseSelectGender = 'pleaseSelectGender';
   static const String pleaseUploadNationalId = 'Please upload your national ID';
-  static const String pleaseUploadDrivingLicense = 'Please upload your driving license';
+  static const String pleaseUploadDrivingLicense =
+      'Please upload your driving license';
   static const String creatingAccountAgreement = 'creatingAccountAgreement';
   static const String iAgree = 'iAgree';
 
@@ -212,6 +214,9 @@ abstract class AppStrings {
   static const String passwordLowercase = 'passwordLowercase';
   static const String passwordUppercase = 'passwordUppercase';
   static const String passwordNumber = 'passwordNumber';
+  static const fileDoesNotExist = 'fileDoesNotExist';
+  static const appMultipartFileRequiresEitherFilePathOrBytes =
+      'appMultipartFileRequiresEitherFilePathOrBytes';
   static const String passwordSpecialCharacter = 'passwordSpecialCharacter';
   static const String passwordNotMatched = 'passwordNotMatched';
   static const String confirmPasswordRequired = 'confirmPasswordRequired';

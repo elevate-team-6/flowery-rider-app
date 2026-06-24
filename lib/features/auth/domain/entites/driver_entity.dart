@@ -30,7 +30,7 @@ class DriverEntity extends Equatable {
     required this.phone,
     required this.photo,
     required this.role,
-    required this.id,
+    required this.id, required String name,
   });
 
   @override

@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/validations/app_validations.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
-import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_type_model.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entites/vehicle_type_entity.dart';
 import 'package:flowery_rider_app/features/auth/presentation/widgets/selection_drowp_down.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -26,6 +26,7 @@ class ApplyForm extends StatelessWidget {
     required this.onPickNationalIdImage,
     required this.onPickDrivingLicenseImage,
     required this.countries,
+    required this.vehicleTypes,
     required this.selectedCountry,
     required this.onCountryChanged,
     required this.selectedVehicleType,
@@ -52,17 +53,9 @@ class ApplyForm extends StatelessWidget {
   final List<CountryEntity> countries;
   final CountryEntity? selectedCountry;
   final ValueChanged<CountryEntity?> onCountryChanged;
-
-  final VehicleType? selectedVehicleType;
-  final ValueChanged<VehicleType?> onVehicleTypeChanged;
-
-  static const List<VehicleType> vehicleTypes = [
-    VehicleType(id: '6856f4a1c8e2ab1234567890', name: 'Bike'),
-    VehicleType(id: '6856f4a1c8e2ab1234567891', name: 'Motorcycle'),
-    VehicleType(id: '6856f4a1c8e2ab1234567892', name: 'Car'),
-    VehicleType(id: '6856f4a1c8e2ab1234567893', name: 'Van'),
-    VehicleType(id: '6856f4a1c8e2ab1234567894', name: 'Truck'),
-  ];
+  final List<VehicleTypeEntity> vehicleTypes;
+  final VehicleTypeEntity? selectedVehicleType;
+  final ValueChanged<VehicleTypeEntity?> onVehicleTypeChanged;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +65,9 @@ class ApplyForm extends StatelessWidget {
         children: [
           AppDropdownField<CountryEntity>(
             label: AppStrings.country,
-            hint: AppStrings.country,
+            hint: countries.isNotEmpty
+                ? countries.first.name
+                : AppStrings.country.tr(),
 
             value: selectedCountry,
 
@@ -121,17 +116,19 @@ class ApplyForm extends StatelessWidget {
 
           SizedBox(height: 16.h),
 
-          AppDropdownField<VehicleType>(
+          AppDropdownField<VehicleTypeEntity>(
             label: AppStrings.vehicleType.tr(),
-            hint: AppStrings.vehicleType.tr(),
+            hint: vehicleTypes.isNotEmpty
+                ? vehicleTypes.first.type
+                : AppStrings.vehicleType.tr(),
 
             value: selectedVehicleType,
 
             items: vehicleTypes
                 .map(
-                  (vehicle) => DropdownMenuItem<VehicleType>(
+                  (vehicle) => DropdownMenuItem<VehicleTypeEntity>(
                     value: vehicle,
-                    child: Text(vehicle.name),
+                    child: Text(vehicle.type),
                   ),
                 )
                 .toList(),

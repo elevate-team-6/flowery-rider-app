@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
-import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_type_model.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entites/vehicle_type_entity.dart';
 
 sealed class ApplyEvent extends Equatable {
   const ApplyEvent();
@@ -23,9 +23,12 @@ final class ChangeCountryEvent extends ApplyEvent {
   List<Object?> get props => [country];
 }
 
-final class ChangeVehicleTypeEvent extends ApplyEvent {
-  final VehicleType vehicleType;
+final class GetVehicleTypesEvent extends ApplyEvent {
+  const GetVehicleTypesEvent();
+}
 
+final class ChangeVehicleTypeEvent extends ApplyEvent {
+  final VehicleTypeEntity vehicleType;
   const ChangeVehicleTypeEvent(this.vehicleType);
 
   @override

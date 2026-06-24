@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
@@ -7,8 +6,10 @@ import 'package:flowery_rider_app/config/helpers/image_picker_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/driver_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entites/vehicle_type_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/apply_use_case.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/get_countries_use_case.dart';
+import 'package:flowery_rider_app/features/auth/domain/use_cases/get_vehicle_type_use_case.dart';
 import 'package:injectable/injectable.dart';
 
 import 'apply_events.dart';
@@ -18,9 +19,13 @@ import 'apply_state.dart';
 class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
   final GetCountriesUseCase getCountriesUseCase;
   final ApplyUseCase applyUseCase;
+  final GetVehicleTypeUseCase getVehicleTypesUseCase;
 
-  ApplyCubit({required this.getCountriesUseCase, required this.applyUseCase})
-    : super(const ApplyState());
+  ApplyCubit({
+    required this.getCountriesUseCase,
+    required this.applyUseCase,
+    required this.getVehicleTypesUseCase,
+  }) : super(const ApplyState());
 
   Future<void> doIntent(ApplyEvent event) async {
     switch (event) {
@@ -50,6 +55,8 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
 
       case ApplyDriverEvent():
         await _apply(event.request);
+      case GetVehicleTypesEvent():
+        await _getVehicleTypes();
     }
   }
 
@@ -62,11 +69,11 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
     } catch (e) {
       emit(
         state.copyWith(
-          countriesState: BaseState(errorMessage: e.toString().tr()),
+          countriesState: BaseState(errorMessage: e.toString()),
         ),
       );
 
-      emitEvent(DisplayErrorEvent(e.toString().tr()));
+      emitEvent(DisplayErrorEvent(e.toString()));
     }
   }
 
@@ -113,13 +120,40 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
         emit(
           state.copyWith(
             applyState: BaseState(
-              errorMessage: result.errorMessage.tr(),
+              errorMessage: result.errorMessage,
               isLoading: false,
             ),
           ),
         );
 
-        emitEvent(DisplayErrorEvent(result.errorMessage.tr()));
+        emitEvent(DisplayErrorEvent(result.errorMessage));
+    }
+  }
+
+  Future<void> _getVehicleTypes() async {
+    emit(state.copyWith(vehicleTypesState: const BaseState(isLoading: true)));
+
+    final result = await getVehicleTypesUseCase();
+
+    switch (result) {
+      case SuccessBaseResponse<List<VehicleTypeEntity>>():
+        emit(
+          state.copyWith(
+            vehicleTypesState: BaseState(data: result.data, isLoading: false),
+          ),
+        );
+
+      case ErrorBaseResponse<List<VehicleTypeEntity>>():
+        emit(
+          state.copyWith(
+            vehicleTypesState: BaseState(
+              errorMessage: result.errorMessage,
+              isLoading: false,
+            ),
+          ),
+        );
+
+        emitEvent(DisplayErrorEvent(result.errorMessage));
     }
   }
 }

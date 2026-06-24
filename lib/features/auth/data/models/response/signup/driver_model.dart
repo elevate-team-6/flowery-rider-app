@@ -58,6 +58,7 @@ class DriverModel {
   }
 
   DriverEntity toEntity() => DriverEntity(
+    name: '',
     country: country ?? '',
     firstName: firstName ?? '',
     lastName: lastName ?? '',

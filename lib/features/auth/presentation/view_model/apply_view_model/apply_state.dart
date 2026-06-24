@@ -2,16 +2,16 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
-import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_type_model.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/driver_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entites/vehicle_type_entity.dart';
 
 class ApplyState extends Equatable {
   final BaseState<List<CountryEntity>> countriesState;
   final BaseState<DriverEntity> applyState;
-
+  final BaseState<List<VehicleTypeEntity>> vehicleTypesState;
   final CountryEntity? selectedCountry;
-  final VehicleType? selectedVehicleType;
+  final VehicleTypeEntity? selectedVehicleType;
   final String? selectedGender;
 
   final File? nationalIdImage;
@@ -20,6 +20,7 @@ class ApplyState extends Equatable {
   const ApplyState({
     this.countriesState = const BaseState(),
     this.applyState = const BaseState(),
+    this.vehicleTypesState = const BaseState(),
     this.selectedCountry,
     this.selectedVehicleType,
     this.selectedGender,
@@ -29,9 +30,10 @@ class ApplyState extends Equatable {
 
   ApplyState copyWith({
     BaseState<List<CountryEntity>>? countriesState,
+    BaseState<List<VehicleTypeEntity>>? vehicleTypesState,
     BaseState<DriverEntity>? applyState,
     CountryEntity? selectedCountry,
-    VehicleType? selectedVehicleType,
+    VehicleTypeEntity? selectedVehicleType,
     String? selectedGender,
     File? nationalIdImage,
     File? drivingLicenseImage,
@@ -39,6 +41,7 @@ class ApplyState extends Equatable {
     bool clearDrivingLicenseImage = false,
   }) {
     return ApplyState(
+      vehicleTypesState: vehicleTypesState ?? this.vehicleTypesState,
       countriesState: countriesState ?? this.countriesState,
       applyState: applyState ?? this.applyState,
       selectedCountry: selectedCountry ?? this.selectedCountry,
@@ -56,6 +59,7 @@ class ApplyState extends Equatable {
   @override
   List<Object?> get props => [
     countriesState,
+    vehicleTypesState,
     applyState,
     selectedCountry,
     selectedVehicleType,

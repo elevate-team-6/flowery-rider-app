@@ -5,8 +5,10 @@ import 'package:flowery_rider_app/features/auth/data/data_sources/auth_local_dat
 import 'package:flowery_rider_app/features/auth/data/data_sources/auth_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/signup/signup_response.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_response.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/entites/driver_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entites/vehicle_type_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/repo/auth_repo_contract.dart';
 import 'package:injectable/injectable.dart';
 
@@ -21,11 +23,9 @@ class AuthRepoImpl implements AuthRepoContract {
     final response = await _remoteDataSource.signup(request);
     switch (response) {
       case SuccessBaseResponse<SignUpResponse>():
-  if (response.data == null || response.data!.driver == null) {
-    return ErrorBaseResponse(
-      AppStrings.signupFailedUserIsNull.tr(),
-    );
-  }
+        if (response.data == null || response.data!.driver == null) {
+          return ErrorBaseResponse(AppStrings.signupFailedUserIsNull.tr());
+        }
         return SuccessBaseResponse(response.data!.driver!.toEntity());
       case ErrorBaseResponse<SignUpResponse>():
         return ErrorBaseResponse(response.errorMessage.tr());
@@ -35,4 +35,19 @@ class AuthRepoImpl implements AuthRepoContract {
   @override
   Future<List<CountryEntity>> getCountries() async =>
       (await localDataSource.getCountries()).map((e) => e.toEntity()).toList();
+
+  @override
+  Future<BaseResponse<List<VehicleTypeEntity>>> getVehicles() async {
+    final response = await _remoteDataSource.vehicles();
+
+    switch (response) {
+      case SuccessBaseResponse<VehicleResponse>():
+        return SuccessBaseResponse(
+          response.data!.vehicles.map((e) => e.toEntity()).toList(),
+        );
+
+      case ErrorBaseResponse<VehicleResponse>():
+        return ErrorBaseResponse(response.errorMessage.tr());
+    }
+  }
 }
