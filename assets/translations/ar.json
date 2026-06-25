@@ -83,5 +83,25 @@
     "applyNow": "تقدم الآن",
     "versionPlaceholder": "v 6.3.0 - (446)",
     "success": "في الطريق! 🛵",
-    "oops": "عذراً!"
+    "oops": "عذراً!",
+
+    "vehicleInfo": "بيانات المركبة",
+    "language": "اللغة",
+    "english": "الإنجليزية",
+    "arabic": "العربية",
+    "editProfile": "تعديل الملف الشخصي",
+    "update": "تحديث",
+    "change": "تغيير",
+    "firstName": "الاسم الأول",
+    "lastName": "الاسم الأخير",
+    "phoneNumber": "رقم الهاتف",
+    "gender": "النوع",
+    "female": "أنثى",
+    "male": "ذكر",
+    "editProfileSuccessfly": "تم تحديث الملف الشخصي بنجاح",
+    "photoUpdatedSuccess": "تم تحديث صورة الملف الشخصي بنجاح",
+    "photoTooLarge": "يجب أن يكون حجم الصورة 4 ميجابايت أو أقل",
+    "retry": "إعادة المحاولة",
+    "profileDataNotFound": "لم يتم العثور على بيانات الملف الشخصي",
+    "someThingWentWrong": "حدث خطأ ما"
 }

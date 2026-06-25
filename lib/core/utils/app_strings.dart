@@ -89,6 +89,7 @@ abstract class AppStrings {
   static const String logoutSuccess = 'logoutSuccess';
   static const String version = 'version';
   static const String confirmLogout = 'confirmLogout';
+  static const String passwordMask = '★★★★★★';
 
   // Address Details Screen
   static const String enableLocationServices =
@@ -146,6 +147,9 @@ abstract class AppStrings {
   static const String editProfileSuccessfly = 'editProfileSuccessfly';
   static const String change = 'change';
   static const String update = 'update';
+  static const String vehicleInfo = 'vehicleInfo';
+  static const String photoUpdatedSuccess = 'photoUpdatedSuccess';
+  static const String photoTooLarge = 'photoTooLarge';
   static const String femaleValue = 'female';
   static const String maleValue = 'male';
   static const String photo = 'photo';

@@ -87,5 +87,25 @@
     "applyNow": "Apply now",
     "versionPlaceholder": "v 6.3.0 - (446)",
     "success": "On its way! 🛵",
-    "oops": "Oops!"
+    "oops": "Oops!",
+
+    "vehicleInfo": "Vehicle info",
+    "language": "Language",
+    "english": "English",
+    "arabic": "Arabic",
+    "editProfile": "Edit profile",
+    "update": "Update",
+    "change": "Change",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "phoneNumber": "Phone number",
+    "gender": "Gender",
+    "female": "Female",
+    "male": "Male",
+    "editProfileSuccessfly": "Profile updated successfully",
+    "photoUpdatedSuccess": "Profile photo updated successfully",
+    "photoTooLarge": "Image must be 4 MB or smaller",
+    "retry": "Retry",
+    "profileDataNotFound": "Profile data not found",
+    "someThingWentWrong": "Something went wrong"
 }
