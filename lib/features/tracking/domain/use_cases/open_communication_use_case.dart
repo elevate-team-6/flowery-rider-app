@@ -11,8 +11,10 @@ class OpenCommunicationUseCase {
       uri = Uri.parse('tel:$phone');
     } else {
       // WhatsApp format: https://wa.me/<number>
-      // Remove any non-digit characters except for a leading plus
+      // Remove any non-digit characters except for a leading plus,
+      // then remove the plus itself since wa.me expects digits only.
       String cleanPhone = phone.replaceAll(RegExp(r'[^0-9+]'), '');
+      cleanPhone = cleanPhone.replaceFirst('+', '');
       uri = Uri.parse('https://wa.me/$cleanPhone');
     }
 

@@ -9,6 +9,7 @@ import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_states.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/confirm_cancel_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -69,36 +70,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
         value: cubit,
         child: BlocBuilder<OrderDetailsCubit, OrderDetailsState>(
           builder: (context, state) {
-            return AlertDialog(
-              title: Text(AppStrings.confirmCancelOrderTitle.tr()),
-              content: Text(AppStrings.confirmCancelOrderMessage.tr()),
-              actions: [
-                TextButton(
-                  onPressed: state.canselOrderState.isLoading
-                      ? null
-                      : () => Navigator.pop(context),
-                  child: Text(AppStrings.cancel.tr()),
-                ),
-                TextButton(
-                  onPressed: state.canselOrderState.isLoading
-                      ? null
-                      : () {
-                          context.read<OrderDetailsCubit>().doEvent(
-                            RevertOrderToPendingEvent(widget.order.id ?? ''),
-                          );
-                        },
-                  child: state.canselOrderState.isLoading
-                      ? SizedBox(
-                          width: 20.w,
-                          height: 20.w,
-                          child: const CircularProgressIndicator(
-                            strokeWidth: 2,
-                          ),
-                        )
-                      : Text(AppStrings.confirm.tr()),
-                ),
-              ],
-            );
+            return ConfirmCancelDialog(state: state, order: widget.order);
           },
         ),
       ),
@@ -187,8 +159,9 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                           label: AppStrings.userAddress,
                           imageUrl: order.user?.photo,
                           title: order.user?.fullName,
-                          address:
-                              '${order.shippingAddress?.street}, ${order.shippingAddress?.city}',
+                          address: order.shippingAddress != null
+                              ? '${order.shippingAddress?.street}, ${order.shippingAddress?.city}'
+                              : '_,_',
                           onTap: () {
                             context.read<OrderDetailsCubit>().doEvent(
                               NavigateToMapEvent(LocationType.user),

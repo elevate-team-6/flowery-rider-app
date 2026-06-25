@@ -2,6 +2,8 @@ import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:json_annotation/json_annotation.dart';
 
+import '../../../../../core/utils/app_constants.dart';
+
 part 'user_model.g.dart';
 
 @JsonSerializable()
@@ -38,7 +40,11 @@ class UserModel extends Equatable {
     id: id,
     fullName: '$firstName $lastName',
     phone: phone,
-    photo: photo,
+    photo: (photo != null && photo!.isNotEmpty)
+        ? (photo!.startsWith('http')
+              ? photo
+              : '${AppConstants.imageBaseUrl}$photo')
+        : photo,
   );
 
   @override

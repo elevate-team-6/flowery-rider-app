@@ -2,7 +2,6 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/app_colors.dart';
 import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/app_text_styles.dart';
@@ -68,7 +67,7 @@ class OrderCard extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           OrderAddressTile(
-            imageUrl: _userPhotoUrl(user?.photo),
+            imageUrl: user?.photo,
             title: user?.fullName,
             address: _customerAddress,
           ),
@@ -101,12 +100,6 @@ class OrderCard extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String? _userPhotoUrl(String? photo) {
-    if (photo == null || photo.isEmpty) return null;
-    if (photo.startsWith('http')) return photo;
-    return '${AppImages.imageBaseUrl}$photo';
   }
 }
 

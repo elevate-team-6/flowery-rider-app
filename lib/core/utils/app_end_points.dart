@@ -19,7 +19,7 @@ abstract class AppEndPoints {
   static const String uploadPhoto = "$baseUrl/drivers/upload-photo";
 
   // Tracking:
-  static const String driverOrders = "$baseUrl/drivers/all-orders";
+  static const String driverOrders = "$baseUrl/orders/driver-orders";
   static const String startOrder = '$baseUrl/orders/start/';
   static const String updateOrderState = '$baseUrl/orders/state/';
 
