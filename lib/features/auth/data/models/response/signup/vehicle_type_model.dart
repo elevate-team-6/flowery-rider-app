@@ -1,4 +1,5 @@
-import 'package:flowery_rider_app/features/auth/domain/entites/vehicle_type_entity.dart';
+
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/vehicle_type_entity.dart';
 
 class VehicleModel {
   final String id;

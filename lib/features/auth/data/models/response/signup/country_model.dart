@@ -1,5 +1,4 @@
-import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
-
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/country_entity.dart';
 
 class CountryModel {
   final String isoCode;
@@ -8,14 +7,12 @@ class CountryModel {
   final String flag;
   final String currency;
 
-
   CountryModel({
     required this.isoCode,
     required this.name,
     required this.phoneCode,
     required this.flag,
     required this.currency,
-
   });
 
   factory CountryModel.fromJson(Map<String, dynamic> json) {
@@ -25,7 +22,6 @@ class CountryModel {
       phoneCode: json['phoneCode'] ?? '',
       flag: json['flag'] ?? '',
       currency: json['currency'] ?? '',
-    
     );
   }
 
@@ -35,10 +31,8 @@ class CountryModel {
       name: name,
       phoneCode: phoneCode,
       flag: flag,
-      currency: currency, id: '',
-  
+      currency: currency,
+      id: '',
     );
   }
 }
-
-

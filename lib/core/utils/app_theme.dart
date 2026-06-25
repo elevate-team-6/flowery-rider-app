@@ -50,6 +50,7 @@ abstract class AppTheme {
           backgroundColor: AppColors.primary,
           foregroundColor: AppColors.white,
           disabledBackgroundColor: AppColors.black30,
+          disabledForegroundColor: AppColors.white,
           elevation: 0,
           minimumSize: Size(double.infinity, 48.h),
           shape: RoundedRectangleBorder(
@@ -180,6 +181,28 @@ abstract class AppTheme {
             RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
           ),
         ),
+      ),
+      // Navigation Bar Theme
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.white,
+        indicatorColor: Colors.transparent,
+        elevation: 0,
+
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return AppTextStyles.primary12400;
+          }
+
+          return AppTextStyles.gray12400;
+        }),
+
+        iconTheme: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const IconThemeData(color: AppColors.primary);
+          }
+
+          return const IconThemeData(color: AppColors.black30);
+        }),
       ),
     );
   }

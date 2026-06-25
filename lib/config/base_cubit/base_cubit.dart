@@ -5,23 +5,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class BaseCubit<State, UiEvent> extends Cubit<State> {
   BaseCubit(super.initialState);
 
-  final StreamController<UiEvent> _eventController = StreamController();
+  final StreamController<UiEvent> _eventController =
+      StreamController.broadcast();
 
   Stream<UiEvent> get eventStream => _eventController.stream;
-  @override
-  void emit(State state) {
-    if (!isClosed) {
-      super.emit(state);
+
+  void emitUiEvent(UiEvent event) {
+    if (_eventController.isClosed) {
+      throw Exception('cannot emit new event after closing the stream');
     }
-  }
-  void emitEvent(UiEvent event) {
-     if (isClosed || _eventController.isClosed) return;
     _eventController.add(event);
   }
 
   @override
-  Future<void> close() async{
-    await _eventController.close();
+  Future<void> close() {
+    _eventController.close();
     return super.close();
   }
 }

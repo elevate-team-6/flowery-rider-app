@@ -5,11 +5,11 @@ import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/helpers/image_picker_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/driver_entity.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/vehicle_type_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/apply_use_case.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/get_countries_use_case.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/get_vehicle_type_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/driver_entity.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/vehicle_type_entity.dart';
 import 'package:injectable/injectable.dart';
 
 import 'apply_events.dart';
@@ -73,7 +73,7 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
         ),
       );
 
-      emitEvent(DisplayErrorEvent(e.toString()));
+      emitUiEvent(DisplayErrorEvent(e.toString()));
     }
   }
 
@@ -85,7 +85,7 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
 
       emit(state.copyWith(nationalIdImage: image));
     } catch (e) {
-      emitEvent(DisplayErrorEvent(e.toString()));
+      emitUiEvent(DisplayErrorEvent(e.toString()));
     }
   }
 
@@ -97,7 +97,7 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
 
       emit(state.copyWith(drivingLicenseImage: image));
     } catch (e) {
-      emitEvent(DisplayErrorEvent(e.toString()));
+      emitUiEvent(DisplayErrorEvent(e.toString()));
     }
   }
 
@@ -114,7 +114,7 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
           ),
         );
 
-        emitEvent(NavigateEvent(AppRoutes.submit));
+        emitUiEvent(NavigateEvent(AppRoutes.submit));
 
       case ErrorBaseResponse<DriverEntity>():
         emit(
@@ -126,7 +126,7 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
           ),
         );
 
-        emitEvent(DisplayErrorEvent(result.errorMessage));
+        emitUiEvent(DisplayErrorEvent(result.errorMessage));
     }
   }
 
@@ -153,7 +153,7 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
           ),
         );
 
-        emitEvent(DisplayErrorEvent(result.errorMessage));
+        emitUiEvent(DisplayErrorEvent(result.errorMessage));
     }
   }
 }

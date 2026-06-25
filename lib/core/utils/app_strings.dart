@@ -67,6 +67,15 @@ abstract class AppStrings {
       'Please upload your driving license';
   static const String creatingAccountAgreement = 'creatingAccountAgreement';
   static const String iAgree = 'iAgree';
+  // Onboarding Screen
+
+  static const String welcomeToFloweryRider = 'Welcome to Flowery rider app';
+  static const String applyNow = 'Apply now';
+  static const String versionPlaceholder = 'v 6.3.0 - (446)';
+  static const String welcomeTo = 'welcomeTo';
+  static const String floweryRiderApp = 'floweryRiderApp';
+  static const String floweryRider = 'Flowery Rider';
+  static const String splashSubtitle = 'We ride, flowers inside';
 
   // Forget Password Screen
   static const String forgetPasswordTitle = 'forgetPasswordTitle';
@@ -105,6 +114,7 @@ abstract class AppStrings {
   static const String english = 'english';
   static const String aboutUs = 'aboutUs';
   static const String logout = 'logout';
+  static const String logoutSuccess = 'logoutSuccess';
   static const String version = 'version';
   static const String confirmLogout = 'confirmLogout';
 
@@ -122,6 +132,7 @@ abstract class AppStrings {
   // Main Layout
   static const String home = 'home';
   static const String profile = 'profile';
+  static const String orders = 'orders';
 
   // Products
   static const String addToCart = 'addToCart';
@@ -136,6 +147,15 @@ abstract class AppStrings {
 
   // home
   static const String flowery = 'flowery';
+  static const String floweryRiderTitle = 'flowery_rider_title';
+  static const String flowerOrder = 'flower_order';
+  static const String pickupAddress = 'pickup_address';
+  static const String userAddress = 'user_address';
+  static const String accept = 'accept';
+  static const String reject = 'reject';
+  static const String egp = 'egp';
+  static const String noPendingOrders = 'no_pending_orders';
+  static const String noPendingOrdersSubtitle = 'no_pending_orders_subtitle';
 
   // Placeholder/Generic
   static const String icon = 'icon';
@@ -181,6 +201,10 @@ abstract class AppStrings {
   static const String pleaseSelectCityAndArea = 'pleaseSelectCityAndArea';
   static const String pleaseSelectLocationOnMap = 'pleaseSelectLocationOnMap';
   static const String locationFetchError = 'locationFetchError';
+
+  // SnackBar
+  static const String success = 'success';
+  static const String oops = 'oops';
 
   // Error Messages
   static const String someThingWentWrong = 'someThingWentWrong';
@@ -244,6 +268,7 @@ abstract class AppStrings {
   static const String deliveredOn = 'delivered_on';
   static const String noActiveOrders = 'no_active_orders';
   static const String noCompletedOrders = 'no_completed_orders';
+
   // ===========================================================================
   // API Constants (Values sent directly to Backend - Do NOT Translate)
   // ===========================================================================

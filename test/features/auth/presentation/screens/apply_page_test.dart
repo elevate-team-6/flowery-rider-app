@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/country_entity.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/vehicle_type_entity.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -13,8 +14,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/vehicle_type_entity.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/apply_page.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/apply_view_model/apply_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/apply_view_model/apply_events.dart';

@@ -19,6 +19,9 @@ abstract class AppEndPoints {
   static const String editProfile = "$baseUrl/drivers/editProfile";
   static const String uploadPhoto = "$baseUrl/drivers/upload-photo";
 
+  // Orders:
+  static const String pendingOrders = "$baseUrl/orders/pending-orders";
+
   // General:
   static const String addresses = "$baseUrl/addresses";
 

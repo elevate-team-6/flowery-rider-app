@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/country_entity.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/vehicle_type_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/vehicle_type_entity.dart';
 import 'package:flowery_rider_app/features/auth/presentation/widgets/apply_form.dart'; 
 
 class _InMemoryAssetLoader extends AssetLoader {
@@ -192,15 +192,12 @@ void main() {
 
     testWidgets('triggers image picker callbacks on tap', (tester) async {
       await pumpForm(tester);
-
-      // محاكاة الضغط على حقل رخصة القيادة
       await tester.tap(
         find.byWidgetPredicate((w) => w is TextField && w.decoration?.labelText == 'Vehicle license'),
       );
       await tester.pump();
       expect(isDrivingLicensePicked, isTrue);
 
-      // محاكاة الضغط على حقل صورة البطاقة
       await tester.tap(
         find.byWidgetPredicate((w) => w is TextField && w.decoration?.labelText == 'ID image'),
       );

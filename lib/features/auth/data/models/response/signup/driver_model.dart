@@ -1,4 +1,5 @@
-import 'package:flowery_rider_app/features/auth/domain/entites/driver_entity.dart';
+
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/driver_entity.dart';
 
 class DriverModel {
   final String? country;

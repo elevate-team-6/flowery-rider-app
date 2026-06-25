@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/country_entity.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/driver_entity.dart';
-import 'package:flowery_rider_app/features/auth/domain/entites/vehicle_type_entity.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/country_entity.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/driver_entity.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/vehicle_type_entity.dart';
 
 class ApplyState extends Equatable {
   final BaseState<List<CountryEntity>> countriesState;
