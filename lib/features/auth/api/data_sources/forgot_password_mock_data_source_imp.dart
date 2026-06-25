@@ -1,5 +1,8 @@
 import 'dart:async';
 
+import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/signup/signup_response.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_response.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../config/base_response/base_response.dart';
@@ -85,5 +88,15 @@ class ForgetPasswordMockDataSourceImpl implements AuthRemoteDataSourceContract {
     } else {
       return _simulate(ErrorBaseResponse('Password too weak'));
     }
+  }
+
+  @override
+  Future<BaseResponse<SignUpResponse>> signup(SignUpRequest request) {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<BaseResponse<VehicleResponse>> vehicles() {
+    throw UnimplementedError();
   }
 }

@@ -26,6 +26,8 @@ abstract class AppIcons {
   static const String orders = '${_iconsPath}orders_icon.svg';
   static const String logout = '${_iconsPath}logout_icon.svg';
   static const String time = '${_iconsPath}time.svg';
+  static const String submitIcon = '${_iconsPath}submit_bg_icon.svg';
+  static const String success = '${_iconsPath}success_icon.svg';
 }
 
 abstract class AppImages {
@@ -46,4 +48,8 @@ abstract class AppLottie {
   static const String flowerLoading = '${_lottiePath}flower_loading.json';
   static const String onboardingAnimation =
       '${_lottiePath}onboarding_animation.json';
+}
+
+abstract class AppJson {
+  static const String countryPath = 'assets/json/country.json';
 }
