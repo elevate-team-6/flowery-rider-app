@@ -41,20 +41,25 @@ class SuccessApplyScreen extends StatelessWidget {
 
                 SizedBox(height: 24.h),
 
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      AppRoutes.login,
-                      (route) => false,
-                    );
-                  },
-                  child: Text(AppStrings.login.tr()),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        AppRoutes.login,
+                        (route) => false,
+                      );
+                    },
+                    child: Text(AppStrings.login.tr()),
+                  ),
                 ),
 
                 SizedBox(height: 40.h),
 
                 SvgPicture.asset(AppIcons.submitIcon),
+
+                SizedBox(height: 24.h),
               ],
             ),
           ),

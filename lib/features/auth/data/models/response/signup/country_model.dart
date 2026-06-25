@@ -35,7 +35,7 @@ class CountryModel {
       name: name,
       phoneCode: phoneCode,
       flag: flag,
-      currency: currency,
+      currency: currency, id: '',
   
     );
   }
