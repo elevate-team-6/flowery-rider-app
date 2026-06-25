@@ -4,9 +4,10 @@ import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/cache/hive_helper.dart';
-import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
+import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
@@ -17,18 +18,21 @@ import 'package:flowery_rider_app/features/tracking/presentation/view_model/orde
 import 'package:injectable/injectable.dart';
 
 import '../../../../../config/base_state/base_state.dart';
+import '../../../../../core/utils/app_keys.dart';
 
 @injectable
 class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   final UpdateOrderStateUseCase _updateOrderStateUseCase;
   final StartOrderUseCase _startOrderUseCase;
   final OpenCommunicationUseCase _openCommunicationUseCase;
+  final UpdateOrderProgressUseCase _updateOrderProgressUseCase;
   final HiveHelper _hiveHelper;
 
   OrderDetailsCubit(
     this._updateOrderStateUseCase,
     this._startOrderUseCase,
     this._openCommunicationUseCase,
+    this._updateOrderProgressUseCase,
     this._hiveHelper,
   ) : super(const OrderDetailsState());
 
@@ -89,6 +93,9 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
           ),
         );
         _cacheOrder(mergedOrder);
+
+        // Notify User: Step 1 (Accepted)
+        _updateProgress(UserNotificationState.accepted);
       }
     }
   }
@@ -122,6 +129,19 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
             uiStep: nextStep,
           ),
         );
+
+        // Notification logic for specific user-facing steps
+        final notifyState = switch (nextStep) {
+          2 => UserNotificationState.preparing,
+          4 => UserNotificationState.onWay,
+          6 => UserNotificationState.delivered,
+          _ => null,
+        };
+
+        if (notifyState != null) {
+          _updateProgress(notifyState);
+        }
+
         if (nextStep == 6) {
           _clearCache();
           emitUiEvent(
@@ -136,6 +156,17 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       case ErrorBaseResponse<OrderEntity>():
         emitUiEvent(DisplayErrorEvent(result.errorMessage));
     }
+  }
+
+  Future<void> _updateProgress(UserNotificationState notifyState) async {
+    final order = state.orderDetailsState.data;
+    if (order?.id == null || order?.user?.id == null) return;
+
+    await _updateOrderProgressUseCase(
+      userId: order!.user!.id!,
+      orderId: order.id!,
+      state: notifyState,
+    );
   }
 
   /// Merges partial order data from API with rich local data (User/Store)
@@ -159,7 +190,11 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       orderItems: (remote.orderItems != null && remote.orderItems!.isNotEmpty)
           ? remote.orderItems
           : local.orderItems,
-      shippingAddress: remote.shippingAddress ?? local.shippingAddress,
+      shippingAddress:
+          (remote.shippingAddress?.street != null &&
+              remote.shippingAddress!.street!.isNotEmpty)
+          ? remote.shippingAddress
+          : local.shippingAddress,
     );
   }
 
@@ -203,6 +238,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
             navigationType: NavigationType.pushAndRemoveUntil,
           ),
         );
+        _updateProgress(UserNotificationState.canceled);
       case ErrorBaseResponse<OrderEntity>():
         emit(
           state.copyWith(
@@ -241,9 +277,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       phoneNumber,
       CommunicationType.phone,
     );
-    if (!success) {
-      emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
-    }
+    if (!success) emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
   }
 
   Future<void> _onOpenWhatsApp(String phoneNumber) async {
@@ -251,8 +285,6 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       phoneNumber,
       CommunicationType.whatsapp,
     );
-    if (!success) {
-      emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
-    }
+    if (!success) emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
   }
 }
