@@ -1,4 +1,4 @@
-import 'driver_model.dart';
+import '../../../../../../core/models/driver_model.dart';
 
 class SignUpResponse {
   final String? message;

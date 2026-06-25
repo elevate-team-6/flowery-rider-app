@@ -1,5 +1,4 @@
-
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/driver_entity.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 
 class DriverModel {
   final String? country;
@@ -59,20 +58,20 @@ class DriverModel {
   }
 
   DriverEntity toEntity() => DriverEntity(
-    name: '',
     country: country ?? '',
     firstName: firstName ?? '',
     lastName: lastName ?? '',
-    vehicleType: vehicleType??'',
-    vehicleNumber: vehicleNumber??'',
-    vehicleLicense: vehicleLicense??'',
-    nid: nid??'',
-    nidImg: nidImg??'',
-    email: email??'',
-    gender: gender??'',
-    phone: phone??'',
-    photo: photo??'',
-    role: role??'',
-    id: id??'',
+    vehicleType: vehicleType ?? '',
+    vehicleNumber: vehicleNumber ?? '',
+    vehicleLicense: vehicleLicense ?? '',
+    nid: nid ?? '',
+    nidImg: nidImg ?? '',
+    email: email ?? '',
+    gender: gender ?? '',
+    phone: phone ?? '',
+    photo: photo ?? '',
+    role: role ?? '',
+    id: id ?? '',
+    name: '',
   );
 }

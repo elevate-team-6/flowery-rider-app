@@ -1,4 +1,4 @@
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/country_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/country_entity.dart';
 
 class CountryModel {
   final String isoCode;

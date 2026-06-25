@@ -2,9 +2,9 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/sign_in_entity.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/country_entity.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/driver_entity.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/vehicle_type_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/country_entity.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
 
 import '../entities/forget_password_entity.dart';
 

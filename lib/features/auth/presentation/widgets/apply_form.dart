@@ -3,8 +3,8 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/validations/app_validations.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/auth/presentation/widgets/selection_drowp_down.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/country_entity.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/vehicle_type_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/country_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 

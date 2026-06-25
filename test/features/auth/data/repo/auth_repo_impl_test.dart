@@ -1,4 +1,4 @@
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/vehicle_type_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -13,7 +13,7 @@ import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_requ
 
 
 import 'package:flowery_rider_app/features/auth/data/models/response/signup/country_model.dart';
-import 'package:flowery_rider_app/features/auth/data/models/response/signup/driver_model.dart';
+import 'package:flowery_rider_app/core/models/driver_model.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/signup/signup_response.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_response.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_type_model.dart';

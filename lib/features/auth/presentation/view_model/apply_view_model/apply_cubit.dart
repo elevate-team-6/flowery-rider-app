@@ -8,8 +8,8 @@ import 'package:flowery_rider_app/features/auth/data/models/request/signup/signu
 import 'package:flowery_rider_app/features/auth/domain/use_cases/apply_use_case.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/get_countries_use_case.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/get_vehicle_type_use_case.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/driver_entity.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/vehicle_type_entity.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
 import 'package:injectable/injectable.dart';
 
 import 'apply_events.dart';

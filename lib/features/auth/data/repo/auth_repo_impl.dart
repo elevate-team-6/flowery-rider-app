@@ -1,11 +1,14 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/auth/data/data_sources/auth_local_data_source_contract.dart';
 import 'package:flowery_rider_app/features/auth/data/data_sources/auth_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/signup/signup_response.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_response.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/country_entity.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/repo/auth_repo_contract.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/reset_password_response.dart';
@@ -13,9 +16,6 @@ import 'package:flowery_rider_app/features/auth/data/models/response/sign_in_res
 import 'package:flowery_rider_app/features/auth/data/models/response/verify_reset_code_response.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/forget_password_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/sign_in_entity.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/country_entity.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/driver_entity.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/vehicle_type_entity.dart';
 import 'package:injectable/injectable.dart';
 import '../models/request/forgot_password_request.dart';
 import '../models/request/reset_password_request.dart';
