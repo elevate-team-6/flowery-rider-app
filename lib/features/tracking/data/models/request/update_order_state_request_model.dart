@@ -1,3 +1,5 @@
+import 'package:equatable/equatable.dart';
+
 enum OrderStatus {
   pending,
   inProgress,
@@ -33,12 +35,15 @@ enum OrderStatus {
   }
 }
 
-class UpdateOrderStateRequestModel {
+class UpdateOrderStateRequestModel extends Equatable {
   final OrderStatus state;
 
-  UpdateOrderStateRequestModel({required this.state});
+  const UpdateOrderStateRequestModel({required this.state});
 
   Map<String, dynamic> toJson() {
     return {'state': state.value};
   }
+
+  @override
+  List<Object?> get props => [state];
 }

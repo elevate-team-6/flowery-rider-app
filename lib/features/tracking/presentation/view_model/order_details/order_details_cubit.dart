@@ -80,7 +80,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       if (startResult is SuccessBaseResponse<OrderEntity>) {
         final updatedOrder = startResult.data;
         // Merge: Keep the rich data (user/store) from passed entity if API response is partial
-        final mergedOrder = _mergeOrders(order, updatedOrder);
+        final mergedOrder = order.mergeWith(updatedOrder);
 
         emit(
           state.copyWith(
@@ -113,7 +113,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     switch (result) {
       case SuccessBaseResponse<OrderEntity>():
         // Merge to prevent losing user/store details
-        final mergedOrder = _mergeOrders(currentOrder!, result.data);
+        final mergedOrder = currentOrder!.mergeWith(result.data);
 
         emit(
           state.copyWith(
@@ -136,31 +136,6 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       case ErrorBaseResponse<OrderEntity>():
         emitUiEvent(DisplayErrorEvent(result.errorMessage));
     }
-  }
-
-  /// Merges partial order data from API with rich local data (User/Store)
-  OrderEntity _mergeOrders(OrderEntity local, OrderEntity? remote) {
-    if (remote == null) return local;
-
-    return OrderEntity(
-      id: remote.id ?? local.id,
-      orderNumber: remote.orderNumber ?? local.orderNumber,
-      totalPrice: remote.totalPrice ?? local.totalPrice,
-      state: remote.state ?? local.state,
-      createdAt: remote.createdAt ?? local.createdAt,
-      paymentType: remote.paymentType ?? local.paymentType,
-      // Priority to local rich entities if remote only has ID (or is null)
-      user: (remote.user?.fullName != null && remote.user!.fullName!.isNotEmpty)
-          ? remote.user
-          : local.user,
-      store: (remote.store?.name != null && remote.store!.name!.isNotEmpty)
-          ? remote.store
-          : local.store,
-      orderItems: (remote.orderItems != null && remote.orderItems!.isNotEmpty)
-          ? remote.orderItems
-          : local.orderItems,
-      shippingAddress: remote.shippingAddress ?? local.shippingAddress,
-    );
   }
 
   void _cacheOrder(OrderEntity order) {

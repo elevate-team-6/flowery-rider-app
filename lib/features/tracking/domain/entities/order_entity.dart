@@ -39,10 +39,61 @@ class OrderEntity extends Equatable {
     this.shippingAddress,
   });
 
+  OrderEntity copyWith({
+    String? id,
+    String? orderNumber,
+    num? totalPrice,
+    String? state,
+    String? createdAt,
+    String? paymentType,
+    UserEntity? user,
+    StoreEntity? store,
+    List<OrderItemEntity>? orderItems,
+    ShippingAddressEntity? shippingAddress,
+  }) {
+    return OrderEntity(
+      id: id ?? this.id,
+      orderNumber: orderNumber ?? this.orderNumber,
+      totalPrice: totalPrice ?? this.totalPrice,
+      state: state ?? this.state,
+      createdAt: createdAt ?? this.createdAt,
+      paymentType: paymentType ?? this.paymentType,
+      user: user ?? this.user,
+      store: store ?? this.store,
+      orderItems: orderItems ?? this.orderItems,
+      shippingAddress: shippingAddress ?? this.shippingAddress,
+    );
+  }
+
   factory OrderEntity.fromJson(Map<String, dynamic> json) =>
       _$OrderEntityFromJson(json);
 
   Map<String, dynamic> toJson() => _$OrderEntityToJson(this);
+
+  /// Merges partial order data from API with rich local data (User/Store)
+  OrderEntity mergeWith(OrderEntity? remote) {
+    if (remote == null) return this;
+
+    return copyWith(
+      id: remote.id,
+      orderNumber: remote.orderNumber,
+      totalPrice: remote.totalPrice,
+      state: remote.state,
+      createdAt: remote.createdAt,
+      paymentType: remote.paymentType,
+      // Priority to local rich entities if remote only has ID (or is null)
+      user: (remote.user?.fullName != null && remote.user!.fullName!.isNotEmpty)
+          ? remote.user
+          : user,
+      store: (remote.store?.name != null && remote.store!.name!.isNotEmpty)
+          ? remote.store
+          : store,
+      orderItems: (remote.orderItems != null && remote.orderItems!.isNotEmpty)
+          ? remote.orderItems
+          : orderItems,
+      shippingAddress: remote.shippingAddress,
+    );
+  }
 
   @override
   List<Object?> get props => [
