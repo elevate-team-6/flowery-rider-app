@@ -127,10 +127,7 @@ void main() {
 
       verify(mockRemoteDataSource.uploadPhoto(photo)).called(1);
       expect(result, isA<SuccessBaseResponse<DriverEntity>>());
-      expect(
-        (result as SuccessBaseResponse<DriverEntity>).data?.id,
-        '1',
-      );
+      expect((result as SuccessBaseResponse<DriverEntity>).data?.id, '1');
     });
 
     test('propagates error message on failure', () async {
@@ -149,9 +146,7 @@ void main() {
       when(
         mockRemoteDataSource.logout(),
       ).thenAnswer((_) async => SuccessBaseResponse(null));
-      when(
-        mockCache.deleteData(key: anyNamed('key')),
-      ).thenAnswer((_) async {});
+      when(mockCache.deleteData(key: anyNamed('key'))).thenAnswer((_) async {});
 
       final result = await repo.logout();
 
@@ -164,9 +159,7 @@ void main() {
       when(
         mockRemoteDataSource.logout(),
       ).thenAnswer((_) async => ErrorBaseResponse('network error'));
-      when(
-        mockCache.deleteData(key: anyNamed('key')),
-      ).thenAnswer((_) async {});
+      when(mockCache.deleteData(key: anyNamed('key'))).thenAnswer((_) async {});
 
       final result = await repo.logout();
 

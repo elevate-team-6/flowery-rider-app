@@ -23,9 +23,10 @@ class DriverEntity extends Equatable {
     this.vehicleNumber,
   });
 
-  String get fullName => [firstName, lastName]
-      .where((part) => part != null && part.isNotEmpty)
-      .join(' ');
+  String get fullName => [
+    firstName,
+    lastName,
+  ].where((part) => part != null && part.isNotEmpty).join(' ');
 
   @override
   List<Object?> get props => [

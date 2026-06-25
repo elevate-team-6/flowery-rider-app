@@ -130,28 +130,31 @@ void main() {
   });
 
   group('SubmitEditProfileEvent', () {
-    test('emits loading then success side effects and pops on success', () async {
-      when(
-        mockEditUseCase.call(request),
-      ).thenAnswer((_) async => SuccessBaseResponse(updatedDriver));
+    test(
+      'emits loading then success side effects and pops on success',
+      () async {
+        when(
+          mockEditUseCase.call(request),
+        ).thenAnswer((_) async => SuccessBaseResponse(updatedDriver));
 
-      final expectation = expectLater(
-        cubit.eventStream,
-        emitsInOrder([
-          isA<ShowLoadingEvent>(),
-          isA<HideLoadingEvent>(),
-          isA<DisplaySuccessEvent>(),
-          isA<NavigateEvent>()
-              .having((e) => e.navigationType, 'type', NavigationType.pop)
-              .having((e) => e.arguments, 'arguments', updatedDriver),
-        ]),
-      );
+        final expectation = expectLater(
+          cubit.eventStream,
+          emitsInOrder([
+            isA<ShowLoadingEvent>(),
+            isA<HideLoadingEvent>(),
+            isA<DisplaySuccessEvent>(),
+            isA<NavigateEvent>()
+                .having((e) => e.navigationType, 'type', NavigationType.pop)
+                .having((e) => e.arguments, 'arguments', updatedDriver),
+          ]),
+        );
 
-      cubit.doEvent(const SubmitEditProfileEvent(request));
-      await expectation;
+        cubit.doEvent(const SubmitEditProfileEvent(request));
+        await expectation;
 
-      verify(mockEditUseCase.call(request)).called(1);
-    });
+        verify(mockEditUseCase.call(request)).called(1);
+      },
+    );
 
     test('emits loading then error side effects on failure', () async {
       when(
@@ -177,20 +180,23 @@ void main() {
   });
 
   group('PickAndUploadPhotoEvent', () {
-    test('rejects a photo larger than the 4 MB limit without uploading', () async {
-      final photo = MockFile();
-      when(photo.length()).thenAnswer((_) async => 5 * 1024 * 1024);
+    test(
+      'rejects a photo larger than the 4 MB limit without uploading',
+      () async {
+        final photo = MockFile();
+        when(photo.length()).thenAnswer((_) async => 5 * 1024 * 1024);
 
-      final expectation = expectLater(
-        cubit.eventStream,
-        emits(isA<DisplayErrorEvent>()),
-      );
+        final expectation = expectLater(
+          cubit.eventStream,
+          emits(isA<DisplayErrorEvent>()),
+        );
 
-      cubit.doEvent(PickAndUploadPhotoEvent(photo));
-      await expectation;
+        cubit.doEvent(PickAndUploadPhotoEvent(photo));
+        await expectation;
 
-      verifyNever(mockUploadUseCase.call(any));
-    });
+        verifyNever(mockUploadUseCase.call(any));
+      },
+    );
 
     test('uploads, refreshes profile and reports success', () async {
       final photo = MockFile();

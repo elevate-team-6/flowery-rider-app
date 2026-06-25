@@ -32,9 +32,6 @@ class ProfileAvatar extends StatelessWidget {
     );
   }
 
-  Widget _placeholder() => Icon(
-    Icons.person,
-    size: radius,
-    color: AppColors.white80,
-  );
+  Widget _placeholder() =>
+      Icon(Icons.person, size: radius, color: AppColors.white80);
 }
