@@ -5,6 +5,7 @@ import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'package:flowery_rider_app/features/profile/domain/use_cases/profile_use_case.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_events.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_states.dart';
 import 'package:injectable/injectable.dart';
@@ -14,12 +15,50 @@ import '../../domain/use_cases/logout_use_case.dart';
 @injectable
 class ProfileCubit extends BaseCubit<ProfileStates, BaseUiEvent> {
   final LogoutUseCase _logoutUseCase;
-  ProfileCubit(this._logoutUseCase) : super(const ProfileStates());
+    final ProfileUseCase _profileUseCase;
+  ProfileCubit(this._logoutUseCase,this._profileUseCase) : super(const ProfileStates());
 
   void doEvent(ProfileEvents event) {
     switch (event) {
       case LogoutEvent():
         _logout();
+      case GetProfileEvent():
+       _getProfile();
+    }
+  }
+   Future<void> _getProfile() async {
+    emit(
+      state.copyWith(
+        profileState: const BaseState(
+          isLoading: true,
+        ),
+      ),
+    );
+
+    final response = await _profileUseCase.call();
+
+    switch (response) {
+      case SuccessBaseResponse():
+        emit(
+          state.copyWith(
+            profileState: BaseState(
+              data: response.data,
+            ),
+          ),
+        );
+
+      case ErrorBaseResponse():
+        emit(
+          state.copyWith(
+            profileState: const BaseState(),
+          ),
+        );
+
+        emitUiEvent(
+          DisplayErrorEvent(
+            AppStrings.someThingWentWrong.tr(),
+          ),
+        );
     }
   }
 
