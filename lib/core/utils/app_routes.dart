@@ -9,6 +9,8 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_p
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
+import 'package:flowery_rider_app/features/profile/presentation/screens/edit_vehicle_screen.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_vehicle/edit_vehicle_cubit.dart';
 import 'package:flowery_rider_app/features/splash/presentation/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -26,6 +28,7 @@ abstract class AppRoutes {
   static const String forgetPassword = '/forgotPassword';
   static const String verifyResetCode = '/VerifyResetCode';
   static const String resetPassword = '/resetPassword';
+  static const String editVehicle = '/editVehicle';
   static const String orderDetails = 'orderDetails';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
@@ -60,6 +63,13 @@ abstract class AppRoutes {
             builder: (_) => BlocProvider(
               create: (_) => getIt<ApplyCubit>(),
               child: const ApplyPage(),
+            ),
+          );
+        case editVehicle:
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => getIt<EditVehicleCubit>(),
+              child: const EditVehicleScreen(),
             ),
           );
         case submit:

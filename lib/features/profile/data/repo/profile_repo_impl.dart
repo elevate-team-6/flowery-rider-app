@@ -1,3 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
+import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'package:flowery_rider_app/features/profile/data/models/request/edit_vehicle_request.dart';
+import 'package:flowery_rider_app/features/profile/data/models/response/profile_response_model.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../config/base_response/base_response.dart';
@@ -18,5 +23,26 @@ class ProfileRepoImpl implements ProfileRepoContract {
     final result = await _remoteDataSource.logout();
     await _secureCacheHelper.deleteData(key: AppKeys.tokenKey);
     return result;
+  }
+
+  @override
+  Future<BaseResponse<DriverEntity>> editVehicle(
+    EditVehicleRequest request,
+  ) async {
+     print('REPO EDIT VEHICLE');
+  print(request.vehicleNumber);
+    final response = await _remoteDataSource.editVehicle(request);
+ print(response);
+    switch (response) {
+      case SuccessBaseResponse<ProfileResponseModel>():
+        if (response.data == null || response.data!.driver == null) {
+          return ErrorBaseResponse(AppStrings.userNotFound.tr());
+        }
+
+        return SuccessBaseResponse(response.data!.driver!.toEntity());
+
+      case ErrorBaseResponse<ProfileResponseModel>():
+        return ErrorBaseResponse<DriverEntity>(response.errorMessage);
+    }
   }
 }
