@@ -1,12 +1,13 @@
 import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/country_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
+import 'package:flowery_rider_app/features/auth/presentation/widgets/apply_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flowery_rider_app/features/auth/presentation/widgets/apply_form.dart'; 
 
 class _InMemoryAssetLoader extends AssetLoader {
   const _InMemoryAssetLoader(this._data);
@@ -33,10 +34,10 @@ void main() {
 
   late List<CountryEntity> mockCountries;
   late List<VehicleTypeEntity> mockVehicleTypes;
-  
+
   CountryEntity? selectedCountry;
   VehicleTypeEntity? selectedVehicleType;
-  
+
   bool isNationalIdPicked = false;
   bool isDrivingLicensePicked = false;
 
@@ -85,8 +86,22 @@ void main() {
     confirmPasswordController = TextEditingController();
 
     mockCountries = [
-      const CountryEntity(id: '1', name: 'Egypt', isoCode: '', phoneCode: '', flag: '', currency: ''),
-      const CountryEntity(id: '2', name: 'Saudi Arabia', isoCode: '', phoneCode: '', flag: '', currency: ''),
+      const CountryEntity(
+        id: '1',
+        name: 'Egypt',
+        isoCode: '',
+        phoneCode: '',
+        flag: '',
+        currency: '',
+      ),
+      const CountryEntity(
+        id: '2',
+        name: 'Saudi Arabia',
+        isoCode: '',
+        phoneCode: '',
+        flag: '',
+        currency: '',
+      ),
     ];
 
     mockVehicleTypes = [
@@ -111,7 +126,11 @@ void main() {
     confirmPasswordController.dispose();
   });
 
-  Future<void> pumpForm(WidgetTester tester, {File? nationalId, File? drivingLicense}) async {
+  Future<void> pumpForm(
+    WidgetTester tester, {
+    File? nationalId,
+    File? drivingLicense,
+  }) async {
     await tester.pumpWidget(
       EasyLocalization(
         supportedLocales: const [Locale('en')],
@@ -142,7 +161,8 @@ void main() {
                       nationalIdImage: nationalId,
                       drivingLicenseImage: drivingLicense,
                       onPickNationalIdImage: () => isNationalIdPicked = true,
-                      onPickDrivingLicenseImage: () => isDrivingLicensePicked = true,
+                      onPickDrivingLicenseImage: () =>
+                          isDrivingLicensePicked = true,
                       countries: mockCountries,
                       vehicleTypes: mockVehicleTypes,
                       selectedCountry: selectedCountry,
@@ -165,7 +185,7 @@ void main() {
     testWidgets('renders all form fields correctly', (tester) async {
       await pumpForm(tester);
 
-      expect(find.byType(TextField), findsNWidgets(10)); 
+      expect(find.byType(TextField), findsNWidgets(10));
       expect(find.text('First legal name'), findsOneWidget);
       expect(find.text('Email'), findsOneWidget);
     });
@@ -174,13 +194,16 @@ void main() {
       await pumpForm(tester);
 
       final firstNameField = find.byWidgetPredicate(
-        (widget) => widget is TextField && widget.decoration?.labelText == 'Enter first legal name',
+        (widget) =>
+            widget is TextField &&
+            widget.decoration?.labelText == 'Enter first legal name',
       );
       await tester.enterText(firstNameField, 'Ahmed');
       expect(firstNameController.text, 'Ahmed');
 
       final emailField = find.byWidgetPredicate(
-        (widget) => widget is TextField && widget.decoration?.labelText == 'Email',
+        (widget) =>
+            widget is TextField && widget.decoration?.labelText == 'Email',
       );
       await tester.enterText(emailField, 'test@test.com');
       expect(emailController.text, 'test@test.com');
@@ -190,19 +213,22 @@ void main() {
       await pumpForm(tester);
 
       final licenseField = find.byWidgetPredicate(
-        (widget) => widget is TextField && widget.decoration?.labelText == 'Vehicle license',
+        (widget) =>
+            widget is TextField &&
+            widget.decoration?.labelText == 'Vehicle license',
       );
-      await tester.ensureVisible(licenseField); 
+      await tester.ensureVisible(licenseField);
       await tester.tap(licenseField);
       await tester.pump();
       expect(isDrivingLicensePicked, isTrue);
 
       final idImgField = find.byWidgetPredicate(
-        (widget) => widget is TextField && widget.decoration?.labelText == 'ID image',
+        (widget) =>
+            widget is TextField && widget.decoration?.labelText == 'ID image',
       );
-      await tester.ensureVisible(idImgField); 
-      await tester.pumpAndSettle(); 
-      
+      await tester.ensureVisible(idImgField);
+      await tester.pumpAndSettle();
+
       await tester.tap(idImgField);
       await tester.pump();
       expect(isNationalIdPicked, isTrue);
@@ -220,7 +246,7 @@ void main() {
       await pumpForm(tester);
 
       final isValid = formKey.currentState?.validate();
-      
+
       expect(isValid, isFalse);
     });
   });

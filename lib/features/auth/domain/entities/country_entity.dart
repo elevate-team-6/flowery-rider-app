@@ -12,7 +12,8 @@ class CountryEntity extends Equatable {
     required this.name,
     required this.phoneCode,
     required this.flag,
-    required this.currency, required String id,
+    required this.currency,
+    required String id,
   });
 
   @override

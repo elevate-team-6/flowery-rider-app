@@ -4,19 +4,15 @@ import 'package:injectable/injectable.dart';
 
 @singleton
 class MultipartService {
-  Future<FormData> createSignUpFormData(
-    SignUpRequest request,
-  ) async {
+  Future<FormData> createSignUpFormData(SignUpRequest request) async {
     return FormData.fromMap({
       ...request.toJson(),
 
       if (request.vehicleLicense != null)
-        'vehicleLicense':
-            await request.vehicleLicense!.toMultipartFile(),
+        'vehicleLicense': await request.vehicleLicense!.toMultipartFile(),
 
       if (request.nidImg != null)
-        'NIDImg':
-            await request.nidImg!.toMultipartFile(),
+        'NIDImg': await request.nidImg!.toMultipartFile(),
     });
   }
 }
