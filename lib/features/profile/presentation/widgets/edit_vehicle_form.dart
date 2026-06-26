@@ -1,9 +1,10 @@
 import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/validations/app_validations.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
-import 'package:flowery_rider_app/features/auth/presentation/widgets/selection_drowp_down.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
+import 'package:flowery_rider_app/features/auth/presentation/widgets/selection_drowp_down.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -13,19 +14,36 @@ class EditVehicleForm extends StatelessWidget {
     required this.formKey,
     required this.vehicleNumberController,
     required this.drivingLicenseImage,
+    required this.drivingLicenseImageUrl,
     required this.onPickDrivingLicenseImage,
     required this.vehicleTypes,
     required this.selectedVehicleType,
     required this.onVehicleTypeChanged,
   });
 
-  final File? drivingLicenseImage;
-  final VoidCallback onPickDrivingLicenseImage;
   final GlobalKey<FormState> formKey;
   final TextEditingController vehicleNumberController;
+
+  final File? drivingLicenseImage;
+  final String? drivingLicenseImageUrl;
+
+  final VoidCallback onPickDrivingLicenseImage;
+
   final List<VehicleTypeEntity> vehicleTypes;
   final VehicleTypeEntity? selectedVehicleType;
   final ValueChanged<VehicleTypeEntity?> onVehicleTypeChanged;
+
+  String _getFileName() {
+    if (drivingLicenseImage != null) {
+      return drivingLicenseImage!.path.split('/').last;
+    }
+
+    if (drivingLicenseImageUrl != null && drivingLicenseImageUrl!.isNotEmpty) {
+      return Uri.parse(drivingLicenseImageUrl!).pathSegments.last;
+    }
+
+    return AppStrings.uploadVehicleLicense.tr();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,12 +53,8 @@ class EditVehicleForm extends StatelessWidget {
         children: [
           AppDropdownField<VehicleTypeEntity>(
             label: AppStrings.vehicleType.tr(),
-            hint: vehicleTypes.isNotEmpty
-                ? vehicleTypes.first.type
-                : AppStrings.vehicleType.tr(),
-
+            hint: AppStrings.vehicleType.tr(),
             value: selectedVehicleType,
-
             items: vehicleTypes
                 .map(
                   (vehicle) => DropdownMenuItem<VehicleTypeEntity>(
@@ -49,9 +63,7 @@ class EditVehicleForm extends StatelessWidget {
                   ),
                 )
                 .toList(),
-
             onChanged: onVehicleTypeChanged,
-
             validator: (value) => AppValidations.validateDropdown(
               value,
               AppStrings.vehicleType.tr(),
@@ -65,8 +77,8 @@ class EditVehicleForm extends StatelessWidget {
             textInputAction: TextInputAction.next,
             autovalidateMode: AutovalidateMode.onUserInteraction,
             decoration: InputDecoration(
-              hintText: AppStrings.enterVehicleNumber.tr(),
               labelText: AppStrings.vehicleNumber.tr(),
+              hintText: AppStrings.enterVehicleNumber.tr(),
             ),
             validator: AppValidations.validateVehicleNumber,
           ),
@@ -80,9 +92,7 @@ class EditVehicleForm extends StatelessWidget {
                 AppValidations.drivingLicenseImage(drivingLicenseImage),
             decoration: InputDecoration(
               labelText: AppStrings.vehicleLicense.tr(),
-              hintText: drivingLicenseImage == null
-                  ? AppStrings.uploadVehicleLicense.tr()
-                  : drivingLicenseImage!.path.split('/').last,
+              hintText: _getFileName(),
               suffixIcon: const Icon(Icons.cloud_upload_outlined),
             ),
           ),

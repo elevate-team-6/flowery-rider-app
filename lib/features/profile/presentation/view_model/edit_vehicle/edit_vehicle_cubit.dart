@@ -3,29 +3,26 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/helpers/image_picker_helper.dart';
-import 'package:flowery_rider_app/core/entities/driver_entity.dart';
-import 'package:flowery_rider_app/core/extensions/app_multipart_file.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/get_vehicle_type_use_case.dart';
-import 'package:flowery_rider_app/features/profile/data/models/request/edit_vehicle_request.dart';
-import 'package:flowery_rider_app/features/profile/domain/use_cases/edit_vehicle_use_case.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_vehicle/edit_vehicle_events.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_vehicle/edit_vehicle_states.dart';
 import 'package:injectable/injectable.dart';
-
-import 'edit_vehicle_events.dart';
 
 @injectable
 class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
   final GetVehicleTypeUseCase getVehicleTypesUseCase;
-  final EditVehicleUseCase editVehicleUseCase;
 
-  EditVehicleCubit({
-    required this.getVehicleTypesUseCase,
-    required this.editVehicleUseCase,
-  }) : super(const EditVehicleState());
+  EditVehicleCubit({required this.getVehicleTypesUseCase})
+    : super(const EditVehicleState());
+
+  String? _vehicleTypeId;
 
   Future<void> doIntent(EditVehicleEvent event) async {
     switch (event) {
+      case InitializeEditVehicleEvent():
+        _initialize(event);
+
       case GetVehicleTypesEvent():
         await _getVehicleTypes();
 
@@ -47,8 +44,14 @@ class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
         emit(state.copyWith(clearDrivingLicenseImage: true, hasChanges: true));
 
       case EditVehicleSubmitEvent():
-        await _editVehicle(event.vehicleNumber);
+        _submit();
     }
+  }
+
+  void _initialize(InitializeEditVehicleEvent event) {
+    _vehicleTypeId = event.vehicleTypeId;
+
+    emit(state.copyWith(drivingLicenseImageUrl: event.vehicleLicenseUrl));
   }
 
   Future<void> _getVehicleTypes() async {
@@ -58,7 +61,20 @@ class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
 
     switch (result) {
       case SuccessBaseResponse<List<VehicleTypeEntity>>():
-        emit(state.copyWith(vehicleTypesState: BaseState(data: result.data)));
+        VehicleTypeEntity? selected;
+
+        if (_vehicleTypeId != null) {
+          try {
+            selected = result.data?.firstWhere((e) => e.id == _vehicleTypeId);
+          } catch (_) {}
+        }
+
+        emit(
+          state.copyWith(
+            vehicleTypesState: BaseState(data: result.data),
+            selectedVehicleType: selected,
+          ),
+        );
 
       case ErrorBaseResponse<List<VehicleTypeEntity>>():
         emit(
@@ -83,38 +99,9 @@ class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
     }
   }
 
-  Future<void> _editVehicle(String vehicleNumber) async {
-    emit(state.copyWith(editVehicleState: const BaseState(isLoading: true)));
+  void _submit() {
+    emit(state.copyWith(hasChanges: false));
 
-    final result = await editVehicleUseCase(
-      EditVehicleRequest(
-        vehicleType: state.selectedVehicleType?.id ?? '',
-        vehicleNumber: vehicleNumber,
-        vehicleLicense: state.drivingLicenseImage == null
-            ? null
-            : AppMultipartFile.fromPath(state.drivingLicenseImage!.path),
-      ),
-    );
-
-    switch (result) {
-      case SuccessBaseResponse<DriverEntity>():
-        emit(
-          state.copyWith(
-            editVehicleState: const BaseState(),
-            hasChanges: false,
-          ),
-        );
-
-        emitUiEvent(DisplaySuccessEvent('Vehicle updated successfully'));
-
-      case ErrorBaseResponse<DriverEntity>():
-        emit(
-          state.copyWith(
-            editVehicleState: BaseState(errorMessage: result.errorMessage),
-          ),
-        );
-
-        emitUiEvent(DisplayErrorEvent(result.errorMessage));
-    }
+    emitUiEvent(DisplaySuccessEvent('Vehicle updated successfully'));
   }
 }

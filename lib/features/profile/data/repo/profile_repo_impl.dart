@@ -29,10 +29,7 @@ class ProfileRepoImpl implements ProfileRepoContract {
   Future<BaseResponse<DriverEntity>> editVehicle(
     EditVehicleRequest request,
   ) async {
-     print('REPO EDIT VEHICLE');
-  print(request.vehicleNumber);
     final response = await _remoteDataSource.editVehicle(request);
- print(response);
     switch (response) {
       case SuccessBaseResponse<ProfileResponseModel>():
         if (response.data == null || response.data!.driver == null) {

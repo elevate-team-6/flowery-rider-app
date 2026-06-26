@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/widgets/custom_snack_bar.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_vehicle/edit_vehicle_cubit.dart';
@@ -13,7 +14,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EditVehicleScreen extends StatefulWidget {
-  const EditVehicleScreen({super.key});
+  final DriverEntity driver;
+
+  const EditVehicleScreen({super.key, required this.driver});
 
   @override
   State<EditVehicleScreen> createState() => _EditVehicleScreenState();
@@ -29,9 +32,18 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
   @override
   void initState() {
     super.initState();
-  print('=== EDIT VEHICLE INIT ===');
 
     final cubit = context.read<EditVehicleCubit>();
+
+    vehicleNumberController.text = widget.driver.vehicleNumber;
+
+    cubit.doIntent(
+      InitializeEditVehicleEvent(
+        vehicleTypeId: widget.driver.vehicleType,
+        vehicleNumber: widget.driver.vehicleNumber,
+        vehicleLicenseUrl: widget.driver.vehicleLicense,
+      ),
+    );
 
     cubit.doIntent(const GetVehicleTypesEvent());
 
@@ -43,14 +55,12 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
   }
 
   void _handleUiEvent(BaseUiEvent event) {
-    print('EVENT => ${event.runtimeType}');
     switch (event) {
       case DisplayErrorEvent():
         CustomSnackBar.showErrorMessage(event.errorMessage.tr());
 
       case DisplaySuccessEvent():
         CustomSnackBar.showSuccessMessage(event.successMessage.tr());
-
         Navigator.pop(context);
 
       default:
@@ -60,8 +70,6 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
 
   @override
   void dispose() {
-      print('=== EDIT VEHICLE DISPOSE ===');
-
     _eventSubscription?.cancel();
     vehicleNumberController.dispose();
     super.dispose();
@@ -83,6 +91,7 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
                       formKey: formKey,
                       vehicleNumberController: vehicleNumberController,
                       drivingLicenseImage: state.drivingLicenseImage,
+                      drivingLicenseImageUrl: state.drivingLicenseImageUrl,
                       onPickDrivingLicenseImage: () {
                         context.read<EditVehicleCubit>().doIntent(
                           const PickDrivingLicenseImageEvent(),
@@ -100,21 +109,14 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
                     ),
                   ),
                 ),
-
                 SizedBox(height: 16.h),
-
                 ElevatedButton(
-                  onPressed:
-                      !state.hasChanges || state.editVehicleState.isLoading
+                  onPressed: !state.hasChanges
                       ? null
                       : () {
-                          print('UPDATE BUTTON CLICKED');
                           if (!formKey.currentState!.validate()) {
-                                      print('FORM INVALID');
-
                             return;
                           }
-        print('FORM VALID');
 
                           context.read<EditVehicleCubit>().doIntent(
                             EditVehicleSubmitEvent(
@@ -122,9 +124,7 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
                             ),
                           );
                         },
-                  child: state.editVehicleState.isLoading
-                      ? const CircularProgressIndicator()
-                      : Text(AppStrings.update.tr()),
+                  child: Text(AppStrings.update.tr()),
                 ),
               ],
             );

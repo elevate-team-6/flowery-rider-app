@@ -9,6 +9,8 @@ class EditVehicleState extends Equatable {
   final BaseState<List<VehicleTypeEntity>> vehicleTypesState;
 
   final VehicleTypeEntity? selectedVehicleType;
+
+  final String? drivingLicenseImageUrl;
   final File? drivingLicenseImage;
 
   final bool hasChanges;
@@ -17,6 +19,7 @@ class EditVehicleState extends Equatable {
     this.editVehicleState = const BaseState(),
     this.vehicleTypesState = const BaseState(),
     this.selectedVehicleType,
+    this.drivingLicenseImageUrl,
     this.drivingLicenseImage,
     this.hasChanges = false,
   });
@@ -25,6 +28,7 @@ class EditVehicleState extends Equatable {
     BaseState<void>? editVehicleState,
     BaseState<List<VehicleTypeEntity>>? vehicleTypesState,
     VehicleTypeEntity? selectedVehicleType,
+    String? drivingLicenseImageUrl,
     File? drivingLicenseImage,
     bool? hasChanges,
     bool clearDrivingLicenseImage = false,
@@ -33,6 +37,8 @@ class EditVehicleState extends Equatable {
       editVehicleState: editVehicleState ?? this.editVehicleState,
       vehicleTypesState: vehicleTypesState ?? this.vehicleTypesState,
       selectedVehicleType: selectedVehicleType ?? this.selectedVehicleType,
+      drivingLicenseImageUrl:
+          drivingLicenseImageUrl ?? this.drivingLicenseImageUrl,
       drivingLicenseImage: clearDrivingLicenseImage
           ? null
           : drivingLicenseImage ?? this.drivingLicenseImage,
@@ -45,6 +51,7 @@ class EditVehicleState extends Equatable {
     editVehicleState,
     vehicleTypesState,
     selectedVehicleType,
+    drivingLicenseImageUrl,
     drivingLicenseImage,
     hasChanges,
   ];

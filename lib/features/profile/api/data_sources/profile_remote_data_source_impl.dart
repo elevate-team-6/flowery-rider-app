@@ -22,14 +22,10 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSourceContract {
   @override
 Future<BaseResponse<ProfileResponseModel>> editVehicle(
   EditVehicleRequest request,
-) {
-  print('REMOTE DATASOURCE CALLED');
-  return ErrorHandler.handleApiCall(() async {
+) {  return ErrorHandler.handleApiCall(() async {
     final formData = await _multipartService.createEditVehicleFormData(
       request,
     );
-  print(formData.fields);
-    print(formData.files);
     return _apiClient.editVehicle(formData);
   });
 }

@@ -1,4 +1,5 @@
 import 'package:flowery_rider_app/config/di/di.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/apply_page.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/forget_password_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/login_screen.dart';
@@ -69,7 +70,26 @@ abstract class AppRoutes {
           return MaterialPageRoute(
             builder: (_) => BlocProvider(
               create: (_) => getIt<EditVehicleCubit>(),
-              child: const EditVehicleScreen(),
+              child: const EditVehicleScreen(
+                driver: DriverEntity(
+                  id: '1',
+                  firstName: 'Youssef',
+                  lastName: 'Singer',
+                  vehicleType: 'Car',
+                  vehicleNumber: 'ABC123',
+                  vehicleLicense:
+                      'https://flower.elevateegy.com/uploads/default-profile.png',
+                  country: '',
+                  nid: '',
+                  nidImg: '',
+                  email: '',
+                  gender: '',
+                  phone: '',
+                  photo: '',
+                  role: '',
+                  name: '',
+                ),
+              ),
             ),
           );
         case submit:
