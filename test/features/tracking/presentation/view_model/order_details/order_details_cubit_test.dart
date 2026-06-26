@@ -6,6 +6,8 @@ import 'package:flowery_rider_app/config/cache/hive_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
+import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
@@ -24,27 +26,40 @@ import 'order_details_cubit_test.mocks.dart';
   UpdateOrderStateUseCase,
   StartOrderUseCase,
   OpenCommunicationUseCase,
+  UpdateOrderProgressUseCase,
   HiveHelper,
 ])
 void main() {
   provideDummy<BaseResponse<OrderEntity>>(ErrorBaseResponse('dummy'));
+  provideDummy<BaseResponse<void>>(SuccessBaseResponse(null));
 
   late OrderDetailsCubit cubit;
   late MockUpdateOrderStateUseCase mockUpdateOrderStateUseCase;
   late MockStartOrderUseCase mockStartOrderUseCase;
   late MockOpenCommunicationUseCase mockOpenCommunicationUseCase;
+  late MockUpdateOrderProgressUseCase mockUpdateOrderProgressUseCase;
   late MockHiveHelper mockHiveHelper;
 
   setUp(() {
     mockUpdateOrderStateUseCase = MockUpdateOrderStateUseCase();
     mockStartOrderUseCase = MockStartOrderUseCase();
     mockOpenCommunicationUseCase = MockOpenCommunicationUseCase();
+    mockUpdateOrderProgressUseCase = MockUpdateOrderProgressUseCase();
     mockHiveHelper = MockHiveHelper();
+
+    when(
+      mockUpdateOrderProgressUseCase(
+        userId: anyNamed('userId'),
+        orderId: anyNamed('orderId'),
+        state: anyNamed('state'),
+      ),
+    ).thenAnswer((_) async => SuccessBaseResponse(null));
 
     cubit = OrderDetailsCubit(
       mockUpdateOrderStateUseCase,
       mockStartOrderUseCase,
       mockOpenCommunicationUseCase,
+      mockUpdateOrderProgressUseCase,
       mockHiveHelper,
     );
   });
@@ -54,17 +69,25 @@ void main() {
     state: 'pending',
     orderNumber: 'ORD-1',
     store: const StoreEntity(lat: '30.0', long: '31.0', name: 'Store'),
+    user: const UserEntity(id: 'user1'),
     shippingAddress: const ShippingAddressEntity(lat: '30.1', long: '31.1'),
   );
 
   group('InitializeOrderDetailsEvent', () {
     blocTest<OrderDetailsCubit, OrderDetailsState>(
-      'emits initial state and then updated state after startOrder succeeds',
+      'emits initial state and then updated state after startOrder succeeds and updates progress',
       build: () {
         when(mockStartOrderUseCase(any)).thenAnswer(
           (_) async =>
               SuccessBaseResponse(tOrder.copyWith(state: 'inProgress')),
         );
+        when(
+          mockUpdateOrderProgressUseCase(
+            userId: anyNamed('userId'),
+            orderId: anyNamed('orderId'),
+            state: anyNamed('state'),
+          ),
+        ).thenAnswer((_) async => SuccessBaseResponse(null));
         return cubit;
       },
       act: (cubit) => cubit.doEvent(InitializeOrderDetailsEvent(tOrder)),
@@ -80,6 +103,13 @@ void main() {
       ],
       verify: (_) {
         verify(mockStartOrderUseCase('1')).called(1);
+        verify(
+          mockUpdateOrderProgressUseCase(
+            userId: 'user1',
+            orderId: '1',
+            state: UserNotificationState.accepted,
+          ),
+        ).called(1);
         verify(
           mockHiveHelper.cacheData(
             boxName: AppKeys.activeOrderBox,
@@ -130,12 +160,19 @@ void main() {
 
   group('NextStepEvent', () {
     blocTest<OrderDetailsCubit, OrderDetailsState>(
-      'emits updated step and caches order when API succeeds for steps < 6',
+      'emits updated step and caches order when API succeeds for steps < 6 and updates progress',
       build: () {
         when(mockUpdateOrderStateUseCase(any, any)).thenAnswer(
           (_) async =>
               SuccessBaseResponse(tOrder.copyWith(state: 'inProgress')),
         );
+        when(
+          mockUpdateOrderProgressUseCase(
+            userId: anyNamed('userId'),
+            orderId: anyNamed('orderId'),
+            state: anyNamed('state'),
+          ),
+        ).thenAnswer((_) async => SuccessBaseResponse(null));
         return cubit;
       },
       seed: () => OrderDetailsState(
@@ -149,6 +186,13 @@ void main() {
             .having((s) => s.orderStatus, 'status', OrderStatus.inProgress),
       ],
       verify: (_) {
+        verify(
+          mockUpdateOrderProgressUseCase(
+            userId: 'user1',
+            orderId: '1',
+            state: UserNotificationState.preparing,
+          ),
+        ).called(1);
         verify(
           mockHiveHelper.cacheData(
             boxName: AppKeys.activeOrderBox,
@@ -180,46 +224,63 @@ void main() {
       cubit.doEvent(NextStepEvent());
     });
 
-    test('emits NavigateEvent and clears cache when reaching step 6', () async {
-      when(mockUpdateOrderStateUseCase(any, any)).thenAnswer(
-        (_) async => SuccessBaseResponse(tOrder.copyWith(state: 'completed')),
-      );
+    test(
+      'emits NavigateEvent, clears cache and updates progress when reaching step 6',
+      () async {
+        when(mockUpdateOrderStateUseCase(any, any)).thenAnswer(
+          (_) async => SuccessBaseResponse(tOrder.copyWith(state: 'completed')),
+        );
+        when(
+          mockUpdateOrderProgressUseCase(
+            userId: anyNamed('userId'),
+            orderId: anyNamed('orderId'),
+            state: anyNamed('state'),
+          ),
+        ).thenAnswer((_) async => SuccessBaseResponse(null));
 
-      cubit.emit(
-        OrderDetailsState(
-          orderDetailsState: BaseState(data: tOrder),
-          uiStep: 5,
-        ),
-      );
+        cubit.emit(
+          OrderDetailsState(
+            orderDetailsState: BaseState(data: tOrder),
+            uiStep: 5,
+          ),
+        );
 
-      expectLater(
-        cubit.eventStream,
-        emitsThrough(
-          isA<NavigateEvent>()
-              .having((e) => e.routeName, 'routeName', AppRoutes.orderSuccess)
-              .having(
-                (e) => e.navigationType,
-                'type',
-                NavigationType.pushReplacement,
-              ),
-        ),
-      );
+        expectLater(
+          cubit.eventStream,
+          emitsThrough(
+            isA<NavigateEvent>()
+                .having((e) => e.routeName, 'routeName', AppRoutes.orderSuccess)
+                .having(
+                  (e) => e.navigationType,
+                  'type',
+                  NavigationType.pushReplacement,
+                ),
+          ),
+        );
 
-      cubit.doEvent(NextStepEvent());
+        cubit.doEvent(NextStepEvent());
 
-      await untilCalled(
-        mockHiveHelper.deleteData(
-          boxName: AppKeys.activeOrderBox,
-          key: AppKeys.activeOrderKey,
-        ),
-      );
-      verify(
-        mockHiveHelper.deleteData(
-          boxName: AppKeys.activeOrderBox,
-          key: AppKeys.activeOrderKey,
-        ),
-      ).called(1);
-    });
+        await untilCalled(
+          mockHiveHelper.deleteData(
+            boxName: AppKeys.activeOrderBox,
+            key: AppKeys.activeOrderKey,
+          ),
+        );
+        verify(
+          mockUpdateOrderProgressUseCase(
+            userId: 'user1',
+            orderId: '1',
+            state: UserNotificationState.delivered,
+          ),
+        ).called(1);
+        verify(
+          mockHiveHelper.deleteData(
+            boxName: AppKeys.activeOrderBox,
+            key: AppKeys.activeOrderKey,
+          ),
+        ).called(1);
+      },
+    );
 
     test('emits DisplayErrorEvent when API fails', () async {
       when(
@@ -269,13 +330,21 @@ void main() {
 
   group('RevertOrderToPendingEvent', () {
     blocTest<OrderDetailsCubit, OrderDetailsState>(
-      'emits loading then success when cancel API succeeds',
+      'emits loading then success and updates progress when cancel API succeeds',
       build: () {
         when(
           mockUpdateOrderStateUseCase(any, any),
         ).thenAnswer((_) async => SuccessBaseResponse(tOrder));
+        when(
+          mockUpdateOrderProgressUseCase(
+            userId: anyNamed('userId'),
+            orderId: anyNamed('orderId'),
+            state: anyNamed('state'),
+          ),
+        ).thenAnswer((_) async => SuccessBaseResponse(null));
         return cubit;
       },
+      seed: () => OrderDetailsState(orderDetailsState: BaseState(data: tOrder)),
       act: (cubit) => cubit.doEvent(RevertOrderToPendingEvent('1')),
       expect: () => [
         isA<OrderDetailsState>().having(
@@ -290,6 +359,13 @@ void main() {
         ),
       ],
       verify: (_) {
+        verify(
+          mockUpdateOrderProgressUseCase(
+            userId: 'user1',
+            orderId: '1',
+            state: UserNotificationState.canceled,
+          ),
+        ).called(1);
         verify(
           mockHiveHelper.deleteData(
             boxName: AppKeys.activeOrderBox,

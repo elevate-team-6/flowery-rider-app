@@ -6,6 +6,7 @@ import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/cache/hive_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
+import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/start_order_use_case.dart';
@@ -36,12 +37,14 @@ class _InMemoryAssetLoader extends AssetLoader {
   UpdateOrderStateUseCase,
   StartOrderUseCase,
   OpenCommunicationUseCase,
+  UpdateOrderProgressUseCase,
   HiveHelper,
 ])
 void main() {
   late MockUpdateOrderStateUseCase mockUpdateUseCase;
   late MockStartOrderUseCase mockStartUseCase;
   late MockOpenCommunicationUseCase mockCommUseCase;
+  late MockUpdateOrderProgressUseCase mockUpdateProgressUseCase;
   late MockHiveHelper mockHiveHelper;
   late OrderDetailsCubit cubit;
   late Map<String, Map<String, dynamic>> translations;
@@ -57,7 +60,11 @@ void main() {
       address: '20th st, Sheikh Zayed, Giza',
       phoneNumber: '01000000000',
     ),
-    user: const UserEntity(fullName: 'Nour mohamed', phone: '01111111111'),
+    user: const UserEntity(
+      fullName: 'Nour mohamed',
+      phone: '01111111111',
+      id: 'user123',
+    ),
     totalPrice: 150,
   );
 
@@ -98,9 +105,19 @@ void main() {
     mockUpdateUseCase = MockUpdateOrderStateUseCase();
     mockStartUseCase = MockStartOrderUseCase();
     mockCommUseCase = MockOpenCommunicationUseCase();
+    mockUpdateProgressUseCase = MockUpdateOrderProgressUseCase();
     mockHiveHelper = MockHiveHelper();
 
     provideDummy<BaseResponse<OrderEntity>>(ErrorBaseResponse('dummy'));
+    provideDummy<BaseResponse<void>>(SuccessBaseResponse(null));
+
+    when(
+      mockUpdateProgressUseCase(
+        userId: anyNamed('userId'),
+        orderId: anyNamed('orderId'),
+        state: anyNamed('state'),
+      ),
+    ).thenAnswer((_) async => SuccessBaseResponse(null));
 
     when(
       mockStartUseCase(any),
@@ -110,6 +127,7 @@ void main() {
       mockUpdateUseCase,
       mockStartUseCase,
       mockCommUseCase,
+      mockUpdateProgressUseCase,
       mockHiveHelper,
     );
   });
