@@ -5,11 +5,7 @@ class SignUpResponse {
   final DriverModel? driver;
   final String? token;
 
-  SignUpResponse({
-    this.message,
-    this.driver,
-    this.token,
-  });
+  SignUpResponse({this.message, this.driver, this.token});
 
   factory SignUpResponse.fromJson(Map<String, dynamic> json) {
     return SignUpResponse(

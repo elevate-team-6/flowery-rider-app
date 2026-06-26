@@ -3,7 +3,6 @@ import 'package:flowery_rider_app/features/auth/data/models/request/signup/signu
 import 'package:flowery_rider_app/features/auth/domain/entities/country_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
 
-
 sealed class ApplyEvent extends Equatable {
   const ApplyEvent();
 
