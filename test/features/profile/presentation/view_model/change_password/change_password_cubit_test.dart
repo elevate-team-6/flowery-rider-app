@@ -14,19 +14,15 @@ import 'package:flowery_rider_app/features/profile/presentation/view_model/chang
 import 'package:flowery_rider_app/features/profile/presentation/view_model/change_password/change_password_states.dart';
 
 import 'change_password_cubit_test.mocks.dart';
-@GenerateMocks([
-  ChangePasswordUseCase,
-  SecureCacheHelper,
-])
+
+@GenerateMocks([ChangePasswordUseCase, SecureCacheHelper])
 void main() {
-    setUpAll(() {
+  setUpAll(() {
     provideDummy<BaseResponse<String>>(
       SuccessBaseResponse<String>('dummy_token'),
     );
 
-    provideDummy<BaseResponse<void>>(
-      SuccessBaseResponse<void>(null),
-    );
+    provideDummy<BaseResponse<void>>(SuccessBaseResponse<void>(null));
   });
   late MockChangePasswordUseCase useCase;
   late MockSecureCacheHelper secureCacheHelper;
@@ -36,10 +32,7 @@ void main() {
     useCase = MockChangePasswordUseCase();
     secureCacheHelper = MockSecureCacheHelper();
 
-    cubit = ChangePasswordCubit(
-      useCase,
-      secureCacheHelper,
-    );
+    cubit = ChangePasswordCubit(useCase, secureCacheHelper);
   });
 
   blocTest<ChangePasswordCubit, ChangePasswordState>(
@@ -47,11 +40,7 @@ void main() {
     build: () {
       when(
         useCase('oldPass', 'newPass'),
-      ).thenAnswer(
-        (_) async => SuccessBaseResponse<String>(
-         'new_token',
-        ),
-      );
+      ).thenAnswer((_) async => SuccessBaseResponse<String>('new_token'));
 
       when(
         secureCacheHelper.writeData(
@@ -74,68 +63,53 @@ void main() {
       const ChangePasswordState(
         changePasswordState: BaseState(isLoading: true),
       ),
-      const ChangePasswordState(
-        changePasswordState: BaseState(),
-      ),
+      const ChangePasswordState(changePasswordState: BaseState()),
     ],
     verify: (_) {
       verify(useCase('oldPass', 'newPass')).called(1);
 
       verify(
-        secureCacheHelper.writeData(
-          key: AppKeys.tokenKey,
-          value: 'new_token',
-        ),
+        secureCacheHelper.writeData(key: AppKeys.tokenKey, value: 'new_token'),
       ).called(1);
     },
   );
 
   test(
-  'emits DisplaySuccessEvent when password changed successfully',
-  () async {
-    when(
-      useCase('oldPass', 'newPass'),
-    ).thenAnswer(
-      (_) async => SuccessBaseResponse<String>(
-        'new_token',
-      ),
-    );
+    'emits DisplaySuccessEvent when password changed successfully',
+    () async {
+      when(
+        useCase('oldPass', 'newPass'),
+      ).thenAnswer((_) async => SuccessBaseResponse<String>('new_token'));
 
-    when(
-      secureCacheHelper.writeData(
-        key: anyNamed('key'),
-        value: anyNamed('value'),
-      ),
-    ).thenAnswer((_) async {});
+      when(
+        secureCacheHelper.writeData(
+          key: anyNamed('key'),
+          value: anyNamed('value'),
+        ),
+      ).thenAnswer((_) async {});
 
-    final expectation = expectLater(
-      cubit.eventStream,
-      emits(
-        isA<DisplaySuccessEvent>(),
-      ),
-    );
+      final expectation = expectLater(
+        cubit.eventStream,
+        emits(isA<DisplaySuccessEvent>()),
+      );
 
-    await cubit.doIntent(
-      const SubmitChangePasswordEvent(
-        currentPassword: 'oldPass',
-        newPassword: 'newPass',
-      ),
-    );
+      await cubit.doIntent(
+        const SubmitChangePasswordEvent(
+          currentPassword: 'oldPass',
+          newPassword: 'newPass',
+        ),
+      );
 
-    await expectation;
-  },
-);
+      await expectation;
+    },
+  );
 
   blocTest<ChangePasswordCubit, ChangePasswordState>(
     'emits loading then error when usecase fails',
     build: () {
       when(
         useCase('oldPass', 'newPass'),
-      ).thenAnswer(
-        (_) async => ErrorBaseResponse<String>(
-          'wrong password',
-        ),
-      );
+      ).thenAnswer((_) async => ErrorBaseResponse<String>('wrong password'));
 
       return cubit;
     },
@@ -152,29 +126,19 @@ void main() {
         changePasswordState: BaseState(isLoading: true),
       ),
       const ChangePasswordState(
-        changePasswordState: BaseState(
-          errorMessage: 'wrong password',
-        ),
+        changePasswordState: BaseState(errorMessage: 'wrong password'),
       ),
     ],
   );
 
-  test(
-  'emits DisplayErrorEvent when usecase fails',
-  () async {
+  test('emits DisplayErrorEvent when usecase fails', () async {
     when(
       useCase('oldPass', 'newPass'),
-    ).thenAnswer(
-      (_) async => ErrorBaseResponse<String>(
-        'wrong password',
-      ),
-    );
+    ).thenAnswer((_) async => ErrorBaseResponse<String>('wrong password'));
 
     final expectation = expectLater(
       cubit.eventStream,
-      emits(
-        isA<DisplayErrorEvent>(),
-      ),
+      emits(isA<DisplayErrorEvent>()),
     );
 
     await cubit.doIntent(
@@ -185,7 +149,5 @@ void main() {
     );
 
     await expectation;
-  },
-);
-
+  });
 }

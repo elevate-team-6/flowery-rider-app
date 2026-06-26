@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flowery_rider_app/features/auth/presentation/widgets/apply_form.dart'; 
+import 'package:flowery_rider_app/features/auth/presentation/widgets/apply_form.dart';
 
 class _InMemoryAssetLoader extends AssetLoader {
   const _InMemoryAssetLoader(this._data);
@@ -33,10 +33,10 @@ void main() {
 
   late List<CountryEntity> mockCountries;
   late List<VehicleTypeEntity> mockVehicleTypes;
-  
+
   CountryEntity? selectedCountry;
   VehicleTypeEntity? selectedVehicleType;
-  
+
   bool isNationalIdPicked = false;
   bool isDrivingLicensePicked = false;
 
@@ -85,8 +85,22 @@ void main() {
     confirmPasswordController = TextEditingController();
 
     mockCountries = [
-      const CountryEntity(id: '1', name: 'Egypt', isoCode: '', phoneCode: '', flag: '', currency: ''),
-      const CountryEntity(id: '2', name: 'Saudi Arabia', isoCode: '', phoneCode: '', flag: '', currency: ''),
+      const CountryEntity(
+        id: '1',
+        name: 'Egypt',
+        isoCode: '',
+        phoneCode: '',
+        flag: '',
+        currency: '',
+      ),
+      const CountryEntity(
+        id: '2',
+        name: 'Saudi Arabia',
+        isoCode: '',
+        phoneCode: '',
+        flag: '',
+        currency: '',
+      ),
     ];
 
     mockVehicleTypes = [
@@ -111,7 +125,11 @@ void main() {
     confirmPasswordController.dispose();
   });
 
-  Future<void> pumpForm(WidgetTester tester, {File? nationalId, File? drivingLicense}) async {
+  Future<void> pumpForm(
+    WidgetTester tester, {
+    File? nationalId,
+    File? drivingLicense,
+  }) async {
     await tester.pumpWidget(
       EasyLocalization(
         supportedLocales: const [Locale('en')],
@@ -142,7 +160,8 @@ void main() {
                       nationalIdImage: nationalId,
                       drivingLicenseImage: drivingLicense,
                       onPickNationalIdImage: () => isNationalIdPicked = true,
-                      onPickDrivingLicenseImage: () => isDrivingLicensePicked = true,
+                      onPickDrivingLicenseImage: () =>
+                          isDrivingLicensePicked = true,
                       countries: mockCountries,
                       vehicleTypes: mockVehicleTypes,
                       selectedCountry: selectedCountry,
@@ -166,7 +185,7 @@ void main() {
       await pumpForm(tester);
 
       // للتأكد من وجود الـ TextFields كلها على الشاشة
-      expect(find.byType(TextField), findsNWidgets(9)); 
+      expect(find.byType(TextField), findsNWidgets(9));
       expect(find.text('First legal name'), findsOneWidget);
       expect(find.text('Second legal name'), findsOneWidget);
       expect(find.text('Email'), findsOneWidget);
@@ -178,13 +197,19 @@ void main() {
 
       // تم تعديل نوع الـ الوجت إلى TextField للوصول للـ decoration بدون إيرور
       await tester.enterText(
-        find.byWidgetPredicate((w) => w is TextField && w.decoration?.labelText == 'Enter first legal name'), 
+        find.byWidgetPredicate(
+          (w) =>
+              w is TextField &&
+              w.decoration?.labelText == 'Enter first legal name',
+        ),
         'Ahmed',
       );
       expect(firstNameController.text, 'Ahmed');
 
       await tester.enterText(
-        find.byWidgetPredicate((w) => w is TextField && w.decoration?.labelText == 'Email'), 
+        find.byWidgetPredicate(
+          (w) => w is TextField && w.decoration?.labelText == 'Email',
+        ),
         'test@test.com',
       );
       expect(emailController.text, 'test@test.com');
@@ -193,13 +218,17 @@ void main() {
     testWidgets('triggers image picker callbacks on tap', (tester) async {
       await pumpForm(tester);
       await tester.tap(
-        find.byWidgetPredicate((w) => w is TextField && w.decoration?.labelText == 'Vehicle license'),
+        find.byWidgetPredicate(
+          (w) => w is TextField && w.decoration?.labelText == 'Vehicle license',
+        ),
       );
       await tester.pump();
       expect(isDrivingLicensePicked, isTrue);
 
       await tester.tap(
-        find.byWidgetPredicate((w) => w is TextField && w.decoration?.labelText == 'ID image'),
+        find.byWidgetPredicate(
+          (w) => w is TextField && w.decoration?.labelText == 'ID image',
+        ),
       );
       await tester.pump();
       expect(isNationalIdPicked, isTrue);
@@ -217,7 +246,7 @@ void main() {
       await pumpForm(tester);
 
       final isValid = formKey.currentState?.validate();
-      
+
       expect(isValid, isFalse);
     });
   });

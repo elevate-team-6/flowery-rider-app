@@ -30,24 +30,17 @@ class UpdatePasswordButton extends StatelessWidget {
             ? null
             : () {
                 if (formKey.currentState!.validate()) {
-                  context
-                      .read<ChangePasswordCubit>()
-                      .doIntent(
-                        SubmitChangePasswordEvent(
-                          currentPassword:
-                              currentPassword,
-                          newPassword:
-                              newPassword,
-                        ),
-                      );
+                  context.read<ChangePasswordCubit>().doIntent(
+                    SubmitChangePasswordEvent(
+                      currentPassword: currentPassword,
+                      newPassword: newPassword,
+                    ),
+                  );
                 }
               },
         style: ElevatedButton.styleFrom(
-          backgroundColor: isFormValid
-              ? AppColors.primary
-              : AppColors.black30,
-          disabledBackgroundColor:
-              AppColors.black30,
+          backgroundColor: isFormValid ? AppColors.primary : AppColors.black30,
+          disabledBackgroundColor: AppColors.black30,
         ),
         child: isLoading
             ? const CircularProgressIndicator()

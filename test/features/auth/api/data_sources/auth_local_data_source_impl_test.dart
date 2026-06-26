@@ -23,33 +23,23 @@ void main() {
     ]
     ''';
 
-    TestDefaultBinaryMessengerBinding
-        .instance.defaultBinaryMessenger
-        .setMockMessageHandler(
-      'flutter/assets',
-      (message) async {
-        final key = utf8.decode(message!.buffer.asUint8List());
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMessageHandler('flutter/assets', (message) async {
+          final key = utf8.decode(message!.buffer.asUint8List());
 
-        if (key == AppJson.countryPath) {
-          return ByteData.view(
-            Uint8List.fromList(
-              utf8.encode(jsonData),
-            ).buffer,
-          );
-        }
+          if (key == AppJson.countryPath) {
+            return ByteData.view(
+              Uint8List.fromList(utf8.encode(jsonData)).buffer,
+            );
+          }
 
-        return null;
-      },
-    );
+          return null;
+        });
   });
 
   tearDown(() {
-    TestDefaultBinaryMessengerBinding
-        .instance.defaultBinaryMessenger
-        .setMockMessageHandler(
-      'flutter/assets',
-      null,
-    );
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMessageHandler('flutter/assets', null);
   });
 
   test('should return list of countries', () async {

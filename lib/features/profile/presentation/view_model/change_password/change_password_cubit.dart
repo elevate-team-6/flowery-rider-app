@@ -44,7 +44,9 @@ class ChangePasswordCubit extends BaseCubit<ChangePasswordState, BaseUiEvent> {
 
         emit(state.copyWith(changePasswordState: const BaseState()));
 
-        emitUiEvent(DisplaySuccessEvent(AppStrings.passwordChangedSuccess.tr()));
+        emitUiEvent(
+          DisplaySuccessEvent(AppStrings.passwordChangedSuccess.tr()),
+        );
       case ErrorBaseResponse<String>():
         emit(
           state.copyWith(

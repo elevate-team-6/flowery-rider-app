@@ -8,19 +8,12 @@ import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/features/profile/data/data_sources/profile_remote_data_source_contract.dart';
 import 'profile_repo_impl_test.mocks.dart';
 
-@GenerateMocks([
-  ProfileRemoteDataSourceContract,
-  SecureCacheHelper,
-])
+@GenerateMocks([ProfileRemoteDataSourceContract, SecureCacheHelper])
 void main() {
-   setUpAll(() {
-    provideDummy<BaseResponse<void>>(
-      SuccessBaseResponse<void>(null),
-    );
+  setUpAll(() {
+    provideDummy<BaseResponse<void>>(SuccessBaseResponse<void>(null));
 
-    provideDummy<BaseResponse<String>>(
-      SuccessBaseResponse<String>( ''),
-    );
+    provideDummy<BaseResponse<String>>(SuccessBaseResponse<String>(''));
   });
   late MockProfileRemoteDataSourceContract remoteDataSource;
   late MockSecureCacheHelper secureCacheHelper;
@@ -30,10 +23,7 @@ void main() {
     remoteDataSource = MockProfileRemoteDataSourceContract();
     secureCacheHelper = MockSecureCacheHelper();
 
-    repo = ProfileRepoImpl(
-      remoteDataSource,
-      secureCacheHelper,
-    );
+    repo = ProfileRepoImpl(remoteDataSource, secureCacheHelper);
   });
 
   group('logout', () {
@@ -43,14 +33,10 @@ void main() {
         // arrange
         when(
           remoteDataSource.logout(),
-        ).thenAnswer(
-          (_) async => SuccessBaseResponse<void>( null),
-        );
+        ).thenAnswer((_) async => SuccessBaseResponse<void>(null));
 
         when(
-          secureCacheHelper.deleteData(
-            key: AppKeys.tokenKey,
-          ),
+          secureCacheHelper.deleteData(key: AppKeys.tokenKey),
         ).thenAnswer((_) async {});
 
         // act
@@ -61,126 +47,65 @@ void main() {
 
         verify(remoteDataSource.logout()).called(1);
 
-        verify(
-          secureCacheHelper.deleteData(
-            key: AppKeys.tokenKey,
-          ),
-        ).called(1);
+        verify(secureCacheHelper.deleteData(key: AppKeys.tokenKey)).called(1);
       },
     );
 
-    test(
-      'should delete token even when remote logout fails',
-      () async {
-        // arrange
-        when(
-          remoteDataSource.logout(),
-        ).thenAnswer(
-          (_) async => ErrorBaseResponse<void>(
-            'logout failed',
-          ),
-        );
+    test('should delete token even when remote logout fails', () async {
+      // arrange
+      when(
+        remoteDataSource.logout(),
+      ).thenAnswer((_) async => ErrorBaseResponse<void>('logout failed'));
 
-        when(
-          secureCacheHelper.deleteData(
-            key: AppKeys.tokenKey,
-          ),
-        ).thenAnswer((_) async {});
+      when(
+        secureCacheHelper.deleteData(key: AppKeys.tokenKey),
+      ).thenAnswer((_) async {});
 
-        // act
-        final result = await repo.logout();
+      // act
+      final result = await repo.logout();
 
-        // assert
-        expect(result, isA<ErrorBaseResponse<void>>());
+      // assert
+      expect(result, isA<ErrorBaseResponse<void>>());
 
-        verify(remoteDataSource.logout()).called(1);
+      verify(remoteDataSource.logout()).called(1);
 
-        verify(
-          secureCacheHelper.deleteData(
-            key: AppKeys.tokenKey,
-          ),
-        ).called(1);
-      },
-    );
+      verify(secureCacheHelper.deleteData(key: AppKeys.tokenKey)).called(1);
+    });
   });
 
   group('changePassword', () {
-    test(
-      'should return success response from remote datasource',
-      () async {
-        // arrange
-        when(
-          remoteDataSource.changePassword(
-            'oldPass',
-            'newPass',
-          ),
-        ).thenAnswer(
-          (_) async => SuccessBaseResponse<String>(
-             'new_token',
-          ),
-        );
+    test('should return success response from remote datasource', () async {
+      // arrange
+      when(
+        remoteDataSource.changePassword('oldPass', 'newPass'),
+      ).thenAnswer((_) async => SuccessBaseResponse<String>('new_token'));
 
-        // act
-        final result = await repo.changePassword(
-          'oldPass',
-          'newPass',
-        );
+      // act
+      final result = await repo.changePassword('oldPass', 'newPass');
 
-        // assert
-        expect(result, isA<SuccessBaseResponse<String>>());
+      // assert
+      expect(result, isA<SuccessBaseResponse<String>>());
 
-        verify(
-          remoteDataSource.changePassword(
-            'oldPass',
-            'newPass',
-          ),
-        ).called(1);
+      verify(remoteDataSource.changePassword('oldPass', 'newPass')).called(1);
 
-        verifyNever(
-          secureCacheHelper.deleteData(
-            key: anyNamed('key'),
-          ),
-        );
-      },
-    );
+      verifyNever(secureCacheHelper.deleteData(key: anyNamed('key')));
+    });
 
-    test(
-      'should return error response from remote datasource',
-      () async {
-        // arrange
-        when(
-          remoteDataSource.changePassword(
-            'oldPass',
-            'newPass',
-          ),
-        ).thenAnswer(
-          (_) async => ErrorBaseResponse<String>(
-            'wrong password',
-          ),
-        );
+    test('should return error response from remote datasource', () async {
+      // arrange
+      when(
+        remoteDataSource.changePassword('oldPass', 'newPass'),
+      ).thenAnswer((_) async => ErrorBaseResponse<String>('wrong password'));
 
-        // act
-        final result = await repo.changePassword(
-          'oldPass',
-          'newPass',
-        );
+      // act
+      final result = await repo.changePassword('oldPass', 'newPass');
 
-        // assert
-        expect(result, isA<ErrorBaseResponse<String>>());
+      // assert
+      expect(result, isA<ErrorBaseResponse<String>>());
 
-        verify(
-          remoteDataSource.changePassword(
-            'oldPass',
-            'newPass',
-          ),
-        ).called(1);
+      verify(remoteDataSource.changePassword('oldPass', 'newPass')).called(1);
 
-        verifyNever(
-          secureCacheHelper.deleteData(
-            key: anyNamed('key'),
-          ),
-        );
-      },
-    );
+      verifyNever(secureCacheHelper.deleteData(key: anyNamed('key')));
+    });
   });
 }

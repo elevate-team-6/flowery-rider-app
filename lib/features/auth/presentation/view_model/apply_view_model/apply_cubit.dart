@@ -68,9 +68,7 @@ class ApplyCubit extends BaseCubit<ApplyState, BaseUiEvent> {
       emit(state.copyWith(countriesState: BaseState(data: countries)));
     } catch (e) {
       emit(
-        state.copyWith(
-          countriesState: BaseState(errorMessage: e.toString()),
-        ),
+        state.copyWith(countriesState: BaseState(errorMessage: e.toString())),
       );
 
       emitUiEvent(DisplayErrorEvent(e.toString()));

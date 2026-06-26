@@ -40,12 +40,12 @@ void main() {
 
         expect(success.data, 'new_token');
 
-        final captured = verify(
-  mockApiClient.changePassword(captureAny),
-).captured.single as ChangePasswordRequest;
+        final captured =
+            verify(mockApiClient.changePassword(captureAny)).captured.single
+                as ChangePasswordRequest;
 
-expect(captured.password, 'oldPass');
-expect(captured.newPassword, 'newPass');
+        expect(captured.password, 'oldPass');
+        expect(captured.newPassword, 'newPass');
       },
     );
 

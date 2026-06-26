@@ -15,7 +15,7 @@ abstract class ProfileApiClient {
 
   @GET(AppEndPoints.logout)
   Future<void> logout();
-   @PATCH(AppEndPoints.changePassword)
+  @PATCH(AppEndPoints.changePassword)
   Future<ChangePasswordResponse> changePassword(
     @Body() ChangePasswordRequest request,
   );
