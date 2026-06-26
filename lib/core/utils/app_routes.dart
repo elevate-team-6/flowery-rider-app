@@ -1,8 +1,11 @@
 import 'package:flowery_rider_app/config/di/di.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/apply_page.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/forget_password_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/login_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/onboarding_screen.dart';
+import 'package:flowery_rider_app/features/auth/presentation/screens/success_apply_screen.dart';
+import 'package:flowery_rider_app/features/auth/presentation/view_model/apply_view_model/apply_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
@@ -23,6 +26,7 @@ abstract class AppRoutes {
   static const String onboarding = 'onboarding';
   static const String login = '/login';
   static const String applyScreen = 'apply';
+  static const String submit = 'submit';
   static const String mainLayout = 'mainLayout';
   static const String forgetPassword = '/forgotPassword';
   static const String verifyResetCode = '/VerifyResetCode';
@@ -58,7 +62,15 @@ abstract class AppRoutes {
             },
             settings: settings,
           );
-
+        case applyScreen:
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => getIt<ApplyCubit>(),
+              child: const ApplyPage(),
+            ),
+          );
+        case submit:
+          return MaterialPageRoute(builder: (_) => const SuccessApplyScreen());
         case mainLayout:
           return MaterialPageRoute(
             builder: (_) => const MainLayout(),

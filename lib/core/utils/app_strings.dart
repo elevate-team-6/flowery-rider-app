@@ -9,7 +9,7 @@ abstract class AppStrings {
   static const String signupWithSpace = 'signupWithSpace';
   static const String password = 'password';
   static const String email = 'email';
-  static const String continueText = 'continueText';
+  static const String continueText = 'continue';
   static const String confirmPassword = 'confirmPassword';
 
   // Login Screen
@@ -23,20 +23,48 @@ abstract class AppStrings {
 
   // Sign Up Screen
   static const String userName = 'userName';
+  static const String invalidIdNumber = 'Invalid Id Number';
+  static const String idNumberRequired = 'Id Number Required';
+  static const String isRequired = 'Drop Down is required';
+  static const String vehicleNumberRequired = 'Vehicle Number Required';
+  static const String apply = 'Apply';
+  static const String country = 'Country';
+  static const String uploadImageRequired = 'Please upload required images';
+  static const String welcome = 'Welcome!!';
+  static const String applyDescription =
+      'You want to be a delivery man?\nJoin our team ';
+  static const String submitSuccess = 'Your application has been\n submitted!';
+  static const String submitDescription =
+      'Thank you for providing your application,\n we will review your application and will\n get back to you soon.';
   static const String enterYourUserName = 'enterYourUserName';
-  static const String firstName = 'firstName';
-  static const String enterFirstName = 'enterFirstName';
-  static const String lastName = 'lastName';
-  static const String enterLastName = 'enterLastName';
+  static const String firstName = 'First legal name';
+  static const String enterFirstName = 'Enter first legal name';
+  static const String secondName = 'Second legal name';
+  static const String enterSecondName = 'Enter second legal name';
   static const String phoneNumber = 'phoneNumber';
+  static const String vehicleNumber = 'Vehicle number';
+  static const String vehicleLicense = 'Vehicle license';
+  static const String uploadVehicleLicense = 'Upload license photo';
+  static const String enterVehicleNumber = 'Enter vehicle number';
+  static const String vehicleType = 'Vehicle type';
   static const String enterPhoneNumber = 'enterPhoneNumber';
+  static const String idNumber = 'ID number';
+  static const String idImage = 'ID image';
+  static const String uploadIdImage = 'Upload ID image';
+  static const String enterIdNumber = 'Enter national ID number';
   static const String alreadyHaveAccount = 'alreadyHaveAccount';
   static const String registerSuccess = 'registerSuccess';
   static const String signupFailedUserIsNull = 'signupFailedUserIsNull';
   static const String gender = 'gender';
   static const String female = 'female';
   static const String male = 'male';
+  static const String failedCaptureImage = 'Failed to capture image';
+  static const String failedPickImageGallery =
+      'Failed to pick image from gallery';
   static const String pleaseSelectGender = 'pleaseSelectGender';
+  static const String pleaseUploadNationalId = 'Please upload your national ID';
+  static const String pleaseUploadDrivingLicense =
+      'Please upload your driving license';
   static const String creatingAccountAgreement = 'creatingAccountAgreement';
   static const String iAgree = 'iAgree';
   // Onboarding Screen
@@ -210,6 +238,9 @@ abstract class AppStrings {
   static const String passwordLowercase = 'passwordLowercase';
   static const String passwordUppercase = 'passwordUppercase';
   static const String passwordNumber = 'passwordNumber';
+  static const fileDoesNotExist = 'fileDoesNotExist';
+  static const appMultipartFileRequiresEitherFilePathOrBytes =
+      'appMultipartFileRequiresEitherFilePathOrBytes';
   static const String passwordSpecialCharacter = 'passwordSpecialCharacter';
   static const String passwordNotMatched = 'passwordNotMatched';
   static const String confirmPasswordRequired = 'confirmPasswordRequired';

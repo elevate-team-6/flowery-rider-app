@@ -138,7 +138,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                             );
                           },
                           onPhoneTap: () {
-                            final phone = order.store?.phone;
+                            final phone = order.store?.phoneNumber;
                             if (phone != null) {
                               context.read<OrderDetailsCubit>().doEvent(
                                 CallPhoneEvent(phone),
@@ -146,7 +146,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                             }
                           },
                           onWhatsappTap: () {
-                            final phone = order.store?.phone;
+                            final phone = order.store?.phoneNumber;
                             if (phone != null) {
                               context.read<OrderDetailsCubit>().doEvent(
                                 OpenWhatsAppEvent(phone),
