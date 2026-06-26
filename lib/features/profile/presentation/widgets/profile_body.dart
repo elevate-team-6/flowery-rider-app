@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/profile/presentation/widgets/profile_menu_item.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -80,6 +81,12 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                   ),
                 );
               },
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, AppRoutes.changePassword);
+              },
+              child: Text('go to change password'),
             ),
           ],
         ),

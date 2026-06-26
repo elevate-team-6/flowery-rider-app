@@ -19,4 +19,10 @@ class ProfileRepoImpl implements ProfileRepoContract {
     await _secureCacheHelper.deleteData(key: AppKeys.tokenKey);
     return result;
   }
+
+  @override
+  Future<BaseResponse<String>> changePassword(
+    String password,
+    String newPassword,
+  ) => _remoteDataSource.changePassword(password, newPassword);
 }

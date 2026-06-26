@@ -1,3 +1,4 @@
+import 'package:flowery_rider_app/features/profile/data/models/request/change_password_request.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../config/base_response/base_response.dart';
@@ -14,5 +15,27 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSourceContract {
   @override
   Future<BaseResponse<void>> logout() async {
     return await ErrorHandler.handleApiCall(() => _apiClient.logout());
+  }
+
+  @override
+  Future<BaseResponse<String>> changePassword(
+    String password,
+    String newPassword,
+  ) async {
+    final result = await ErrorHandler.handleApiCall(
+      () => _apiClient.changePassword(
+        ChangePasswordRequest(password: password, newPassword: newPassword),
+      ),
+    );
+
+    return switch (result) {
+      SuccessBaseResponse(:final data) => SuccessBaseResponse<String>(
+        data?.token ?? '',
+      ),
+
+      ErrorBaseResponse(:final errorMessage) => ErrorBaseResponse<String>(
+        errorMessage,
+      ),
+    };
   }
 }
