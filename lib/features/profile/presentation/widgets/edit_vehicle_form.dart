@@ -88,8 +88,10 @@ class EditVehicleForm extends StatelessWidget {
           TextFormField(
             readOnly: true,
             onTap: onPickDrivingLicenseImage,
-            validator: (_) =>
-                AppValidations.drivingLicenseImage(drivingLicenseImage),
+            validator: (_) => AppValidations.drivingLicenseImage(
+              image: drivingLicenseImage,
+              imageUrl: drivingLicenseImageUrl,
+            ),
             decoration: InputDecoration(
               labelText: AppStrings.vehicleLicense.tr(),
               hintText: _getFileName(),

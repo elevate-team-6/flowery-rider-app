@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/helpers/image_picker_helper.dart';
+import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/get_vehicle_type_use_case.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_vehicle/edit_vehicle_events.dart';
@@ -102,6 +104,6 @@ class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
   void _submit() {
     emit(state.copyWith(hasChanges: false));
 
-    emitUiEvent(DisplaySuccessEvent('Vehicle updated successfully'));
+    emitUiEvent(DisplaySuccessEvent(AppStrings.editVehicleSuccessfly.tr()));
   }
 }

@@ -13,42 +13,41 @@ abstract class AppValidations {
     }
     return null;
   }
-// Vehicle Number
-static String? validateVehicleNumber(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return AppStrings.vehicleNumberRequired.tr();
-  }
-  return null;
-}
 
-// National ID
-static String? validateNationalId(String? value) {
-  if (value == null || value.trim().isEmpty) {
-    return AppStrings.idNumberRequired.tr();
+  // Vehicle Number
+  static String? validateVehicleNumber(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppStrings.vehicleNumberRequired.tr();
+    }
+    return null;
   }
 
-  if (!RegExp(r'^\d{14}$').hasMatch(value.trim())) {
-    return AppStrings.invalidIdNumber.tr();
+  // National ID
+  static String? validateNationalId(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return AppStrings.idNumberRequired.tr();
+    }
+
+    if (!RegExp(r'^\d{14}$').hasMatch(value.trim())) {
+      return AppStrings.invalidIdNumber.tr();
+    }
+
+    return null;
   }
 
-  return null;
-}
+  // Dropdown
+  static String? validateDropdown<T>(T? value, String fieldName) {
+    if (value == null) {
+      return '$fieldName ${AppStrings.isRequired.tr()}';
+    }
 
-// Dropdown
-static String? validateDropdown<T>(
-  T? value,
-  String fieldName,
-) {
-  if (value == null) {
-    return '$fieldName ${AppStrings.isRequired.tr()}';
+    if (value is String && value.trim().isEmpty) {
+      return '$fieldName ${AppStrings.isRequired.tr()}';
+    }
+
+    return null;
   }
 
-  if (value is String && value.trim().isEmpty) {
-    return '$fieldName ${AppStrings.isRequired.tr()}';
-  }
-
-  return null;
-}
   // ── Name ──
   static String? validateUserName(String? value) {
     if (value == null || value.trim().isEmpty) {
@@ -62,6 +61,7 @@ static String? validateDropdown<T>(
     }
     return null;
   }
+
   static String? nationalIdImage(File? image) {
     if (image == null) {
       return AppStrings.pleaseUploadNationalId.tr();
@@ -69,12 +69,13 @@ static String? validateDropdown<T>(
     return null;
   }
 
-  static String? drivingLicenseImage(File? image) {
-    if (image == null) {
+  static String? drivingLicenseImage({File? image, String? imageUrl}) {
+    if (image == null && (imageUrl == null || imageUrl.isEmpty)) {
       return AppStrings.pleaseUploadDrivingLicense.tr();
     }
     return null;
   }
+
   static String? validateFirstName(String? value) {
     if (value == null || value.trim().isEmpty) {
       return AppStrings.firstNameRequired.tr();

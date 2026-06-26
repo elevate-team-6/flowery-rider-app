@@ -159,7 +159,7 @@ class ApplyForm extends StatelessWidget {
             readOnly: true,
             onTap: onPickDrivingLicenseImage,
             validator: (_) =>
-                AppValidations.drivingLicenseImage(drivingLicenseImage),
+                AppValidations.drivingLicenseImage(image: drivingLicenseImage),
             decoration: InputDecoration(
               labelText: AppStrings.vehicleLicense.tr(),
               hintText: drivingLicenseImage == null
