@@ -14,8 +14,12 @@ import 'package:injectable/injectable.dart';
 class NotificationRemoteDataSourceImpl
     implements NotificationRemoteDataSourceContract {
   final FirebaseFirestore _firestore;
+  final Dio _dio;
 
-  NotificationRemoteDataSourceImpl(this._firestore);
+  NotificationRemoteDataSourceImpl(
+    this._firestore,
+    @Named('external') this._dio,
+  );
 
   @override
   Future<UserFirestoreModel?> getUserData(String userId) async {
@@ -59,7 +63,7 @@ class NotificationRemoteDataSourceImpl
     String? orderId,
   }) async {
     return ErrorHandler.handleApiCall(() async {
-      final response = await Dio().post(
+      final response = await _dio.post(
         AppEndPoints.fcmSendUrl(projectId),
         options: Options(
           headers: {
