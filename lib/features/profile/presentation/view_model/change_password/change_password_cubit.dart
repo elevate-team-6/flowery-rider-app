@@ -1,9 +1,11 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/cache/secure_cache_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
+import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/profile/domain/use_cases/change_password_use_case.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/change_password/change_password_events.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/change_password/change_password_states.dart';
@@ -28,12 +30,9 @@ class ChangePasswordCubit extends BaseCubit<ChangePasswordState, BaseUiEvent> {
     String currentPassword,
     String newPassword,
   ) async {
-     print('CURRENT PASSWORD = $currentPassword');
-  print('NEW PASSWORD = $newPassword');
     emit(state.copyWith(changePasswordState: const BaseState(isLoading: true)));
 
     final result = await _changePasswordUseCase(currentPassword, newPassword);
-  print('RESULT = $result');
     switch (result) {
       case SuccessBaseResponse<String>():
         if (result.data != null && result.data!.isNotEmpty) {
@@ -45,10 +44,8 @@ class ChangePasswordCubit extends BaseCubit<ChangePasswordState, BaseUiEvent> {
 
         emit(state.copyWith(changePasswordState: const BaseState()));
 
-        emitUiEvent(DisplaySuccessEvent('Password changed successfully'));
- print('SUCCESS => ${result.data}');
+        emitUiEvent(DisplaySuccessEvent(AppStrings.passwordChangedSuccess.tr()));
       case ErrorBaseResponse<String>():
-       print('ERROR => ${result.errorMessage}');
         emit(
           state.copyWith(
             changePasswordState: BaseState(errorMessage: result.errorMessage),
