@@ -106,8 +106,26 @@
     "submitDescription": "Thank you for providing your application,\n we will review your application and will\n get back to you soon.",
     "country": "Country",
     "isRequired": "Drop Down is required",
-    "phoneNumber": "Phone number",
     "enterPhoneNumber": "Enter phone number",
     "signupFailedUserIsNull": "Sign up failed: User is null",
-    "uploadImageRequired": "Please upload required images"
+    "uploadImageRequired": "Please upload required images",
+
+    "vehicleInfo": "Vehicle info",
+    "language": "Language",
+    "english": "English",
+    "arabic": "Arabic",
+    "editProfile": "Edit profile",
+    "update": "Update",
+    "change": "Change",
+    "lastName": "Last name",
+    "phoneNumber": "Phone number",
+    "gender": "Gender",
+    "female": "Female",
+    "male": "Male",
+    "editProfileSuccessfly": "Profile updated successfully",
+    "photoUpdatedSuccess": "Profile photo updated successfully",
+    "photoTooLarge": "Image must be 4 MB or smaller",
+    "retry": "Retry",
+    "profileDataNotFound": "Profile data not found",
+    "someThingWentWrong": "Something went wrong"
 }

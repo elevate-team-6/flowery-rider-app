@@ -17,4 +17,7 @@ abstract class ApiParameters {
   static const String role = 'role';
   static const String createdAt = 'createdAt';
   static const String pageQueryParam = 'page';
+  static const String driver = 'driver';
+  static const String vehicleType = 'vehicleType';
+  static const String vehicleNumber = 'vehicleNumber';
 }

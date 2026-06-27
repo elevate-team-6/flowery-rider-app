@@ -1,4 +1,4 @@
-import 'package:flowery_rider_app/features/profile/data/models/response/driver_model.dart';
+import 'package:flowery_rider_app/core/models/driver_model.dart';
 
 class ProfileResponse {
   final String? message;

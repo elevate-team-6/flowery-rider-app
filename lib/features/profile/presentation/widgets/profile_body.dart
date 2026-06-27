@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_events.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_states.dart';
@@ -76,9 +77,9 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
               children: [
                 ProfileTile(
                   leading: ClipOval(
-                    child: driver?.photo != null && driver!.photo!.isNotEmpty
+                    child: driver?.photo != null && driver!.photo.isNotEmpty
                         ? Image.network(
-                            driver.photo!,
+                            driver.photo,
                             width: 48,
                             height: 48,
                             fit: BoxFit.cover,
@@ -90,7 +91,9 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                             child: const Icon(Icons.person),
                           ),
                   ),
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushNamed(context, AppRoutes.editProfile,arguments: state.profileState.data);
+                  },
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: Column(
@@ -137,7 +140,7 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                     context.locale.languageCode == 'ar'
                         ? AppStrings.arabic.tr()
                         : AppStrings.english.tr(),
-                        style: AppTextStyles.primary12400,
+                    style: AppTextStyles.primary12400,
                   ),
                   onTap: () {
                     showModalBottomSheet(
