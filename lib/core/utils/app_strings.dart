@@ -106,8 +106,9 @@ abstract class AppStrings {
   static const String notification = 'notification';
   static const String language = 'language';
   static const String changeLanguage = 'changeLanguage';
-  static const String arabic = 'arabic';
-  static const String english = 'english';
+  static const String arabic = 'Arabic';
+  static const String english = 'English';
+  static const String vehicleInfo = 'Vehicle info';
   static const String aboutUs = 'aboutUs';
   static const String logout = 'logout';
   static const String logoutSuccess = 'logoutSuccess';
