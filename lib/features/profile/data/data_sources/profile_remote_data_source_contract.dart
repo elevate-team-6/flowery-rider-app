@@ -24,4 +24,8 @@ abstract interface class ProfileRemoteDataSourceContract {
   Future<BaseResponse<ProfileResponseModel>> editVehicle(
     EditVehicleRequest request,
   );
+  Future<BaseResponse<String>> changePassword(
+    String password,
+    String newPassword,
+  );
 }

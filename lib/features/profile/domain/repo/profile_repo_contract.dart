@@ -17,4 +17,8 @@ abstract interface class ProfileRepoContract {
 
   Future<BaseResponse<DriverEntity>> uploadPhoto(File photo);
   Future<BaseResponse<DriverEntity>> editVehicle(EditVehicleRequest request);
+  Future<BaseResponse<String>> changePassword(
+    String password,
+    String newPassword,
+  );
 }

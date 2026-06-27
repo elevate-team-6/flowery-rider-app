@@ -32,6 +32,12 @@ class ProfileRepoImpl implements ProfileRepoContract {
   }
 
   @override
+  Future<BaseResponse<String>> changePassword(
+    String password,
+    String newPassword,
+  ) => _remoteDataSource.changePassword(password, newPassword);
+
+  @override
   Future<BaseResponse<DriverEntity>> editVehicle(
     EditVehicleRequest request,
   ) async {

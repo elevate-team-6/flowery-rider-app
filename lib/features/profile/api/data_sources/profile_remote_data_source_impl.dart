@@ -4,6 +4,7 @@ import 'package:flowery_rider_app/features/profile/data/models/response/profile_
 import 'package:flowery_rider_app/config/services/multi_part_service.dart';
 import 'package:flowery_rider_app/features/profile/data/models/request/edit_vehicle_request.dart';
 import 'package:flowery_rider_app/features/profile/data/models/response/profile_response_model.dart';
+import 'package:flowery_rider_app/features/profile/data/models/request/change_password_request.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../config/base_response/base_response.dart';
@@ -59,5 +60,27 @@ Future<BaseResponse<ProfileResponseModel>> editVehicle(
     return await ErrorHandler.handleApiCall(
       () => _apiClient.uploadPhoto(photo),
     );
+  }
+
+  @override
+  Future<BaseResponse<String>> changePassword(
+    String password,
+    String newPassword,
+  ) async {
+    final result = await ErrorHandler.handleApiCall(
+      () => _apiClient.changePassword(
+        ChangePasswordRequest(password: password, newPassword: newPassword),
+      ),
+    );
+
+    return switch (result) {
+      SuccessBaseResponse(:final data) => SuccessBaseResponse<String>(
+        data?.token ?? '',
+      ),
+
+      ErrorBaseResponse(:final errorMessage) => ErrorBaseResponse<String>(
+        errorMessage,
+      ),
+    };
   }
 }

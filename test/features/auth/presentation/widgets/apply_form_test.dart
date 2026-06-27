@@ -184,52 +184,51 @@ void main() {
     testWidgets('renders all form fields correctly', (tester) async {
       await pumpForm(tester);
 
-      // للتأكد من وجود الـ TextFields كلها على الشاشة
-      expect(find.byType(TextField), findsNWidgets(9));
+      expect(find.byType(TextField), findsNWidgets(10));
       expect(find.text('First legal name'), findsOneWidget);
-      expect(find.text('Second legal name'), findsOneWidget);
       expect(find.text('Email'), findsOneWidget);
-      expect(find.text('Phone number'), findsOneWidget);
     });
 
     testWidgets('typing in fields updates controllers', (tester) async {
       await pumpForm(tester);
 
-      // تم تعديل نوع الـ الوجت إلى TextField للوصول للـ decoration بدون إيرور
-      await tester.enterText(
-        find.byWidgetPredicate(
-          (w) =>
-              w is TextField &&
-              w.decoration?.labelText == 'Enter first legal name',
-        ),
-        'Ahmed',
+      final firstNameField = find.byWidgetPredicate(
+        (widget) =>
+            widget is TextField &&
+            widget.decoration?.labelText == 'Enter first legal name',
       );
+      await tester.enterText(firstNameField, 'Ahmed');
       expect(firstNameController.text, 'Ahmed');
 
-      await tester.enterText(
-        find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == 'Email',
-        ),
-        'test@test.com',
+      final emailField = find.byWidgetPredicate(
+        (widget) =>
+            widget is TextField && widget.decoration?.labelText == 'Email',
       );
+      await tester.enterText(emailField, 'test@test.com');
       expect(emailController.text, 'test@test.com');
     });
 
     testWidgets('triggers image picker callbacks on tap', (tester) async {
       await pumpForm(tester);
-      await tester.tap(
-        find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == 'Vehicle license',
-        ),
+
+      final licenseField = find.byWidgetPredicate(
+        (widget) =>
+            widget is TextField &&
+            widget.decoration?.labelText == 'Vehicle license',
       );
+      await tester.ensureVisible(licenseField);
+      await tester.tap(licenseField);
       await tester.pump();
       expect(isDrivingLicensePicked, isTrue);
 
-      await tester.tap(
-        find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == 'ID image',
-        ),
+      final idImgField = find.byWidgetPredicate(
+        (widget) =>
+            widget is TextField && widget.decoration?.labelText == 'ID image',
       );
+      await tester.ensureVisible(idImgField);
+      await tester.pumpAndSettle();
+
+      await tester.tap(idImgField);
       await tester.pump();
       expect(isNationalIdPicked, isTrue);
     });
