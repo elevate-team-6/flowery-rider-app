@@ -9,7 +9,7 @@ abstract class AppStrings {
   static const String signupWithSpace = 'signupWithSpace';
   static const String password = 'password';
   static const String email = 'email';
-  static const String continueText = 'continue';
+  static const String continueText = 'continueText';
   static const String confirmPassword = 'confirmPassword';
 
   // Login Screen
@@ -23,59 +23,55 @@ abstract class AppStrings {
 
   // Sign Up Screen
   static const String userName = 'userName';
-  static const String invalidIdNumber = 'Invalid Id Number';
-  static const String idNumberRequired = 'Id Number Required';
-  static const String isRequired = 'Drop Down is required';
-  static const String vehicleNumberRequired = 'Vehicle Number Required';
-  static const String apply = 'Apply';
-  static const String country = 'Country';
-  static const String uploadImageRequired = 'Please upload required images';
-  static const String welcome = 'Welcome!!';
-  static const String applyDescription =
-      'You want to be a delivery man?\nJoin our team ';
-  static const String submitSuccess = 'Your application has been\n submitted!';
-  static const String submitDescription =
-      'Thank you for providing your application,\n we will review your application and will\n get back to you soon.';
+  static const String invalidIdNumber = 'invalidIdNumber';
+  static const String idNumberRequired = 'idNumberRequired';
+  static const String isRequired = 'isRequired';
+  static const String vehicleNumberRequired = 'vehicleNumberRequired';
+  static const String apply = 'apply';
+  static const String country = 'country';
+  static const String uploadImageRequired = 'uploadImageRequired';
+  static const String welcome = 'welcome';
+  static const String applyDescription = 'applyDescription';
+  static const String submitSuccess = 'submitSuccess';
+  static const String submitDescription = 'submitDescription';
   static const String enterYourUserName = 'enterYourUserName';
-  static const String firstName = 'First legal name';
-  static const String enterFirstName = 'Enter first legal name';
-  static const String secondName = 'Second legal name';
-  static const String enterSecondName = 'Enter second legal name';
+  static const String firstName = 'firstName';
+  static const String enterFirstName = 'enterFirstName';
+  static const String secondName = 'secondName';
+  static const String enterSecondName = 'enterSecondName';
   static const String phoneNumber = 'phoneNumber';
-  static const String vehicleNumber = 'Vehicle number';
-  static const String vehicleLicense = 'Vehicle license';
-  static const String uploadVehicleLicense = 'Upload license photo';
-  static const String enterVehicleNumber = 'Enter vehicle number';
-  static const String vehicleType = 'Vehicle type';
+  static const String vehicleNumber = 'vehicleNumber';
+  static const String vehicleLicense = 'vehicleLicense';
+  static const String uploadVehicleLicense = 'uploadVehicleLicense';
+  static const String enterVehicleNumber = 'enterVehicleNumber';
+  static const String vehicleType = 'vehicleType';
   static const String enterPhoneNumber = 'enterPhoneNumber';
-  static const String idNumber = 'ID number';
-  static const String idImage = 'ID image';
-  static const String uploadIdImage = 'Upload ID image';
-  static const String enterIdNumber = 'Enter national ID number';
+  static const String idNumber = 'idNumber';
+  static const String idImage = 'idImage';
+  static const String uploadIdImage = 'uploadIdImage';
+  static const String enterIdNumber = 'enterIdNumber';
   static const String alreadyHaveAccount = 'alreadyHaveAccount';
   static const String registerSuccess = 'registerSuccess';
   static const String signupFailedUserIsNull = 'signupFailedUserIsNull';
   static const String gender = 'gender';
   static const String female = 'female';
   static const String male = 'male';
-  static const String failedCaptureImage = 'Failed to capture image';
-  static const String failedPickImageGallery =
-      'Failed to pick image from gallery';
+  static const String failedCaptureImage = 'failedCaptureImage';
+  static const String failedPickImageGallery = 'failedPickImageGallery';
   static const String pleaseSelectGender = 'pleaseSelectGender';
-  static const String pleaseUploadNationalId = 'Please upload your national ID';
-  static const String pleaseUploadDrivingLicense =
-      'Please upload your driving license';
+  static const String pleaseUploadNationalId = 'pleaseUploadNationalId';
+  static const String pleaseUploadDrivingLicense = 'pleaseUploadDrivingLicense';
   static const String creatingAccountAgreement = 'creatingAccountAgreement';
   static const String iAgree = 'iAgree';
-  // Onboarding Screen
 
-  static const String welcomeToFloweryRider = 'Welcome to Flowery rider app';
-  static const String applyNow = 'Apply now';
-  static const String versionPlaceholder = 'v 6.3.0 - (446)';
+  // Onboarding Screen
+  static const String welcomeToFloweryRider = 'welcomeToFloweryRider';
+  static const String applyNow = 'applyNow';
+  static const String versionPlaceholder = 'versionPlaceholder';
   static const String welcomeTo = 'welcomeTo';
   static const String floweryRiderApp = 'floweryRiderApp';
-  static const String floweryRider = 'Flowery Rider';
-  static const String splashSubtitle = 'We ride, flowers inside';
+  static const String floweryRider = 'floweryRider';
+  static const String splashSubtitle = 'splashSubtitle';
 
   // Forget Password Screen
   static const String forgetPasswordTitle = 'forgetPasswordTitle';
@@ -119,14 +115,12 @@ abstract class AppStrings {
   static const String confirmLogout = 'confirmLogout';
 
   // Address Details Screen
-  static const String enableLocationServices =
-      'Please enable location services to add a delivery address.';
-  static const String locationPermissionDenied =
-      'Location permission is permanently denied. Please enable it from app settings.';
-  static const String later = 'Later';
-  static const String enableLocation = 'Enable Location';
-  static const String openSettings = 'Open Settings';
-  static const String locationRequired = 'Location Required';
+  static const String enableLocationServices = 'enableLocationServices';
+  static const String locationPermissionDenied = 'locationPermissionDenied';
+  static const String later = 'later';
+  static const String enableLocation = 'enableLocation';
+  static const String openSettings = 'openSettings';
+  static const String locationRequired = 'locationRequired';
   static const String userNotFound = 'userNotFound';
 
   // Main Layout
@@ -259,7 +253,6 @@ abstract class AppStrings {
   static const String recipientNameRequired = 'recipientNameRequired';
 
   // My orders
-  // static const String myOrders = 'my_orders';
   static const String active = 'active';
   static const String completed = 'completed';
   static const String trackOrder = 'track_order';
@@ -268,8 +261,4 @@ abstract class AppStrings {
   static const String deliveredOn = 'delivered_on';
   static const String noActiveOrders = 'no_active_orders';
   static const String noCompletedOrders = 'no_completed_orders';
-
-  // ===========================================================================
-  // API Constants (Values sent directly to Backend - Do NOT Translate)
-  // ===========================================================================
 }
