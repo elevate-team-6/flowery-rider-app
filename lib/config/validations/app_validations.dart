@@ -69,8 +69,8 @@ abstract class AppValidations {
     return null;
   }
 
-  static String? drivingLicenseImage(File? image) {
-    if (image == null) {
+  static String? drivingLicenseImage({File? image, String? imageUrl}) {
+    if (image == null && (imageUrl == null || imageUrl.isEmpty)) {
       return AppStrings.pleaseUploadDrivingLicense.tr();
     }
     return null;

@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 import 'package:flowery_rider_app/core/utils/app_end_points.dart';
 import 'package:flowery_rider_app/core/utils/app_params.dart';
 import 'package:flowery_rider_app/features/profile/data/models/response/profile_response.dart';
+import 'package:flowery_rider_app/features/profile/data/models/response/profile_response_model.dart';
 import 'package:injectable/injectable.dart';
 import 'package:retrofit/retrofit.dart';
 
@@ -34,4 +35,6 @@ abstract class ProfileApiClient {
   Future<ProfileResponseModel> uploadPhoto(
     @Part(name: ApiParameters.photo) File photo,
   );
+  @PUT(AppEndPoints.editProfile)
+  Future<ProfileResponseModel> editVehicle(@Body() FormData formData);
 }

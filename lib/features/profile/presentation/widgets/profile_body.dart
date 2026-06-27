@@ -92,7 +92,11 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                           ),
                   ),
                   onTap: () {
-                    Navigator.pushNamed(context, AppRoutes.editProfile,arguments: state.profileState.data);
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.editProfile,
+                      arguments: state.profileState.data,
+                    );
                   },
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
@@ -112,7 +116,13 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                 const SizedBox(height: 20),
 
                 ProfileTile(
-                  onTap: () {},
+                  onTap: () {
+                    Navigator.pushNamed(
+                      context,
+                      AppRoutes.editVehicle,
+                      arguments: state.profileState.data,
+                    );
+                  },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
