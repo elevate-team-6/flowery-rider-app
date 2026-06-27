@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/config/base_state/base_state.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_events.dart';
@@ -91,12 +93,16 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                             child: const Icon(Icons.person),
                           ),
                   ),
-                  onTap: () {
-                    Navigator.pushNamed(
+                  onTap: () async {
+                    final result = await Navigator.pushNamed(
                       context,
                       AppRoutes.editProfile,
                       arguments: state.profileState.data,
                     );
+
+                    if (result is DriverEntity) {
+                      context.read<ProfileCubit>().updateProfile(result);
+                    }
                   },
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
@@ -116,12 +122,22 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                 const SizedBox(height: 20),
 
                 ProfileTile(
-                  onTap: () {
-                    Navigator.pushNamed(
+                  onTap: () async {
+                    final result = await Navigator.pushNamed(
                       context,
                       AppRoutes.editVehicle,
-                      arguments: state.profileState.data,
+                      arguments: driver,
                     );
+
+                    if (result is DriverEntity) {
+                      // ignore: use_build_context_synchronously, invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
+                      context.read<ProfileCubit>().emit(
+                        // ignore: use_build_context_synchronously
+                        context.read<ProfileCubit>().state.copyWith(
+                          profileState: BaseState(data: result),
+                        ),
+                      );
+                    }
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
