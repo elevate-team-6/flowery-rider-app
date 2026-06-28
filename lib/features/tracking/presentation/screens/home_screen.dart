@@ -19,6 +19,7 @@ import '../view_model/home_view_model/home_events.dart';
 import '../view_model/home_view_model/home_states.dart';
 import '../widgets/empty_orders_state.dart';
 import '../widgets/order_card.dart';
+import '../widgets/pagination_bar.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -80,6 +81,9 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
             previous.pendingOrdersState != current.pendingOrdersState,
         builder: (context, state) {
           final ordersState = state.pendingOrdersState;
+          final bool hasPagination =
+              ordersState.data?.totalPages != null &&
+              ordersState.data!.totalPages! > 1;
 
           if (ordersState.isLoading) {
             return Center(
@@ -99,27 +103,45 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
             return EmptyOrdersState(onRefresh: _loadOrders);
           }
 
-          return RefreshIndicator(
-            onRefresh: _loadOrders,
-            child: ListView.separated(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: EdgeInsets.all(16.w),
-              itemCount: orders.length,
-              separatorBuilder: (context, index) => SizedBox(height: 16.h),
-              itemBuilder: (context, index) {
-                final order = orders[index];
-                final cubit = context.read<HomeCubit>();
-                return OrderCard(
-                  order: order,
-                  onAccept: () => cubit.doEvent(AcceptOrderEvent(order)),
-                  onReject: () {
-                    if (order.id != null) {
-                      cubit.doEvent(RejectOrderEvent(order.id!));
-                    }
-                  },
-                );
-              },
-            ),
+          return Column(
+            children: [
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _loadOrders,
+                  child: ListView.separated(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: EdgeInsets.all(16.w),
+                    itemCount: orders.length + (hasPagination ? 1 : 0),
+                    separatorBuilder: (context, index) =>
+                        SizedBox(height: 16.h),
+                    itemBuilder: (context, index) {
+                      if (hasPagination && index == orders.length) {
+                        return PaginationBar(
+                          currentPage: ordersState.data!.currentPage ?? 1,
+                          totalPages: ordersState.data!.totalPages!,
+                          onPageChanged: (page) {
+                            context.read<HomeCubit>().doEvent(
+                              GetPendingOrdersEvent(page: page),
+                            );
+                          },
+                        );
+                      }
+                      final order = orders[index];
+                      final cubit = context.read<HomeCubit>();
+                      return OrderCard(
+                        order: order,
+                        onAccept: () => cubit.doEvent(AcceptOrderEvent(order)),
+                        onReject: () {
+                          if (order.id != null) {
+                            cubit.doEvent(RejectOrderEvent(order.id!));
+                          }
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ),
+            ],
           );
         },
       ),
