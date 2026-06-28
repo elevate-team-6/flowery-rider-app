@@ -22,7 +22,7 @@ class HomeCubit extends BaseCubit<HomeStates, BaseUiEvent> {
       case AcceptOrderEvent():
         _acceptOrder(event.order);
       case RejectOrderEvent():
-        _rejectOrder(event.orderId);
+        await _rejectOrder(event.orderId);
     }
   }
 
@@ -47,11 +47,12 @@ class HomeCubit extends BaseCubit<HomeStates, BaseUiEvent> {
     emitUiEvent(NavigateEvent(AppRoutes.orderDetails, arguments: order));
   }
 
-  /// Reject is local-only: drop the order from the current list so it
-  /// disappears immediately. Pulling to refresh re-fetches it.
-  void _rejectOrder(String orderId) {
+  Future<void> _rejectOrder(String orderId) async {
     final current = state.pendingOrdersState.data;
     if (current == null) return;
+
+    emit(state.copyWith(rejectingOrderId: orderId));
+    await Future.delayed(const Duration(milliseconds: 600));
 
     final remaining = current.orders
         ?.where((order) => order.id != orderId)
@@ -65,6 +66,7 @@ class HomeCubit extends BaseCubit<HomeStates, BaseUiEvent> {
             orders: remaining,
           ),
         ),
+        clearRejectingOrderId: true,
       ),
     );
   }

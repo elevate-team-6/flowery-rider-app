@@ -6,14 +6,26 @@ import '../../../domain/entities/order_entity.dart';
 class HomeStates extends Equatable {
   final BaseState<PendingOrdersEntity> pendingOrdersState;
 
-  const HomeStates({this.pendingOrdersState = const BaseState()});
+  final String? rejectingOrderId;
 
-  HomeStates copyWith({BaseState<PendingOrdersEntity>? pendingOrdersState}) {
+  const HomeStates({
+    this.pendingOrdersState = const BaseState(),
+    this.rejectingOrderId,
+  });
+
+  HomeStates copyWith({
+    BaseState<PendingOrdersEntity>? pendingOrdersState,
+    String? rejectingOrderId,
+    bool clearRejectingOrderId = false,
+  }) {
     return HomeStates(
       pendingOrdersState: pendingOrdersState ?? this.pendingOrdersState,
+      rejectingOrderId: clearRejectingOrderId
+          ? null
+          : (rejectingOrderId ?? this.rejectingOrderId),
     );
   }
 
   @override
-  List<Object?> get props => [pendingOrdersState];
+  List<Object?> get props => [pendingOrdersState, rejectingOrderId];
 }

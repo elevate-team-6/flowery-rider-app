@@ -65,7 +65,12 @@ class LoginCubit extends BaseCubit<LoginState, BaseUiEvent> {
         final entity = result.data ?? const SignInEntity();
         await _cacheUserSession(entity, request.email);
         emitUiEvent(DisplaySuccessEvent(AppStrings.loginSuccess.tr()));
-        emitUiEvent(NavigateEvent(AppRoutes.mainLayout));
+        emitUiEvent(
+          NavigateEvent(
+            AppRoutes.mainLayout,
+            navigationType: NavigationType.pushAndRemoveUntil,
+          ),
+        );
       case ErrorBaseResponse<SignInEntity>():
         emitUiEvent(DisplayErrorEvent(result.errorMessage));
     }
