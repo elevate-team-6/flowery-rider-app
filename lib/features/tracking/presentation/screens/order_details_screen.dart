@@ -203,10 +203,13 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                   padding: EdgeInsets.all(16.w),
                   child: BlocBuilder<OrderDetailsCubit, OrderDetailsState>(
                     buildWhen: (previous, current) =>
-                        previous.uiStep != current.uiStep,
+                        previous.uiStep != current.uiStep ||
+                        previous.updateStepState.isLoading !=
+                            current.updateStepState.isLoading,
                     builder: (context, state) {
                       return OrderActionButton(
                         uiStep: state.uiStep,
+                        isLoading: state.updateStepState.isLoading,
                         onPressed: () {
                           context.read<OrderDetailsCubit>().doEvent(
                             OrderDetailsNextStepEvent(),

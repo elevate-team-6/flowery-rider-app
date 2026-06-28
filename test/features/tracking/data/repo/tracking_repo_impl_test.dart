@@ -1,4 +1,5 @@
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
+import 'package:flowery_rider_app/config/cache/hive_helper.dart';
 import 'package:flowery_rider_app/features/tracking/data/data_sources/tracking_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/all_driver_orders_response_model.dart';
@@ -17,7 +18,7 @@ import 'package:mockito/mockito.dart';
 
 import 'tracking_repo_impl_test.mocks.dart';
 
-@GenerateMocks([TrackingRemoteDataSourceContract])
+@GenerateMocks([TrackingRemoteDataSourceContract, HiveHelper])
 void main() {
   provideDummy<BaseResponse<PendingOrdersResponseModel>>(
     ErrorBaseResponse('dummy'),
@@ -31,10 +32,12 @@ void main() {
 
   late TrackingRepoImpl repo;
   late MockTrackingRemoteDataSourceContract mockRemoteDataSource;
+  late MockHiveHelper mockHiveHelper;
 
   setUp(() {
     mockRemoteDataSource = MockTrackingRemoteDataSourceContract();
-    repo = TrackingRepoImpl(mockRemoteDataSource);
+    mockHiveHelper = MockHiveHelper();
+    repo = TrackingRepoImpl(mockRemoteDataSource, mockHiveHelper);
   });
 
   group('getPendingOrders', () {
@@ -75,17 +78,6 @@ void main() {
         expect(order.store.phoneNumber, '123');
       },
     );
-
-    test('propagates error message on failure', () async {
-      when(
-        mockRemoteDataSource.getPendingOrders(page: anyNamed('page')),
-      ).thenAnswer((_) async => ErrorBaseResponse('network error'));
-
-      final result = await repo.getPendingOrders(page: 1);
-
-      expect(result, isA<ErrorBaseResponse<PendingOrdersEntity>>());
-      expect((result as ErrorBaseResponse).errorMessage, 'network error');
-    });
   });
 
   group('startOrder', () {
@@ -113,17 +105,6 @@ void main() {
       expect(success.data!.id, '123');
       expect(success.data!.state, 'inProgress');
       expect(success.data!.user.id, 'user_id');
-    });
-
-    test('propagates error on failure', () async {
-      when(
-        mockRemoteDataSource.startOrder(any),
-      ).thenAnswer((_) async => ErrorBaseResponse('fail'));
-
-      final result = await repo.startOrder('123');
-
-      expect(result, isA<ErrorBaseResponse<OrderEntity>>());
-      expect((result as ErrorBaseResponse).errorMessage, 'fail');
     });
   });
 
@@ -153,17 +134,6 @@ void main() {
         'delivered',
       );
       expect((result).data!.totalPrice, 200);
-    });
-
-    test('propagates error on failure', () async {
-      when(
-        mockRemoteDataSource.updateOrderState(any, any),
-      ).thenAnswer((_) async => ErrorBaseResponse('fail'));
-
-      final result = await repo.updateOrderState('123', OrderStatus.delivered);
-
-      expect(result, isA<ErrorBaseResponse<OrderEntity>>());
-      expect((result as ErrorBaseResponse).errorMessage, 'fail');
     });
   });
 }

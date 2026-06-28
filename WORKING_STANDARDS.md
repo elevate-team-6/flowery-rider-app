@@ -52,6 +52,9 @@ Every feature MUST be divided into exactly these 4 layers with these exact folde
 
 ## 5. Screen & UI Standards (Zero Tolerance for Null logic)
 - **Clean UI Logic**: Since Entities are non-nullable, UI code MUST NOT contain null-checks (`?`), null-aware operators (`??`), or assertions (`!`) when accessing Entity properties.
+- **Bloc Optimization (Mandatory)**: 
+    - `BlocBuilder` MUST ONLY wrap the specific widget(s) that require rebuilding. NEVER wrap a whole screen or large static layouts with a generic `BlocBuilder`.
+    - MANDATORY use of `buildWhen`: Every `BlocBuilder` MUST implement `buildWhen` to prevent unnecessary rebuilds by filtering for specific state changes (e.g., `previous.status != current.status`).
 - **Zero Hardcoding**: NO hardcoded strings, colors, or dimensions. Use `lib/core/utils/`.
 - **Dimensions**: ALWAYS use `ScreenUtil` (h, w, sp, r).
 - **Themes**: MANDATORY use of `AppTheme.mainTheme`. Prohibited to hardcode padding/radius/colors in UI.

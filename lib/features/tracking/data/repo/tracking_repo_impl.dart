@@ -1,4 +1,8 @@
+import 'dart:convert';
+
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
+import 'package:flowery_rider_app/config/cache/hive_helper.dart';
+import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/features/tracking/data/data_sources/tracking_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/all_driver_orders_response_model.dart';
@@ -11,8 +15,9 @@ import 'package:injectable/injectable.dart';
 @Injectable(as: TrackingRepoContract)
 class TrackingRepoImpl implements TrackingRepoContract {
   final TrackingRemoteDataSourceContract _remoteDataSource;
+  final HiveHelper _hiveHelper;
 
-  TrackingRepoImpl(this._remoteDataSource);
+  TrackingRepoImpl(this._remoteDataSource, this._hiveHelper);
 
   @override
   Future<BaseResponse<List<OrderEntity>>> getDriverOrders() async {
@@ -69,6 +74,34 @@ class TrackingRepoImpl implements TrackingRepoContract {
         response.errorMessage,
       ),
     };
+  }
+
+  @override
+  Future<void> cacheActiveOrder(OrderEntity order, int uiStep) async {
+    final cacheData = {AppKeys.order: order.toJson(), AppKeys.uiStep: uiStep};
+
+    _hiveHelper.cacheData(
+      boxName: AppKeys.activeOrderBox,
+      key: AppKeys.activeOrderKey,
+      value: jsonEncode(cacheData),
+    );
+  }
+
+  @override
+  Future<Map<String, dynamic>?> getCachedActiveOrder() async {
+    final data = _hiveHelper.getData(
+      boxName: AppKeys.activeOrderBox,
+      key: AppKeys.activeOrderKey,
+    );
+    return jsonDecode(data as String) as Map<String, dynamic>;
+  }
+
+  @override
+  Future<void> clearCachedActiveOrder() async {
+    _hiveHelper.deleteData(
+      boxName: AppKeys.activeOrderBox,
+      key: AppKeys.activeOrderKey,
+    );
   }
 
   /// Helper to catch mapping exceptions while using switch expressions

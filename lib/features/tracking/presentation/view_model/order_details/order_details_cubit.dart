@@ -1,14 +1,14 @@
-import 'dart:convert';
-
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
-import 'package:flowery_rider_app/config/cache/hive_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/cache_active_order_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/clear_active_order_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_active_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/start_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_order_state_use_case.dart';
@@ -23,13 +23,17 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   final UpdateOrderStateUseCase _updateOrderStateUseCase;
   final StartOrderUseCase _startOrderUseCase;
   final OpenCommunicationUseCase _openCommunicationUseCase;
-  final HiveHelper _hiveHelper;
+  final CacheActiveOrderUseCase _cacheActiveOrderUseCase;
+  final GetActiveOrderUseCase _getActiveOrderUseCase;
+  final ClearActiveOrderUseCase _clearActiveOrderUseCase;
 
   OrderDetailsCubit(
     this._updateOrderStateUseCase,
     this._startOrderUseCase,
     this._openCommunicationUseCase,
-    this._hiveHelper,
+    this._cacheActiveOrderUseCase,
+    this._getActiveOrderUseCase,
+    this._clearActiveOrderUseCase,
   ) : super(const OrderDetailsState());
 
   void doEvent(OrderDetailsEvents event) {
@@ -55,7 +59,24 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     final initialBackendStatus = OrderStatus.fromString(order.state);
     int step = initialStep ?? 1;
 
-    // If no initialStep is provided, fallback to basic logic
+    // Check Cache first
+    final cachedData = await _getActiveOrderUseCase();
+    if (cachedData != null) {
+      final cachedOrder = OrderEntity.fromJson(cachedData[AppKeys.order]);
+      if (cachedOrder.id == order.id) {
+        final cachedStep = cachedData[AppKeys.uiStep] as int;
+        emit(
+          state.copyWith(
+            orderDetailsState: BaseState(data: cachedOrder),
+            orderStatus: OrderStatus.fromString(cachedOrder.state),
+            uiStep: cachedStep,
+          ),
+        );
+        return; // Don't call startOrder API if cached
+      }
+    }
+
+    // Fallback if no cache
     if (initialStep == null) {
       if (initialBackendStatus == OrderStatus.delivered) {
         step = 6;
@@ -76,7 +97,6 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
 
     if (startResult is SuccessBaseResponse<OrderEntity>) {
       final updatedOrder = startResult.data;
-      // Merge: Keep the rich data (user/store) from passed entity if API response is partial
       final mergedOrder = order.mergeWith(updatedOrder);
 
       emit(
@@ -85,13 +105,13 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
           orderStatus: OrderStatus.fromString(mergedOrder.state),
         ),
       );
-      _cacheOrder(mergedOrder);
+      await _cacheActiveOrderUseCase(mergedOrder, state.uiStep);
     }
   }
 
   Future<void> _onNextStep() async {
     final currentStep = state.uiStep;
-    if (currentStep >= 6) return;
+    if (currentStep >= 6 || state.updateStepState.isLoading) return;
 
     final currentOrder = state.orderDetailsState.data;
     if (currentOrder == null) return;
@@ -104,12 +124,13 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
         : OrderStatus.inProgress;
 
     emitUiEvent(ShowLoadingEvent());
+    emit(state.copyWith(updateStepState: const BaseState(isLoading: true)));
     final result = await _updateOrderStateUseCase(orderId, backendStatus);
+    emit(state.copyWith(updateStepState: const BaseState(isLoading: false)));
     emitUiEvent(HideLoadingEvent());
 
     switch (result) {
       case SuccessBaseResponse<OrderEntity>():
-        // Merge to prevent losing user/store details
         final mergedOrder = currentOrder.mergeWith(result.data);
 
         emit(
@@ -120,7 +141,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
           ),
         );
         if (nextStep == 6) {
-          _clearCache();
+          await _clearActiveOrderUseCase();
           emitUiEvent(
             NavigateEvent(
               AppRoutes.orderSuccess,
@@ -128,31 +149,11 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
             ),
           );
         } else {
-          _cacheOrder(mergedOrder);
+          await _cacheActiveOrderUseCase(mergedOrder, nextStep);
         }
       case ErrorBaseResponse<OrderEntity>():
         emitUiEvent(DisplayErrorEvent(result.errorMessage));
     }
-  }
-
-  void _cacheOrder(OrderEntity order) {
-    final cacheData = {
-      AppKeys.order: order.toJson(),
-      AppKeys.uiStep: state.uiStep,
-    };
-
-    _hiveHelper.cacheData(
-      boxName: AppKeys.activeOrderBox,
-      key: AppKeys.activeOrderKey,
-      value: jsonEncode(cacheData),
-    );
-  }
-
-  void _clearCache() {
-    _hiveHelper.deleteData(
-      boxName: AppKeys.activeOrderBox,
-      key: AppKeys.activeOrderKey,
-    );
   }
 
   void _onBackButtonPressed() {
@@ -168,7 +169,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     emit(state.copyWith(canselOrderState: BaseState()));
     switch (result) {
       case SuccessBaseResponse<OrderEntity>():
-        _clearCache();
+        await _clearActiveOrderUseCase();
         emitUiEvent(
           NavigateEvent(
             AppRoutes.mainLayout,

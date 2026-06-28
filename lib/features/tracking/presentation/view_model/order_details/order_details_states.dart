@@ -8,12 +8,14 @@ class OrderDetailsState extends BaseState<OrderEntity> {
   uiStep; // 1: Accepted, 2: ArrivedAtPickup, 3: Picked, 4: OutForDelivery, 5: Arrived, 6: Delivered
   final BaseState canselOrderState;
   final BaseState orderDetailsState;
+  final BaseState updateStepState;
 
   const OrderDetailsState({
     this.orderStatus,
     this.uiStep = 1,
     this.canselOrderState = const BaseState(),
     this.orderDetailsState = const BaseState(),
+    this.updateStepState = const BaseState(),
   });
 
   @override
@@ -25,6 +27,7 @@ class OrderDetailsState extends BaseState<OrderEntity> {
     uiStep,
     canselOrderState,
     orderDetailsState,
+    updateStepState,
   ];
 
   OrderDetailsState copyWith({
@@ -32,12 +35,14 @@ class OrderDetailsState extends BaseState<OrderEntity> {
     int? uiStep,
     BaseState? canselOrderState,
     BaseState? orderDetailsState,
+    BaseState? updateStepState,
   }) {
     return OrderDetailsState(
       orderStatus: orderStatus ?? this.orderStatus,
       uiStep: uiStep ?? this.uiStep,
       canselOrderState: canselOrderState ?? this.canselOrderState,
       orderDetailsState: orderDetailsState ?? this.orderDetailsState,
+      updateStepState: updateStepState ?? this.updateStepState,
     );
   }
 }
