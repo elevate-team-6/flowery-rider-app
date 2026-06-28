@@ -6,12 +6,12 @@ import '../../../../../config/base_response/base_response.dart';
 import '../../../../../config/base_state/base_state.dart';
 import '../../../../../config/base_ui_event/base_ui_event.dart';
 import '../../../../../core/utils/app_strings.dart';
-import '../../../../../core/utils/phone_formatter.dart';
 import '../../../domain/entities/driver_entity.dart';
 import '../../../domain/use_cases/edit_profile_use_case.dart';
 import '../../../domain/use_cases/get_profile_data_use_case.dart';
 import '../../../domain/use_cases/upload_photo_use_case.dart';
 import 'edit_profile_events.dart';
+import 'edit_profile_form.dart';
 import 'edit_profile_states.dart';
 
 /// Maximum profile photo size accepted by the backend (4 MB).
@@ -29,23 +29,12 @@ class EditProfileCubit extends BaseCubit<EditProfileStates, BaseUiEvent> {
     this._getProfileDataUseCase,
   ) : super(const EditProfileStates());
 
-  DriverEntity? _initialDriver;
-  String _firstName = '';
-  String _lastName = '';
-  String _email = '';
-  String _phone = '';
-  bool _photoChanged = false;
-
   void doEvent(EditProfileEvents event) {
     switch (event) {
       case InitEditProfileEvent():
         _init(event.driver);
-      case FormChangedEvent():
-        _firstName = event.firstName;
-        _lastName = event.lastName;
-        _email = event.email;
-        _phone = event.phone;
-        _recomputeDirty();
+      case EditProfileFormChangedEvent():
+        _onFormChanged(event);
       case PickAndUploadPhotoEvent():
         _uploadPhoto(event);
       case SubmitEditProfileEvent():
@@ -54,32 +43,28 @@ class EditProfileCubit extends BaseCubit<EditProfileStates, BaseUiEvent> {
   }
 
   void _init(DriverEntity driver) {
-    _initialDriver = driver;
-    _photoChanged = false;
-    _firstName = driver.firstName ?? '';
-    _lastName = driver.lastName ?? '';
-    _email = driver.email ?? '';
-    _phone = PhoneFormatter.toLocal(driver.phone);
     emit(
       state.copyWith(
         driver: driver,
         gender: driver.gender ?? '',
-        isFormChanged: false,
+        form: EditProfileForm.fromDriver(driver),
       ),
     );
   }
 
-  void _recomputeDirty() {
-    final driver = _initialDriver;
-    final changed =
-        _photoChanged ||
-        _firstName.trim() != (driver?.firstName ?? '') ||
-        _lastName.trim() != (driver?.lastName ?? '') ||
-        _email.trim() != (driver?.email ?? '') ||
-        _phone.trim() != PhoneFormatter.toLocal(driver?.phone);
-    if (changed != state.isFormChanged) {
-      emit(state.copyWith(isFormChanged: changed));
-    }
+  void _onFormChanged(EditProfileFormChangedEvent event) {
+    final form = state.form;
+    if (form == null) return;
+    emit(
+      state.copyWith(
+        form: form.copyWith(
+          firstName: event.firstName,
+          lastName: event.lastName,
+          email: event.email,
+          phone: event.phone,
+        ),
+      ),
+    );
   }
 
   Future<void> _uploadPhoto(PickAndUploadPhotoEvent event) async {
@@ -101,12 +86,11 @@ class EditProfileCubit extends BaseCubit<EditProfileStates, BaseUiEvent> {
             refreshed.data ?? response.data ?? state.driver,
           ErrorBaseResponse<DriverEntity>() => response.data ?? state.driver,
         };
-        _photoChanged = true;
         emit(
           state.copyWith(
             driver: freshDriver,
             uploadState: BaseState(data: freshDriver),
-            isFormChanged: true,
+            form: state.form?.copyWith(photoChanged: true),
           ),
         );
         emitUiEvent(DisplaySuccessEvent(AppStrings.photoUpdatedSuccess.tr()));

@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/utils/app_colors.dart';
@@ -18,14 +19,13 @@ class ProfileAvatar extends StatelessWidget {
       backgroundColor: AppColors.gray10,
       child: ClipOval(
         child: hasPhoto
-            ? Image.network(
-                photoUrl!,
+            ? CachedNetworkImage(
+                imageUrl: photoUrl!,
                 width: radius * 2,
                 height: radius * 2,
                 fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => _placeholder(),
-                loadingBuilder: (context, child, progress) =>
-                    progress == null ? child : _placeholder(),
+                errorWidget: (context, url, error) => _placeholder(),
+                placeholder: (context, url) => _placeholder(),
               )
             : _placeholder(),
       ),

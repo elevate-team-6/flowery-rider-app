@@ -85,14 +85,14 @@ void main() {
     );
   });
 
-  group('FormChangedEvent', () {
+  group('EditProfileFormChangedEvent', () {
     blocTest<EditProfileCubit, EditProfileStates>(
       'marks the form dirty when a field differs from the initial driver',
       build: () => cubit,
       act: (cubit) {
         cubit.doEvent(const InitEditProfileEvent(driver));
         cubit.doEvent(
-          const FormChangedEvent(
+          const EditProfileFormChangedEvent(
             firstName: 'Mohamed',
             lastName: 'Ali',
             email: 'ahmed@test.com',
@@ -116,7 +116,7 @@ void main() {
       act: (cubit) {
         cubit.doEvent(const InitEditProfileEvent(driver));
         cubit.doEvent(
-          const FormChangedEvent(
+          const EditProfileFormChangedEvent(
             firstName: 'Ahmed',
             lastName: 'Ali',
             email: 'ahmed@test.com',
@@ -217,6 +217,7 @@ void main() {
         ]),
       );
 
+      cubit.doEvent(const InitEditProfileEvent(driver));
       cubit.doEvent(PickAndUploadPhotoEvent(photo));
       await expectation;
 

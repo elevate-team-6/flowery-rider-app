@@ -1,9 +1,12 @@
 import 'dart:io';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../config/base_response/base_response.dart';
 import '../../../../config/cache/secure_cache_helper.dart';
+import '../../../../core/exceptions/missing_field_exception.dart';
 import '../../../../core/utils/app_keys.dart';
+import '../../../../core/utils/app_strings.dart';
 import '../../domain/entities/driver_entity.dart';
 import '../../domain/repo/profile_repo_contract.dart';
 import '../data_sources/profile_remote_data_source_contract.dart';
@@ -48,12 +51,18 @@ class ProfileRepoImpl implements ProfileRepoContract {
     BaseResponse<ProfileResponseModel> result,
   ) {
     return switch (result) {
-      SuccessBaseResponse<ProfileResponseModel>() => SuccessBaseResponse(
-        result.data?.driver?.toEntity(),
-      ),
+      SuccessBaseResponse<ProfileResponseModel>() => _mapDriver(result.data),
       ErrorBaseResponse<ProfileResponseModel>() => ErrorBaseResponse(
         result.errorMessage,
       ),
     };
+  }
+
+  BaseResponse<DriverEntity> _mapDriver(ProfileResponseModel? data) {
+    try {
+      return SuccessBaseResponse(data?.driver?.toEntity());
+    } on MissingFieldException {
+      return ErrorBaseResponse(AppStrings.unexpectedError.tr());
+    }
   }
 }

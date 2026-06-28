@@ -5,7 +5,7 @@ import 'package:flowery_rider_app/config/cache/secure_cache_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/features/profile/data/data_sources/profile_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/profile/data/models/request/edit_profile_request.dart';
-import 'package:flowery_rider_app/features/profile/data/models/response/driver_model.dart';
+import 'package:flowery_rider_app/features/profile/data/models/response/driver_response_model.dart';
 import 'package:flowery_rider_app/features/profile/data/models/response/profile_response_model.dart';
 import 'package:flowery_rider_app/features/profile/data/repo/profile_repo_impl.dart';
 import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
@@ -32,7 +32,7 @@ void main() {
 
   const fakeResponse = ProfileResponseModel(
     message: 'success',
-    driver: DriverModel(
+    driver: DriverResponseModel(
       id: '1',
       firstName: 'Ahmed',
       lastName: 'Ali',
@@ -84,6 +84,26 @@ void main() {
 
       expect(result, isA<ErrorBaseResponse<DriverEntity>>());
       expect((result as ErrorBaseResponse).errorMessage, 'network error');
+    });
+
+    test('returns error when a required driver field is missing', () async {
+      const incompleteResponse = ProfileResponseModel(
+        message: 'success',
+        driver: DriverResponseModel(
+          // id is null -> mapping to the entity must fail.
+          firstName: 'Ahmed',
+          lastName: 'Ali',
+          email: 'ahmed@test.com',
+          phone: '+201030313971',
+        ),
+      );
+      when(
+        mockRemoteDataSource.getProfileData(),
+      ).thenAnswer((_) async => SuccessBaseResponse(incompleteResponse));
+
+      final result = await repo.getProfileData();
+
+      expect(result, isA<ErrorBaseResponse<DriverEntity>>());
     });
   });
 

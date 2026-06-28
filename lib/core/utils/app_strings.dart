@@ -36,6 +36,7 @@ abstract class AppStrings {
   static const String submitDescription = 'submitDescription';
   static const String enterYourUserName = 'enterYourUserName';
   static const String firstName = 'firstName';
+  static const String lastName = 'lastName';
   static const String enterFirstName = 'enterFirstName';
   static const String secondName = 'secondName';
   static const String enterSecondName = 'enterSecondName';

@@ -46,9 +46,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
   void initState() {
     super.initState();
     final driver = widget.driver;
-    _firstNameController.text = driver.firstName ?? '';
-    _lastNameController.text = driver.lastName ?? '';
-    _emailController.text = driver.email ?? '';
+    _firstNameController.text = driver.firstName;
+    _lastNameController.text = driver.lastName;
+    _emailController.text = driver.email;
     _phoneController.text = PhoneFormatter.toLocal(driver.phone);
     final cubit = context.read<EditProfileCubit>();
     cubit.doEvent(InitEditProfileEvent(driver));
@@ -67,7 +67,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
 
   void _onFormChanged() {
     context.read<EditProfileCubit>().doEvent(
-      FormChangedEvent(
+      EditProfileFormChangedEvent(
         firstName: _firstNameController.text,
         lastName: _lastNameController.text,
         email: _emailController.text,
@@ -168,26 +168,22 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                     Navigator.pushNamed(context, AppRoutes.changePassword),
               ),
               const SizedBox(height: 24),
-              BlocBuilder<EditProfileCubit, EditProfileStates>(
-                buildWhen: (previous, current) =>
-                    previous.gender != current.gender,
-                builder: (context, state) {
+              BlocSelector<EditProfileCubit, EditProfileStates, String>(
+                selector: (state) => state.gender,
+                builder: (context, gender) {
                   return IgnorePointer(
                     child: CustomGenderSelector(
-                      selectedGender: state.gender.isEmpty
-                          ? null
-                          : state.gender,
+                      selectedGender: gender.isEmpty ? null : gender,
                     ),
                   );
                 },
               ),
               const SizedBox(height: 32),
-              BlocBuilder<EditProfileCubit, EditProfileStates>(
-                buildWhen: (previous, current) =>
-                    previous.isFormChanged != current.isFormChanged,
-                builder: (context, state) {
+              BlocSelector<EditProfileCubit, EditProfileStates, bool>(
+                selector: (state) => state.isFormChanged,
+                builder: (context, isFormChanged) {
                   return ElevatedButton(
-                    onPressed: state.isFormChanged ? _submit : null,
+                    onPressed: isFormChanged ? _submit : null,
                     child: Text(AppStrings.update.tr()),
                   );
                 },

@@ -11,13 +11,13 @@ class InitEditProfileEvent extends EditProfileEvents {
   const InitEditProfileEvent(this.driver);
 }
 
-class FormChangedEvent extends EditProfileEvents {
+class EditProfileFormChangedEvent extends EditProfileEvents {
   final String firstName;
   final String lastName;
   final String email;
   final String phone;
 
-  const FormChangedEvent({
+  const EditProfileFormChangedEvent({
     required this.firstName,
     required this.lastName,
     required this.email,
