@@ -1,6 +1,7 @@
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/cache/secure_cache_helper.dart';
 import 'package:flowery_rider_app/features/tracking/data/data_sources/tracking_remote_data_source_contract.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/metadata_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/order_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/pending_orders_response_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/repo/tracking_repo_impl.dart';
@@ -29,6 +30,7 @@ void main() {
 
   const fakeResponse = PendingOrdersResponseModel(
     message: 'success',
+    metadata: MetadataModel(currentPage: 1, totalPages: 5),
     orders: [OrderModel(id: '1', orderNumber: 'ORD-1')],
   );
 
@@ -46,6 +48,8 @@ void main() {
     expect(success.data?.orders, hasLength(1));
     expect(success.data?.orders?.first.id, '1');
     expect(success.data?.orders?.first.orderNumber, 'ORD-1');
+    expect(success.data?.currentPage, 1);
+    expect(success.data?.totalPages, 5);
   });
 
   test('returns null entity data when success data is null', () async {

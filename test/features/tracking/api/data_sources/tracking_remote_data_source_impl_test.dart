@@ -23,12 +23,12 @@ void main() {
 
   test('returns SuccessBaseResponse when api call succeeds', () async {
     when(
-      mockApiClient.getPendingOrders(page: 1),
+      mockApiClient.getPendingOrders(page: 2),
     ).thenAnswer((_) async => fakeResponse);
 
-    final result = await dataSource.getPendingOrders(page: 1);
+    final result = await dataSource.getPendingOrders(page: 2);
 
-    verify(mockApiClient.getPendingOrders(page: 1)).called(1);
+    verify(mockApiClient.getPendingOrders(page: 2)).called(1);
     expect(result, isA<SuccessBaseResponse<PendingOrdersResponseModel>>());
     expect(
       (result as SuccessBaseResponse<PendingOrdersResponseModel>).data,
