@@ -60,7 +60,7 @@ class HomeCubit extends BaseCubit<HomeStates, BaseUiEvent> {
     if (current == null) return;
 
     final remaining = current.orders
-        ?.where((order) => order.id != orderId)
+        .where((order) => order.id != orderId)
         .toList();
 
     emit(

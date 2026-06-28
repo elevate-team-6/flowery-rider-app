@@ -37,14 +37,16 @@ class UserModel extends Equatable {
   Map<String, dynamic> toJson() => _$UserModelToJson(this);
 
   UserEntity toEntity() => UserEntity(
-    id: id,
-    fullName: '$firstName $lastName',
-    phone: phone,
+    id: id ?? (throw Exception('User ID is required')),
+    fullName: (firstName != null || lastName != null)
+        ? '${firstName ?? ''} ${lastName ?? ''}'.trim()
+        : 'Unknown User',
+    phone: phone ?? '',
     photo: (photo != null && photo!.isNotEmpty)
         ? (photo!.startsWith('http')
-              ? photo
+              ? photo!
               : '${AppConstants.imageBaseUrl}$photo')
-        : photo,
+        : '',
   );
 
   @override

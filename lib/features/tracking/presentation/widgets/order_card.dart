@@ -20,13 +20,9 @@ class OrderCard extends StatelessWidget {
     required this.onReject,
   });
 
-  String? get _customerAddress {
+  String get _customerAddress {
     final shipping = order.shippingAddress;
-    if (shipping == null) return null;
-    return [
-      shipping.street,
-      shipping.city,
-    ].where((e) => e != null && e.isNotEmpty).join(', ');
+    return '${shipping.street}, ${shipping.city}';
   }
 
   @override
@@ -54,9 +50,9 @@ class OrderCard extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           OrderAddressTile(
-            imageUrl: store?.image,
-            title: store?.name,
-            address: store?.address,
+            imageUrl: store.image,
+            title: store.name,
+            address: store.address,
           ),
           SizedBox(height: 12.h),
 
@@ -67,8 +63,8 @@ class OrderCard extends StatelessWidget {
           ),
           SizedBox(height: 8.h),
           OrderAddressTile(
-            imageUrl: user?.photo,
-            title: user?.fullName,
+            imageUrl: user.photo,
+            title: user.fullName,
             address: _customerAddress,
           ),
           SizedBox(height: 16.h),
@@ -77,7 +73,7 @@ class OrderCard extends StatelessWidget {
           Row(
             children: [
               Text(
-                '${AppStrings.egp.tr()} ${order.totalPrice?.toStringAsFixed(0)}',
+                '${AppStrings.egp.tr()} ${order.totalPrice.toStringAsFixed(0)}',
                 style: AppTextStyles.black16600,
               ),
               SizedBox(width: 12.w),

@@ -3,7 +3,7 @@ import 'package:equatable/equatable.dart';
 enum OrderStatus {
   pending,
   inProgress,
-  completed,
+  delivered,
   canceled;
 
   String get value {
@@ -12,8 +12,8 @@ enum OrderStatus {
         return 'pending';
       case OrderStatus.inProgress:
         return 'inProgress';
-      case OrderStatus.completed:
-        return 'completed';
+      case OrderStatus.delivered:
+        return 'delivered';
       case OrderStatus.canceled:
         return 'canceled';
     }
@@ -25,8 +25,8 @@ enum OrderStatus {
         return OrderStatus.pending;
       case 'inProgress':
         return OrderStatus.inProgress;
-      case 'completed':
-        return OrderStatus.completed;
+      case 'delivered':
+        return OrderStatus.delivered;
       case 'canceled':
         return OrderStatus.canceled;
       default:

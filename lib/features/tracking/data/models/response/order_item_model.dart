@@ -22,10 +22,10 @@ class OrderItemModel extends Equatable {
   Map<String, dynamic> toJson() => _$OrderItemModelToJson(this);
 
   OrderItemEntity toEntity() => OrderItemEntity(
-    productName: product?.title,
-    productImage: product?.imgCover,
-    price: price,
-    quantity: quantity,
+    productName: product?.title ?? 'Unknown Product',
+    productImage: product?.imgCover ?? '',
+    price: price ?? 0,
+    quantity: quantity ?? 0,
   );
 
   @override

@@ -1,9 +1,9 @@
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/features/tracking/data/data_sources/tracking_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
-import 'package:flowery_rider_app/features/tracking/data/models/response/driver_orders_response_model.dart';
-import 'package:flowery_rider_app/features/tracking/data/models/response/order_action_response_model.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/all_driver_orders_response_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/pending_orders_response_model.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/update_order_state_response_model.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/repo/tracking_repo_contract.dart';
 import 'package:injectable/injectable.dart';
@@ -16,26 +16,26 @@ class TrackingRepoImpl implements TrackingRepoContract {
 
   @override
   Future<BaseResponse<List<OrderEntity>>> getDriverOrders() async {
-    final result = await _remoteDataSource.getDriverOrders();
-    return switch (result) {
-      SuccessBaseResponse<DriverOrdersResponseModel>() => SuccessBaseResponse(
-        result.data?.orders?.map((e) => e.toEntity()).toList(),
+    final response = await _remoteDataSource.getDriverOrders();
+    return switch (response) {
+      SuccessBaseResponse<AllDriverOrdersResponseModel>() => _handleMapping(
+        () => response.data?.orders?.map((e) => e.toEntity()).toList(),
       ),
-      ErrorBaseResponse<DriverOrdersResponseModel>() => ErrorBaseResponse(
-        result.errorMessage,
+      ErrorBaseResponse<AllDriverOrdersResponseModel>() => ErrorBaseResponse(
+        response.errorMessage,
       ),
     };
   }
 
   @override
   Future<BaseResponse<OrderEntity>> startOrder(String id) async {
-    final result = await _remoteDataSource.startOrder(id);
-    return switch (result) {
-      SuccessBaseResponse<OrderActionResponseModel>() => SuccessBaseResponse(
-        result.data?.order?.toEntity(),
+    final response = await _remoteDataSource.startOrder(id);
+    return switch (response) {
+      SuccessBaseResponse<UpdateOrderStateResponseModel>() => _handleMapping(
+        () => response.data?.order?.toEntity(),
       ),
-      ErrorBaseResponse<OrderActionResponseModel>() => ErrorBaseResponse(
-        result.errorMessage,
+      ErrorBaseResponse<UpdateOrderStateResponseModel>() => ErrorBaseResponse(
+        response.errorMessage,
       ),
     };
   }
@@ -45,13 +45,13 @@ class TrackingRepoImpl implements TrackingRepoContract {
     String id,
     OrderStatus state,
   ) async {
-    final result = await _remoteDataSource.updateOrderState(id, state);
-    return switch (result) {
-      SuccessBaseResponse<OrderActionResponseModel>() => SuccessBaseResponse(
-        result.data?.order?.toEntity(),
+    final response = await _remoteDataSource.updateOrderState(id, state);
+    return switch (response) {
+      SuccessBaseResponse<UpdateOrderStateResponseModel>() => _handleMapping(
+        () => response.data?.order?.toEntity(),
       ),
-      ErrorBaseResponse<OrderActionResponseModel>() => ErrorBaseResponse(
-        result.errorMessage,
+      ErrorBaseResponse<UpdateOrderStateResponseModel>() => ErrorBaseResponse(
+        response.errorMessage,
       ),
     };
   }
@@ -62,12 +62,23 @@ class TrackingRepoImpl implements TrackingRepoContract {
   }) async {
     final response = await _remoteDataSource.getPendingOrders(page: page);
     return switch (response) {
-      SuccessBaseResponse<PendingOrdersResponseModel>() => SuccessBaseResponse(
-        response.data?.toEntity(),
+      SuccessBaseResponse<PendingOrdersResponseModel>() => _handleMapping(
+        () => response.data?.toEntity(),
       ),
       ErrorBaseResponse<PendingOrdersResponseModel>() => ErrorBaseResponse(
         response.errorMessage,
       ),
     };
+  }
+
+  /// Helper to catch mapping exceptions while using switch expressions
+  BaseResponse<T> _handleMapping<T>(T? Function() mapper) {
+    try {
+      final result = mapper();
+      if (result == null) return ErrorBaseResponse('Empty data received');
+      return SuccessBaseResponse(result);
+    } catch (e) {
+      return ErrorBaseResponse('Data Mapping Error: ${e.toString()}');
+    }
   }
 }

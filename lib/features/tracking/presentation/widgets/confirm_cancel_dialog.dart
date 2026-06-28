@@ -35,7 +35,7 @@ class ConfirmCancelDialog extends StatelessWidget {
               ? null
               : () {
                   context.read<OrderDetailsCubit>().doEvent(
-                    RevertOrderToPendingEvent(order.id ?? ''),
+                    RevertOrderToPendingEvent(order.id),
                   );
                 },
           child: state.canselOrderState.isLoading

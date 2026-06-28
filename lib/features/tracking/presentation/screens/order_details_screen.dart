@@ -129,74 +129,60 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                         SizedBox(height: 24.h),
                         OrderStatusCard(
                           uiStep: state.uiStep,
-                          orderId: order.orderNumber ?? order.id ?? '',
-                          date: order.createdAt ?? '',
+                          orderId: order.orderNumber,
+                          date: order.createdAt,
                         ),
                         SizedBox(height: 24.h),
                         AddressInfoCard(
                           label: AppStrings.pickupAddress,
-                          imageUrl: order.store?.image,
-                          title: order.store?.name,
-                          address: order.store?.address,
+                          imageUrl: order.store.image,
+                          title: order.store.name,
+                          address: order.store.address,
                           onTap: () {
                             context.read<OrderDetailsCubit>().doEvent(
                               NavigateToMapEvent(LocationType.store),
                             );
                           },
                           onPhoneTap: () {
-                            final phone = order.store?.phoneNumber;
-                            if (phone != null) {
-                              context.read<OrderDetailsCubit>().doEvent(
-                                CallPhoneEvent(phone),
-                              );
-                            }
+                            context.read<OrderDetailsCubit>().doEvent(
+                              CallPhoneEvent(order.store.phoneNumber),
+                            );
                           },
                           onWhatsappTap: () {
-                            final phone = order.store?.phoneNumber;
-                            if (phone != null) {
-                              context.read<OrderDetailsCubit>().doEvent(
-                                OpenWhatsAppEvent(phone),
-                              );
-                            }
+                            context.read<OrderDetailsCubit>().doEvent(
+                              OpenWhatsAppEvent(order.store.phoneNumber),
+                            );
                           },
                         ),
                         SizedBox(height: 24.h),
                         AddressInfoCard(
                           label: AppStrings.userAddress,
-                          imageUrl: order.user?.photo,
-                          title: order.user?.fullName,
-                          address: order.shippingAddress != null
-                              ? '${order.shippingAddress?.street}, ${order.shippingAddress?.city}'
-                              : '_,_',
+                          imageUrl: order.user.photo,
+                          title: order.user.fullName,
+                          address:
+                              '${order.shippingAddress.street}, ${order.shippingAddress.city}',
                           onTap: () {
                             context.read<OrderDetailsCubit>().doEvent(
                               NavigateToMapEvent(LocationType.user),
                             );
                           },
                           onPhoneTap: () {
-                            final phone = order.user?.phone;
-                            if (phone != null) {
-                              context.read<OrderDetailsCubit>().doEvent(
-                                CallPhoneEvent(phone),
-                              );
-                            }
+                            context.read<OrderDetailsCubit>().doEvent(
+                              CallPhoneEvent(order.user.phone),
+                            );
                           },
                           onWhatsappTap: () {
-                            final phone = order.user?.phone;
-                            if (phone != null) {
-                              context.read<OrderDetailsCubit>().doEvent(
-                                OpenWhatsAppEvent(phone),
-                              );
-                            }
+                            context.read<OrderDetailsCubit>().doEvent(
+                              OpenWhatsAppEvent(order.user.phone),
+                            );
                           },
                         ),
                         SizedBox(height: 24.h),
-                        OrderItemsList(items: order.orderItems ?? []),
+                        OrderItemsList(items: order.orderItems),
                         SizedBox(height: 24.h),
                         OrderSummarySection(
-                          total: order.totalPrice ?? 0,
-                          paymentMethod:
-                              order.paymentType ?? AppStrings.cashOnDelivery,
+                          total: order.totalPrice,
+                          paymentMethod: order.paymentType,
                         ),
                         SizedBox(height: 24.h),
                       ],

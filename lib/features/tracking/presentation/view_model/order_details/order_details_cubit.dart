@@ -57,7 +57,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
 
     // If no initialStep is provided, fallback to basic logic
     if (initialStep == null) {
-      if (initialBackendStatus == OrderStatus.completed) {
+      if (initialBackendStatus == OrderStatus.delivered) {
         step = 6;
       } else if (initialBackendStatus == OrderStatus.inProgress) {
         step = 1;
@@ -72,24 +72,20 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       ),
     );
 
-    if (order.id != null) {
-      BaseResponse<OrderEntity> startResult = await _startOrderUseCase(
-        order.id!,
+    BaseResponse<OrderEntity> startResult = await _startOrderUseCase(order.id);
+
+    if (startResult is SuccessBaseResponse<OrderEntity>) {
+      final updatedOrder = startResult.data;
+      // Merge: Keep the rich data (user/store) from passed entity if API response is partial
+      final mergedOrder = order.mergeWith(updatedOrder);
+
+      emit(
+        state.copyWith(
+          orderDetailsState: BaseState(data: mergedOrder),
+          orderStatus: OrderStatus.fromString(mergedOrder.state),
+        ),
       );
-
-      if (startResult is SuccessBaseResponse<OrderEntity>) {
-        final updatedOrder = startResult.data;
-        // Merge: Keep the rich data (user/store) from passed entity if API response is partial
-        final mergedOrder = order.mergeWith(updatedOrder);
-
-        emit(
-          state.copyWith(
-            orderDetailsState: BaseState(data: mergedOrder),
-            orderStatus: OrderStatus.fromString(mergedOrder.state),
-          ),
-        );
-        _cacheOrder(mergedOrder);
-      }
+      _cacheOrder(mergedOrder);
     }
   }
 
@@ -97,13 +93,14 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     final currentStep = state.uiStep;
     if (currentStep >= 6) return;
 
-    final nextStep = currentStep + 1;
     final currentOrder = state.orderDetailsState.data;
-    final orderId = currentOrder?.id;
-    if (orderId == null) return;
+    if (currentOrder == null) return;
+
+    final nextStep = currentStep + 1;
+    final orderId = currentOrder.id;
 
     OrderStatus backendStatus = (nextStep == 6)
-        ? OrderStatus.completed
+        ? OrderStatus.delivered
         : OrderStatus.inProgress;
 
     emitUiEvent(ShowLoadingEvent());
@@ -113,7 +110,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     switch (result) {
       case SuccessBaseResponse<OrderEntity>():
         // Merge to prevent losing user/store details
-        final mergedOrder = currentOrder!.mergeWith(result.data);
+        final mergedOrder = currentOrder.mergeWith(result.data);
 
         emit(
           state.copyWith(
@@ -189,14 +186,16 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
 
   void _onNavigateToMap(LocationType type) {
     final order = state.orderDetailsState.data;
-    final lat = type == LocationType.store
-        ? order?.store?.lat
-        : order?.shippingAddress?.lat;
-    final long = type == LocationType.store
-        ? order?.store?.long
-        : order?.shippingAddress?.long;
+    if (order == null) return;
 
-    if (lat != null && long != null && order != null) {
+    final lat = type == LocationType.store
+        ? order.store.lat
+        : order.shippingAddress.lat;
+    final long = type == LocationType.store
+        ? order.store.long
+        : order.shippingAddress.long;
+
+    if (lat.isNotEmpty && long.isNotEmpty) {
       emitUiEvent(
         NavigateEvent(
           AppRoutes.mapScreen,

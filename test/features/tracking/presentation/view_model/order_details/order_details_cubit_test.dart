@@ -49,12 +49,39 @@ void main() {
     );
   });
 
+  const user = UserEntity(
+    id: 'u1',
+    fullName: 'Test User',
+    phone: '123',
+    photo: '',
+  );
+  const store = StoreEntity(
+    name: 'Store',
+    image: '',
+    address: 'Store Address',
+    phoneNumber: '456',
+    lat: '30.0',
+    long: '31.0',
+  );
+  const shipping = ShippingAddressEntity(
+    street: 'Street',
+    city: 'City',
+    phone: '789',
+    lat: '30.1',
+    long: '31.1',
+  );
+
   final tOrder = OrderEntity(
     id: '1',
     state: 'pending',
     orderNumber: 'ORD-1',
-    store: const StoreEntity(lat: '30.0', long: '31.0', name: 'Store'),
-    shippingAddress: const ShippingAddressEntity(lat: '30.1', long: '31.1'),
+    totalPrice: 100,
+    createdAt: '2021-01-01',
+    paymentType: 'Cash',
+    user: user,
+    store: store,
+    orderItems: [],
+    shippingAddress: shipping,
   );
 
   group('InitializeOrderDetailsEvent', () {
@@ -87,26 +114,6 @@ void main() {
             value: anyNamed('value'),
           ),
         ).called(1);
-      },
-    );
-
-    blocTest<OrderDetailsCubit, OrderDetailsState>(
-      'emits initial state and does not call startOrder if order.id is null',
-      build: () => cubit,
-      act: (cubit) => cubit.doEvent(
-        InitializeOrderDetailsEvent(
-          const OrderEntity(state: 'pending', orderNumber: 'ORD-NULL'),
-        ),
-      ),
-      expect: () => [
-        isA<OrderDetailsState>().having(
-          (s) => s.orderDetailsState.data?.id,
-          'data id',
-          null,
-        ),
-      ],
-      verify: (_) {
-        verifyNever(mockStartOrderUseCase(any));
       },
     );
 
@@ -182,7 +189,7 @@ void main() {
 
     test('emits NavigateEvent and clears cache when reaching step 6', () async {
       when(mockUpdateOrderStateUseCase(any, any)).thenAnswer(
-        (_) async => SuccessBaseResponse(tOrder.copyWith(state: 'completed')),
+        (_) async => SuccessBaseResponse(tOrder.copyWith(state: 'delivered')),
       );
 
       cubit.emit(
@@ -384,13 +391,22 @@ void main() {
       cubit.emit(
         OrderDetailsState(
           orderDetailsState: BaseState(
-            data: tOrder.copyWith(store: const StoreEntity()),
+            data: tOrder.copyWith(
+              store: const StoreEntity(
+                name: '',
+                image: '',
+                address: '',
+                phoneNumber: '',
+                lat: '',
+                long: '',
+              ),
+            ),
           ),
         ),
       );
 
       cubit.doEvent(NavigateToMapEvent(LocationType.store));
-      // No event should be emitted
+      // No event should be emitted because lat/long are empty strings
     });
   });
 

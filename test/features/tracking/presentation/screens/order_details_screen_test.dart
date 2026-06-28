@@ -52,13 +52,30 @@ void main() {
     orderNumber: '123456',
     state: 'pending',
     createdAt: 'Wed, 03 Sep 2024, 11:00 AM',
+    paymentType: 'Cash',
     store: const StoreEntity(
       name: 'Flowery store',
+      image: '',
       address: '20th st, Sheikh Zayed, Giza',
       phoneNumber: '01000000000',
+      lat: '0.0',
+      long: '0.0',
     ),
-    user: const UserEntity(fullName: 'Nour mohamed', phone: '01111111111'),
+    user: const UserEntity(
+      id: 'u1',
+      fullName: 'Nour mohamed',
+      phone: '01111111111',
+      photo: '',
+    ),
     totalPrice: 150,
+    orderItems: const [],
+    shippingAddress: const ShippingAddressEntity(
+      street: 'Street',
+      city: 'Giza',
+      phone: '333',
+      lat: '0.0',
+      long: '0.0',
+    ),
   );
 
   setUpAll(() async {

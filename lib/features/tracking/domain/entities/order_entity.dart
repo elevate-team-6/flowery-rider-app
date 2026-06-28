@@ -1,43 +1,58 @@
 import 'package:equatable/equatable.dart';
-import 'package:json_annotation/json_annotation.dart';
-
-part 'order_entity.g.dart';
 
 class PendingOrdersEntity extends Equatable {
-  final String? message;
-  final List<OrderEntity>? orders;
+  final String message;
+  final List<OrderEntity> orders;
 
-  const PendingOrdersEntity({this.message, this.orders});
+  const PendingOrdersEntity({required this.message, required this.orders});
 
   @override
   List<Object?> get props => [message, orders];
 }
 
-@JsonSerializable()
 class OrderEntity extends Equatable {
-  final String? id;
-  final String? orderNumber;
-  final num? totalPrice;
-  final String? state;
-  final String? createdAt;
-  final String? paymentType;
-  final UserEntity? user;
-  final StoreEntity? store;
-  final List<OrderItemEntity>? orderItems;
-  final ShippingAddressEntity? shippingAddress;
+  final String id;
+  final String orderNumber;
+  final num totalPrice;
+  final String state;
+  final String createdAt;
+  final String paymentType;
+  final UserEntity user;
+  final StoreEntity store;
+  final List<OrderItemEntity> orderItems;
+  final ShippingAddressEntity shippingAddress;
 
   const OrderEntity({
-    this.id,
-    this.orderNumber,
-    this.totalPrice,
-    this.state,
-    this.createdAt,
-    this.paymentType,
-    this.user,
-    this.store,
-    this.orderItems,
-    this.shippingAddress,
+    required this.id,
+    required this.orderNumber,
+    required this.totalPrice,
+    required this.state,
+    required this.createdAt,
+    required this.paymentType,
+    required this.user,
+    required this.store,
+    required this.orderItems,
+    required this.shippingAddress,
   });
+
+  factory OrderEntity.fromJson(Map<String, dynamic> json) {
+    return OrderEntity(
+      id: json['id'] as String,
+      orderNumber: json['orderNumber'] as String,
+      totalPrice: json['totalPrice'] as num,
+      state: json['state'] as String,
+      createdAt: json['createdAt'] as String,
+      paymentType: json['paymentType'] as String,
+      user: UserEntity.fromJson(json['user'] as Map<String, dynamic>),
+      store: StoreEntity.fromJson(json['store'] as Map<String, dynamic>),
+      orderItems: (json['orderItems'] as List)
+          .map((e) => OrderItemEntity.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      shippingAddress: ShippingAddressEntity.fromJson(
+        json['shippingAddress'] as Map<String, dynamic>,
+      ),
+    );
+  }
 
   OrderEntity copyWith({
     String? id,
@@ -65,11 +80,6 @@ class OrderEntity extends Equatable {
     );
   }
 
-  factory OrderEntity.fromJson(Map<String, dynamic> json) =>
-      _$OrderEntityFromJson(json);
-
-  Map<String, dynamic> toJson() => _$OrderEntityToJson(this);
-
   /// Merges partial order data from API with rich local data (User/Store)
   OrderEntity mergeWith(OrderEntity? remote) {
     if (remote == null) return this;
@@ -81,19 +91,27 @@ class OrderEntity extends Equatable {
       state: remote.state,
       createdAt: remote.createdAt,
       paymentType: remote.paymentType,
-      // Priority to local rich entities if remote only has ID (or is null)
-      user: (remote.user?.fullName != null && remote.user!.fullName!.isNotEmpty)
-          ? remote.user
-          : user,
-      store: (remote.store?.name != null && remote.store!.name!.isNotEmpty)
-          ? remote.store
-          : store,
-      orderItems: (remote.orderItems != null && remote.orderItems!.isNotEmpty)
+      user: (remote.user.fullName.isNotEmpty) ? remote.user : user,
+      store: (remote.store.name.isNotEmpty) ? remote.store : store,
+      orderItems: (remote.orderItems.isNotEmpty)
           ? remote.orderItems
           : orderItems,
       shippingAddress: remote.shippingAddress,
     );
   }
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'orderNumber': orderNumber,
+    'totalPrice': totalPrice,
+    'state': state,
+    'createdAt': createdAt,
+    'paymentType': paymentType,
+    'user': user.toJson(),
+    'store': store.toJson(),
+    'orderItems': orderItems.map((e) => e.toJson()).toList(),
+    'shippingAddress': shippingAddress.toJson(),
+  };
 
   @override
   List<Object?> get props => [
@@ -110,94 +128,145 @@ class OrderEntity extends Equatable {
   ];
 }
 
-@JsonSerializable()
 class UserEntity extends Equatable {
-  final String? id;
-  final String? fullName;
-  final String? phone;
-  final String? photo;
+  final String id;
+  final String fullName;
+  final String phone;
+  final String photo;
 
-  const UserEntity({this.id, this.fullName, this.phone, this.photo});
+  const UserEntity({
+    required this.id,
+    required this.fullName,
+    required this.phone,
+    required this.photo,
+  });
 
-  factory UserEntity.fromJson(Map<String, dynamic> json) =>
-      _$UserEntityFromJson(json);
+  factory UserEntity.fromJson(Map<String, dynamic> json) {
+    return UserEntity(
+      id: json['id'] as String,
+      fullName: json['fullName'] as String,
+      phone: json['phone'] as String,
+      photo: json['photo'] as String,
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$UserEntityToJson(this);
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'fullName': fullName,
+    'phone': phone,
+    'photo': photo,
+  };
 
   @override
   List<Object?> get props => [id, fullName, phone, photo];
 }
 
-@JsonSerializable()
 class StoreEntity extends Equatable {
-  final String? name;
-  final String? image;
-  final String? address;
-  final String? phoneNumber;
-  final String? lat;
-  final String? long;
+  final String name;
+  final String image;
+  final String address;
+  final String phoneNumber;
+  final String lat;
+  final String long;
 
   const StoreEntity({
-    this.name,
-    this.image,
-    this.address,
-    this.phoneNumber,
-    this.lat,
-    this.long,
+    required this.name,
+    required this.image,
+    required this.address,
+    required this.phoneNumber,
+    required this.lat,
+    required this.long,
   });
 
-  factory StoreEntity.fromJson(Map<String, dynamic> json) =>
-      _$StoreEntityFromJson(json);
+  factory StoreEntity.fromJson(Map<String, dynamic> json) {
+    return StoreEntity(
+      name: json['name'] as String,
+      image: json['image'] as String,
+      address: json['address'] as String,
+      phoneNumber: json['phoneNumber'] as String,
+      lat: json['lat'] as String,
+      long: json['long'] as String,
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$StoreEntityToJson(this);
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'image': image,
+    'address': address,
+    'phoneNumber': phoneNumber,
+    'lat': lat,
+    'long': long,
+  };
 
   @override
   List<Object?> get props => [name, image, address, phoneNumber, lat, long];
 }
 
-@JsonSerializable()
 class OrderItemEntity extends Equatable {
-  final String? productName;
-  final String? productImage;
-  final num? price;
-  final int? quantity;
+  final String productName;
+  final String productImage;
+  final num price;
+  final int quantity;
 
   const OrderItemEntity({
-    this.productName,
-    this.productImage,
-    this.price,
-    this.quantity,
+    required this.productName,
+    required this.productImage,
+    required this.price,
+    required this.quantity,
   });
 
-  factory OrderItemEntity.fromJson(Map<String, dynamic> json) =>
-      _$OrderItemEntityFromJson(json);
+  factory OrderItemEntity.fromJson(Map<String, dynamic> json) {
+    return OrderItemEntity(
+      productName: json['productName'] as String,
+      productImage: json['productImage'] as String,
+      price: json['price'] as num,
+      quantity: json['quantity'] as int,
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$OrderItemEntityToJson(this);
+  Map<String, dynamic> toJson() => {
+    'productName': productName,
+    'productImage': productImage,
+    'price': price,
+    'quantity': quantity,
+  };
 
   @override
   List<Object?> get props => [productName, productImage, price, quantity];
 }
 
-@JsonSerializable()
 class ShippingAddressEntity extends Equatable {
-  final String? street;
-  final String? city;
-  final String? phone;
-  final String? lat;
-  final String? long;
+  final String street;
+  final String city;
+  final String phone;
+  final String lat;
+  final String long;
 
   const ShippingAddressEntity({
-    this.street,
-    this.city,
-    this.phone,
-    this.lat,
-    this.long,
+    required this.street,
+    required this.city,
+    required this.phone,
+    required this.lat,
+    required this.long,
   });
 
-  factory ShippingAddressEntity.fromJson(Map<String, dynamic> json) =>
-      _$ShippingAddressEntityFromJson(json);
+  factory ShippingAddressEntity.fromJson(Map<String, dynamic> json) {
+    return ShippingAddressEntity(
+      street: json['street'] as String,
+      city: json['city'] as String,
+      phone: json['phone'] as String,
+      lat: json['lat'] as String,
+      long: json['long'] as String,
+    );
+  }
 
-  Map<String, dynamic> toJson() => _$ShippingAddressEntityToJson(this);
+  Map<String, dynamic> toJson() => {
+    'street': street,
+    'city': city,
+    'phone': phone,
+    'lat': lat,
+    'long': long,
+  };
 
   @override
   List<Object?> get props => [street, city, phone, lat, long];
