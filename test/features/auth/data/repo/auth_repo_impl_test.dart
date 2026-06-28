@@ -18,7 +18,7 @@ import 'package:flowery_rider_app/features/auth/domain/entities/sign_in_entity.d
 import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
-import 'package:mockito/mockitoart';
+import 'package:mockito/mockito.dart';
 
 import 'auth_repo_impl_test.mocks.dart';
 
