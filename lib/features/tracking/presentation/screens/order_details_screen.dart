@@ -74,11 +74,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
       context: context,
       builder: (_) => BlocProvider.value(
         value: cubit,
-        child: BlocBuilder<OrderDetailsCubit, OrderDetailsState>(
-          builder: (context, state) {
-            return ConfirmCancelDialog(state: state, order: widget.args.order);
-          },
-        ),
+        child: ConfirmCancelDialog(order: widget.args.order),
       ),
     );
   }
@@ -106,6 +102,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
           ),
         ),
         body: BlocBuilder<OrderDetailsCubit, OrderDetailsState>(
+          buildWhen: (previous, current) =>
+              previous.orderDetailsState != current.orderDetailsState,
           builder: (context, state) {
             final order = state.orderDetailsState.data;
 
@@ -125,12 +123,24 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        OrderStepIndicator(uiStep: state.uiStep),
+                        BlocBuilder<OrderDetailsCubit, OrderDetailsState>(
+                          buildWhen: (previous, current) =>
+                              previous.uiStep != current.uiStep,
+                          builder: (context, state) {
+                            return OrderStepIndicator(uiStep: state.uiStep);
+                          },
+                        ),
                         SizedBox(height: 24.h),
-                        OrderStatusCard(
-                          uiStep: state.uiStep,
-                          orderId: order.orderNumber,
-                          date: order.createdAt,
+                        BlocBuilder<OrderDetailsCubit, OrderDetailsState>(
+                          buildWhen: (previous, current) =>
+                              previous.uiStep != current.uiStep,
+                          builder: (context, state) {
+                            return OrderStatusCard(
+                              uiStep: state.uiStep,
+                              orderId: order.orderNumber,
+                              date: order.createdAt,
+                            );
+                          },
                         ),
                         SizedBox(height: 24.h),
                         AddressInfoCard(
@@ -191,11 +201,17 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                 ),
                 Padding(
                   padding: EdgeInsets.all(16.w),
-                  child: OrderActionButton(
-                    uiStep: state.uiStep,
-                    onPressed: () {
-                      context.read<OrderDetailsCubit>().doEvent(
-                        OrderDetailsNextStepEvent(),
+                  child: BlocBuilder<OrderDetailsCubit, OrderDetailsState>(
+                    buildWhen: (previous, current) =>
+                        previous.uiStep != current.uiStep,
+                    builder: (context, state) {
+                      return OrderActionButton(
+                        uiStep: state.uiStep,
+                        onPressed: () {
+                          context.read<OrderDetailsCubit>().doEvent(
+                            OrderDetailsNextStepEvent(),
+                          );
+                        },
                       );
                     },
                   ),
