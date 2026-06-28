@@ -1,5 +1,4 @@
 import 'package:flowery_rider_app/config/di/di.dart';
-import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/apply_page.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/forget_password_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/login_screen.dart';
@@ -11,7 +10,6 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/login_vi
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
 import 'package:flowery_rider_app/features/splash/presentation/pages/splash_screen.dart';
-import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_success_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_cubit.dart';
@@ -87,21 +85,12 @@ abstract class AppRoutes {
           );
 
         case orderDetails:
-          OrderEntity order;
-          int? initialStep;
-
-          if (settings.arguments is OrderEntity) {
-            order = settings.arguments as OrderEntity;
-          } else {
-            final map = settings.arguments as Map<String, dynamic>;
-            order = map[AppKeys.order] as OrderEntity;
-            initialStep = map[AppKeys.uiStep] as int?;
-          }
+          final args = settings.arguments as OrderDetailsArgs;
 
           return MaterialPageRoute(
             builder: (_) => BlocProvider(
               create: (context) => getIt<OrderDetailsCubit>(),
-              child: OrderDetailsScreen(order: order, initialStep: initialStep),
+              child: OrderDetailsScreen(args: args),
             ),
             settings: settings,
           );

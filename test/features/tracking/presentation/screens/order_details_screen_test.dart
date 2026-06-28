@@ -140,7 +140,9 @@ void main() {
               locale: context.locale,
               home: BlocProvider<OrderDetailsCubit>.value(
                 value: cubit,
-                child: OrderDetailsScreen(order: tOrder),
+                child: OrderDetailsScreen(
+                  args: OrderDetailsArgs(order: tOrder),
+                ),
               ),
             ),
           ),
@@ -190,7 +192,9 @@ void main() {
                 locale: context.locale,
                 home: BlocProvider<OrderDetailsCubit>.value(
                   value: cubit,
-                  child: OrderDetailsScreen(order: tOrder),
+                  child: OrderDetailsScreen(
+                    args: OrderDetailsArgs(order: tOrder),
+                  ),
                 ),
               ),
             ),

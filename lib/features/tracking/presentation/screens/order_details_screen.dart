@@ -21,11 +21,17 @@ import '../widgets/order_status_card.dart';
 import '../widgets/order_step_indicator.dart';
 import '../widgets/order_summary_section.dart';
 
-class OrderDetailsScreen extends StatefulWidget {
+class OrderDetailsArgs {
   final OrderEntity order;
   final int? initialStep;
 
-  const OrderDetailsScreen({super.key, required this.order, this.initialStep});
+  const OrderDetailsArgs({required this.order, this.initialStep});
+}
+
+class OrderDetailsScreen extends StatefulWidget {
+  final OrderDetailsArgs args;
+
+  const OrderDetailsScreen({super.key, required this.args});
 
   @override
   State<OrderDetailsScreen> createState() => _OrderDetailsScreenState();
@@ -47,8 +53,8 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
       if (mounted) {
         context.read<OrderDetailsCubit>().doEvent(
           InitializeOrderDetailsEvent(
-            widget.order,
-            initialStep: widget.initialStep,
+            widget.args.order,
+            initialStep: widget.args.initialStep,
           ),
         );
       }
@@ -70,7 +76,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
         value: cubit,
         child: BlocBuilder<OrderDetailsCubit, OrderDetailsState>(
           builder: (context, state) {
-            return ConfirmCancelDialog(state: state, order: widget.order);
+            return ConfirmCancelDialog(state: state, order: widget.args.order);
           },
         ),
       ),

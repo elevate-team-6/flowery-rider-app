@@ -15,6 +15,7 @@ import '../../../../config/cache/hive_helper.dart';
 import '../../../../config/di/di.dart';
 import '../../../../config/services/auth_service.dart';
 import '../../../tracking/domain/entities/order_entity.dart';
+import '../../../tracking/presentation/screens/order_details_screen.dart';
 import '../widgets/petals_painter.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -171,7 +172,10 @@ class _SplashScreenState extends State<SplashScreen>
         Navigator.pushReplacementNamed(
           context,
           AppRoutes.orderDetails,
-          arguments: {'order': cachedOrder, 'uiStep': cachedStep},
+          arguments: OrderDetailsArgs(
+            order: cachedOrder,
+            initialStep: cachedStep,
+          ),
         );
       } else {
         Navigator.pushReplacementNamed(

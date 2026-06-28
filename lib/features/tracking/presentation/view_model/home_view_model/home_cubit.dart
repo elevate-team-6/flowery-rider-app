@@ -5,6 +5,7 @@ import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_pending_orders_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_events.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_states.dart';
 import 'package:injectable/injectable.dart';
@@ -44,7 +45,12 @@ class HomeCubit extends BaseCubit<HomeStates, BaseUiEvent> {
   }
 
   void _acceptOrder(OrderEntity order) {
-    emitUiEvent(NavigateEvent(AppRoutes.orderDetails, arguments: order));
+    emitUiEvent(
+      NavigateEvent(
+        AppRoutes.orderDetails,
+        arguments: OrderDetailsArgs(order: order),
+      ),
+    );
   }
 
   /// Reject is local-only: drop the order from the current list so it
