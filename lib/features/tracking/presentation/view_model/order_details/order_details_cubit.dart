@@ -34,9 +34,9 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
 
   void doEvent(OrderDetailsEvents event) {
     switch (event) {
-      case InitializeOrderDetailsEvent():
+      case OrderDetailsInitializeEvent():
         _onInitialize(event.order, initialStep: event.initialStep);
-      case NextStepEvent():
+      case OrderDetailsNextStepEvent():
         _onNextStep();
       case ConfirmBackButtonPressedEvent():
         _onBackButtonPressed();

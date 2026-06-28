@@ -52,7 +52,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
     Future.microtask(() {
       if (mounted) {
         context.read<OrderDetailsCubit>().doEvent(
-          InitializeOrderDetailsEvent(
+          OrderDetailsInitializeEvent(
             widget.args.order,
             initialStep: widget.args.initialStep,
           ),
@@ -195,7 +195,7 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                     uiStep: state.uiStep,
                     onPressed: () {
                       context.read<OrderDetailsCubit>().doEvent(
-                        NextStepEvent(),
+                        OrderDetailsNextStepEvent(),
                       );
                     },
                   ),

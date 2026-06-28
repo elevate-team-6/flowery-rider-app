@@ -6,17 +6,17 @@ sealed class OrderDetailsEvents extends Equatable {
   List<Object?> get props => [];
 }
 
-class InitializeOrderDetailsEvent extends OrderDetailsEvents {
+class OrderDetailsInitializeEvent extends OrderDetailsEvents {
   final OrderEntity order;
   final int? initialStep;
 
-  InitializeOrderDetailsEvent(this.order, {this.initialStep});
+  OrderDetailsInitializeEvent(this.order, {this.initialStep});
 
   @override
   List<Object?> get props => [order, initialStep];
 }
 
-class NextStepEvent extends OrderDetailsEvents {}
+class OrderDetailsNextStepEvent extends OrderDetailsEvents {}
 
 class ConfirmBackButtonPressedEvent extends OrderDetailsEvents {}
 

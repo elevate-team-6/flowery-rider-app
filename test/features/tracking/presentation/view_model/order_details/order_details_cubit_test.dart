@@ -94,7 +94,7 @@ void main() {
         );
         return cubit;
       },
-      act: (cubit) => cubit.doEvent(InitializeOrderDetailsEvent(tOrder)),
+      act: (cubit) => cubit.doEvent(OrderDetailsInitializeEvent(tOrder)),
       expect: () => [
         isA<OrderDetailsState>()
             .having((s) => s.orderDetailsState.data?.id, 'data id', '1')
@@ -127,7 +127,7 @@ void main() {
         return cubit;
       },
       act: (cubit) =>
-          cubit.doEvent(InitializeOrderDetailsEvent(tOrder, initialStep: 3)),
+          cubit.doEvent(OrderDetailsInitializeEvent(tOrder, initialStep: 3)),
       expect: () => [
         isA<OrderDetailsState>().having((s) => s.uiStep, 'step', 3),
         isA<OrderDetailsState>(),
@@ -149,7 +149,7 @@ void main() {
         orderDetailsState: BaseState(data: tOrder),
         uiStep: 1,
       ),
-      act: (cubit) => cubit.doEvent(NextStepEvent()),
+      act: (cubit) => cubit.doEvent(OrderDetailsNextStepEvent()),
       expect: () => [
         isA<OrderDetailsState>()
             .having((s) => s.uiStep, 'step', 2)
@@ -184,7 +184,7 @@ void main() {
         emitsInOrder([isA<ShowLoadingEvent>(), isA<HideLoadingEvent>()]),
       );
 
-      cubit.doEvent(NextStepEvent());
+      cubit.doEvent(OrderDetailsNextStepEvent());
     });
 
     test('emits NavigateEvent and clears cache when reaching step 6', () async {
@@ -212,7 +212,7 @@ void main() {
         ),
       );
 
-      cubit.doEvent(NextStepEvent());
+      cubit.doEvent(OrderDetailsNextStepEvent());
 
       await untilCalled(
         mockHiveHelper.deleteData(
@@ -251,18 +251,18 @@ void main() {
         ),
       );
 
-      cubit.doEvent(NextStepEvent());
+      cubit.doEvent(OrderDetailsNextStepEvent());
     });
 
     test('returns early if uiStep >= 6', () async {
       cubit.emit(const OrderDetailsState(uiStep: 6));
-      cubit.doEvent(NextStepEvent());
+      cubit.doEvent(OrderDetailsNextStepEvent());
       verifyNever(mockUpdateOrderStateUseCase(any, any));
     });
 
     test('returns early if order data is missing', () async {
       cubit.emit(const OrderDetailsState(uiStep: 1));
-      cubit.doEvent(NextStepEvent());
+      cubit.doEvent(OrderDetailsNextStepEvent());
       verifyNever(mockUpdateOrderStateUseCase(any, any));
     });
   });
