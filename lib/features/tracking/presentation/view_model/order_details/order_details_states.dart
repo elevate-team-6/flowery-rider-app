@@ -1,8 +1,8 @@
+import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
-import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 
-class OrderDetailsState extends BaseState<OrderEntity> {
+class OrderDetailsState extends Equatable {
   final OrderStatus? orderStatus;
   final int
   uiStep; // 1: Accepted, 2: ArrivedAtPickup, 3: Picked, 4: OutForDelivery, 5: Arrived, 6: Delivered
@@ -20,9 +20,6 @@ class OrderDetailsState extends BaseState<OrderEntity> {
 
   @override
   List<Object?> get props => [
-    isLoading,
-    data,
-    errorMessage,
     orderStatus,
     uiStep,
     canselOrderState,
