@@ -15,50 +15,32 @@ import '../../domain/use_cases/logout_use_case.dart';
 @injectable
 class ProfileCubit extends BaseCubit<ProfileStates, BaseUiEvent> {
   final LogoutUseCase _logoutUseCase;
-    final ProfileUseCase _profileUseCase;
-  ProfileCubit(this._logoutUseCase,this._profileUseCase) : super(const ProfileStates());
+  final ProfileUseCase _profileUseCase;
+  ProfileCubit(this._logoutUseCase, this._profileUseCase)
+    : super(const ProfileStates());
 
   void doEvent(ProfileEvents event) {
     switch (event) {
       case LogoutEvent():
         _logout();
       case GetProfileEvent():
-       _getProfile();
+        _getProfile();
     }
   }
-   Future<void> _getProfile() async {
-    emit(
-      state.copyWith(
-        profileState: const BaseState(
-          isLoading: true,
-        ),
-      ),
-    );
+
+  Future<void> _getProfile() async {
+    emit(state.copyWith(profileState: const BaseState(isLoading: true)));
 
     final response = await _profileUseCase.call();
 
     switch (response) {
       case SuccessBaseResponse():
-        emit(
-          state.copyWith(
-            profileState: BaseState(
-              data: response.data,
-            ),
-          ),
-        );
+        emit(state.copyWith(profileState: BaseState(data: response.data)));
 
       case ErrorBaseResponse():
-        emit(
-          state.copyWith(
-            profileState: const BaseState(),
-          ),
-        );
+        emit(state.copyWith(profileState: const BaseState()));
 
-        emitUiEvent(
-          DisplayErrorEvent(
-            AppStrings.someThingWentWrong.tr(),
-          ),
-        );
+        emitUiEvent(DisplayErrorEvent(AppStrings.someThingWentWrong.tr()));
     }
   }
 

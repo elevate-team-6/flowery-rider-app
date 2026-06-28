@@ -4,10 +4,7 @@ class ProfileResponse {
   final String? message;
   final DriverModel? driver;
 
-  const ProfileResponse({
-    this.message,
-    this.driver,
-  });
+  const ProfileResponse({this.message, this.driver});
 
   factory ProfileResponse.fromJson(Map<String, dynamic> json) {
     return ProfileResponse(

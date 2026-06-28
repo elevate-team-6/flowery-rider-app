@@ -23,31 +23,55 @@ abstract class AppStrings {
 
   // Sign Up Screen
   static const String userName = 'userName';
+  static const String invalidIdNumber = 'invalidIdNumber';
+  static const String idNumberRequired = 'idNumberRequired';
+  static const String isRequired = 'isRequired';
+  static const String vehicleNumberRequired = 'vehicleNumberRequired';
+  static const String apply = 'apply';
+  static const String country = 'country';
+  static const String uploadImageRequired = 'uploadImageRequired';
+  static const String welcome = 'welcome';
+  static const String applyDescription = 'applyDescription';
+  static const String submitSuccess = 'submitSuccess';
+  static const String submitDescription = 'submitDescription';
   static const String enterYourUserName = 'enterYourUserName';
   static const String firstName = 'firstName';
   static const String enterFirstName = 'enterFirstName';
-  static const String lastName = 'lastName';
-  static const String enterLastName = 'enterLastName';
+  static const String secondName = 'secondName';
+  static const String enterSecondName = 'enterSecondName';
   static const String phoneNumber = 'phoneNumber';
+  static const String vehicleNumber = 'vehicleNumber';
+  static const String vehicleLicense = 'vehicleLicense';
+  static const String uploadVehicleLicense = 'uploadVehicleLicense';
+  static const String enterVehicleNumber = 'enterVehicleNumber';
+  static const String vehicleType = 'vehicleType';
   static const String enterPhoneNumber = 'enterPhoneNumber';
+  static const String idNumber = 'idNumber';
+  static const String idImage = 'idImage';
+  static const String uploadIdImage = 'uploadIdImage';
+  static const String enterIdNumber = 'enterIdNumber';
   static const String alreadyHaveAccount = 'alreadyHaveAccount';
   static const String registerSuccess = 'registerSuccess';
   static const String signupFailedUserIsNull = 'signupFailedUserIsNull';
   static const String gender = 'gender';
   static const String female = 'female';
   static const String male = 'male';
+  static const String failedCaptureImage = 'failedCaptureImage';
+  static const String failedPickImageGallery = 'failedPickImageGallery';
   static const String pleaseSelectGender = 'pleaseSelectGender';
+  static const String pleaseUploadNationalId = 'pleaseUploadNationalId';
+  static const String pleaseUploadDrivingLicense = 'pleaseUploadDrivingLicense';
   static const String creatingAccountAgreement = 'creatingAccountAgreement';
   static const String iAgree = 'iAgree';
-  // Onboarding Screen
 
-  static const String welcomeToFloweryRider = 'Welcome to Flowery rider app';
-  static const String applyNow = 'Apply now';
-  static const String versionPlaceholder = 'v 6.3.0 - (446)';
+  // Onboarding Screen
+  static const String welcomeToFloweryRider = 'welcomeToFloweryRider';
+  static const String applyNow = 'applyNow';
+  static const String versionPlaceholder = 'versionPlaceholder';
   static const String welcomeTo = 'welcomeTo';
   static const String floweryRiderApp = 'floweryRiderApp';
-  static const String floweryRider = 'Flowery Rider';
-  static const String splashSubtitle = 'We ride, flowers inside';
+  static const String floweryRider = 'floweryRider';
+  static const String splashSubtitle = 'splashSubtitle';
 
   // Forget Password Screen
   static const String forgetPasswordTitle = 'forgetPasswordTitle';
@@ -92,14 +116,12 @@ abstract class AppStrings {
   static const String confirmLogout = 'confirmLogout';
 
   // Address Details Screen
-  static const String enableLocationServices =
-      'Please enable location services to add a delivery address.';
-  static const String locationPermissionDenied =
-      'Location permission is permanently denied. Please enable it from app settings.';
-  static const String later = 'Later';
-  static const String enableLocation = 'Enable Location';
-  static const String openSettings = 'Open Settings';
-  static const String locationRequired = 'Location Required';
+  static const String enableLocationServices = 'enableLocationServices';
+  static const String locationPermissionDenied = 'locationPermissionDenied';
+  static const String later = 'later';
+  static const String enableLocation = 'enableLocation';
+  static const String openSettings = 'openSettings';
+  static const String locationRequired = 'locationRequired';
   static const String userNotFound = 'userNotFound';
 
   // Main Layout
@@ -120,6 +142,15 @@ abstract class AppStrings {
 
   // home
   static const String flowery = 'flowery';
+  static const String floweryRiderTitle = 'flowery_rider_title';
+  static const String flowerOrder = 'flower_order';
+  static const String pickupAddress = 'pickup_address';
+  static const String userAddress = 'user_address';
+  static const String accept = 'accept';
+  static const String reject = 'reject';
+  static const String egp = 'egp';
+  static const String noPendingOrders = 'no_pending_orders';
+  static const String noPendingOrdersSubtitle = 'no_pending_orders_subtitle';
 
   // Placeholder/Generic
   static const String icon = 'icon';
@@ -202,6 +233,9 @@ abstract class AppStrings {
   static const String passwordLowercase = 'passwordLowercase';
   static const String passwordUppercase = 'passwordUppercase';
   static const String passwordNumber = 'passwordNumber';
+  static const fileDoesNotExist = 'fileDoesNotExist';
+  static const appMultipartFileRequiresEitherFilePathOrBytes =
+      'appMultipartFileRequiresEitherFilePathOrBytes';
   static const String passwordSpecialCharacter = 'passwordSpecialCharacter';
   static const String passwordNotMatched = 'passwordNotMatched';
   static const String confirmPasswordRequired = 'confirmPasswordRequired';
@@ -220,7 +254,6 @@ abstract class AppStrings {
   static const String recipientNameRequired = 'recipientNameRequired';
 
   // My orders
-  // static const String myOrders = 'my_orders';
   static const String active = 'active';
   static const String completed = 'completed';
   static const String trackOrder = 'track_order';
@@ -229,8 +262,4 @@ abstract class AppStrings {
   static const String deliveredOn = 'delivered_on';
   static const String noActiveOrders = 'no_active_orders';
   static const String noCompletedOrders = 'no_completed_orders';
-
-  // ===========================================================================
-  // API Constants (Values sent directly to Backend - Do NOT Translate)
-  // ===========================================================================
 }

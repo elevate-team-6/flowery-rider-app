@@ -15,19 +15,14 @@ import 'package:flowery_rider_app/features/profile/presentation/view_model/profi
 
 import 'profile_cubit_test.mocks.dart';
 
-@GenerateMocks([
-  LogoutUseCase,
-  ProfileUseCase,
-])
+@GenerateMocks([LogoutUseCase, ProfileUseCase])
 void main() {
   late MockLogoutUseCase mockLogoutUseCase;
   late MockProfileUseCase mockProfileUseCase;
   late ProfileCubit cubit;
 
   setUpAll(() {
-    mockito.provideDummy<BaseResponse<void>>(
-      ErrorBaseResponse<void>('dummy'),
-    );
+    mockito.provideDummy<BaseResponse<void>>(ErrorBaseResponse<void>('dummy'));
 
     mockito.provideDummy<BaseResponse<DriverEntity>>(
       ErrorBaseResponse<DriverEntity>('dummy'),
@@ -38,10 +33,7 @@ void main() {
     mockLogoutUseCase = MockLogoutUseCase();
     mockProfileUseCase = MockProfileUseCase();
 
-    cubit = ProfileCubit(
-      mockLogoutUseCase,
-      mockProfileUseCase,
-    );
+    cubit = ProfileCubit(mockLogoutUseCase, mockProfileUseCase);
   });
 
   tearDown(() async {
@@ -52,14 +44,9 @@ void main() {
     blocTest<ProfileCubit, ProfileStates>(
       'should emit loading then success state when profile succeeds',
       build: () {
-        when(
-          mockProfileUseCase.call(),
-        ).thenAnswer(
+        when(mockProfileUseCase.call()).thenAnswer(
           (_) async => SuccessBaseResponse<DriverEntity>(
-            const DriverEntity(
-              firstName: 'Ahmed',
-              lastName: 'Ali',
-            ),
+            const DriverEntity(firstName: 'Ahmed', lastName: 'Ali'),
           ),
         );
 
@@ -69,17 +56,10 @@ void main() {
         cubit.doEvent(const GetProfileEvent());
       },
       expect: () => [
+        const ProfileStates(profileState: BaseState(isLoading: true)),
         const ProfileStates(
           profileState: BaseState(
-            isLoading: true,
-          ),
-        ),
-        const ProfileStates(
-          profileState: BaseState(
-            data: DriverEntity(
-              firstName: 'Ahmed',
-              lastName: 'Ali',
-            ),
+            data: DriverEntity(firstName: 'Ahmed', lastName: 'Ali'),
           ),
         ),
       ],
@@ -91,12 +71,8 @@ void main() {
     blocTest<ProfileCubit, ProfileStates>(
       'should emit loading then empty state when profile fails',
       build: () {
-        when(
-          mockProfileUseCase.call(),
-        ).thenAnswer(
-          (_) async => ErrorBaseResponse<DriverEntity>(
-            'server error',
-          ),
+        when(mockProfileUseCase.call()).thenAnswer(
+          (_) async => ErrorBaseResponse<DriverEntity>('server error'),
         );
 
         return cubit;
@@ -105,14 +81,8 @@ void main() {
         cubit.doEvent(const GetProfileEvent());
       },
       expect: () => [
-        const ProfileStates(
-          profileState: BaseState(
-            isLoading: true,
-          ),
-        ),
-        const ProfileStates(
-          profileState: BaseState(),
-        ),
+        const ProfileStates(profileState: BaseState(isLoading: true)),
+        const ProfileStates(profileState: BaseState()),
       ],
       verify: (_) {
         verify(mockProfileUseCase.call()).called(1);
@@ -126,11 +96,7 @@ void main() {
       build: () {
         when(
           mockLogoutUseCase.call(),
-        ).thenAnswer(
-          (_) async => SuccessBaseResponse<void>(
-            null,
-          ),
-        );
+        ).thenAnswer((_) async => SuccessBaseResponse<void>(null));
 
         return cubit;
       },
@@ -138,14 +104,8 @@ void main() {
         cubit.doEvent(const LogoutEvent());
       },
       expect: () => [
-        const ProfileStates(
-          logoutState: BaseState(
-            isLoading: true,
-          ),
-        ),
-        const ProfileStates(
-          logoutState: BaseState(),
-        ),
+        const ProfileStates(logoutState: BaseState(isLoading: true)),
+        const ProfileStates(logoutState: BaseState()),
       ],
       verify: (_) {
         verify(mockLogoutUseCase.call()).called(1);
@@ -157,11 +117,7 @@ void main() {
       build: () {
         when(
           mockLogoutUseCase.call(),
-        ).thenAnswer(
-          (_) async => ErrorBaseResponse<void>(
-            'logout error',
-          ),
-        );
+        ).thenAnswer((_) async => ErrorBaseResponse<void>('logout error'));
 
         return cubit;
       },
@@ -169,14 +125,8 @@ void main() {
         cubit.doEvent(const LogoutEvent());
       },
       expect: () => [
-        const ProfileStates(
-          logoutState: BaseState(
-            isLoading: true,
-          ),
-        ),
-        const ProfileStates(
-          logoutState: BaseState(),
-        ),
+        const ProfileStates(logoutState: BaseState(isLoading: true)),
+        const ProfileStates(logoutState: BaseState()),
       ],
       verify: (_) {
         verify(mockLogoutUseCase.call()).called(1);

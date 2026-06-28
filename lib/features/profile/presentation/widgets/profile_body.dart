@@ -137,7 +137,7 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                     context.locale.languageCode == 'ar'
                         ? AppStrings.arabic.tr()
                         : AppStrings.english.tr(),
-                        style: AppTextStyles.primary12400,
+                    style: AppTextStyles.primary12400,
                   ),
                   onTap: () {
                     showModalBottomSheet(

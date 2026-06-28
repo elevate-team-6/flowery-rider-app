@@ -14,20 +14,15 @@ import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity
 
 import 'profile_repo_impl_test.mocks.dart';
 
-@GenerateMocks([
-  ProfileRemoteDataSourceContract,
-  SecureCacheHelper,
-])
+@GenerateMocks([ProfileRemoteDataSourceContract, SecureCacheHelper])
 void main() {
   setUpAll(() {
-  provideDummy<BaseResponse<void>>(
-    SuccessBaseResponse<void>(null),
-  );
+    provideDummy<BaseResponse<void>>(SuccessBaseResponse<void>(null));
 
-  provideDummy<BaseResponse<ProfileResponse>>(
-    ErrorBaseResponse<ProfileResponse>('dummy'),
-  );
-});
+    provideDummy<BaseResponse<ProfileResponse>>(
+      ErrorBaseResponse<ProfileResponse>('dummy'),
+    );
+  });
   late MockProfileRemoteDataSourceContract remoteDataSource;
   late MockSecureCacheHelper secureCacheHelper;
   late ProfileRepoImpl repo;
@@ -36,24 +31,17 @@ void main() {
     remoteDataSource = MockProfileRemoteDataSourceContract();
     secureCacheHelper = MockSecureCacheHelper();
 
-    repo = ProfileRepoImpl(
-      remoteDataSource,
-      secureCacheHelper,
-    );
+    repo = ProfileRepoImpl(remoteDataSource, secureCacheHelper);
   });
 
   group('logout', () {
     test('should delete token and return success response', () async {
       final successResponse = SuccessBaseResponse<void>(null);
 
-      when(
-        remoteDataSource.logout(),
-      ).thenAnswer((_) async => successResponse);
+      when(remoteDataSource.logout()).thenAnswer((_) async => successResponse);
 
       when(
-        secureCacheHelper.deleteData(
-          key: anyNamed('key'),
-        ),
+        secureCacheHelper.deleteData(key: anyNamed('key')),
       ).thenAnswer((_) async {});
 
       final result = await repo.logout();
@@ -62,24 +50,16 @@ void main() {
 
       verify(remoteDataSource.logout()).called(1);
 
-      verify(
-        secureCacheHelper.deleteData(
-          key: AppKeys.tokenKey,
-        ),
-      ).called(1);
+      verify(secureCacheHelper.deleteData(key: AppKeys.tokenKey)).called(1);
     });
 
     test('should delete token and return error response', () async {
       final errorResponse = ErrorBaseResponse<void>('error');
 
-      when(
-        remoteDataSource.logout(),
-      ).thenAnswer((_) async => errorResponse);
+      when(remoteDataSource.logout()).thenAnswer((_) async => errorResponse);
 
       when(
-        secureCacheHelper.deleteData(
-          key: anyNamed('key'),
-        ),
+        secureCacheHelper.deleteData(key: anyNamed('key')),
       ).thenAnswer((_) async {});
 
       final result = await repo.logout();
@@ -88,109 +68,63 @@ void main() {
 
       verify(remoteDataSource.logout()).called(1);
 
-      verify(
-        secureCacheHelper.deleteData(
-          key: AppKeys.tokenKey,
-        ),
-      ).called(1);
+      verify(secureCacheHelper.deleteData(key: AppKeys.tokenKey)).called(1);
     });
   });
 
   group('profile', () {
-    test('should return DriverEntity when profile request succeeds',
-        () async {
+    test('should return DriverEntity when profile request succeeds', () async {
       final profileResponse = ProfileResponse(
-        driver: DriverModel(
-          firstName: 'Ahmed',
-          lastName: 'Ali',
-        ),
+        driver: DriverModel(firstName: 'Ahmed', lastName: 'Ali'),
       );
 
-      when(
-        remoteDataSource.profile(),
-      ).thenAnswer(
-        (_) async => SuccessBaseResponse<ProfileResponse>(
-          profileResponse,
-        ),
+      when(remoteDataSource.profile()).thenAnswer(
+        (_) async => SuccessBaseResponse<ProfileResponse>(profileResponse),
       );
 
       final result = await repo.profile();
 
-      expect(
-        result,
-        isA<SuccessBaseResponse<DriverEntity>>(),
+      expect(result, isA<SuccessBaseResponse<DriverEntity>>());
+
+      final successResult = result as SuccessBaseResponse<DriverEntity>;
+
+      expect(successResult.data?.firstName, 'Ahmed');
+
+      verify(remoteDataSource.profile()).called(1);
+    });
+
+    test('should return userNotFound when driver is null', () async {
+      final profileResponse = ProfileResponse(driver: null);
+
+      when(remoteDataSource.profile()).thenAnswer(
+        (_) async => SuccessBaseResponse<ProfileResponse>(profileResponse),
       );
 
-      final successResult =
-          result as SuccessBaseResponse<DriverEntity>;
+      final result = await repo.profile();
 
-      expect(
-        successResult.data?.firstName,
-        'Ahmed',
-      );
+      expect(result, isA<ErrorBaseResponse<DriverEntity>>());
+
+      final error = result as ErrorBaseResponse<DriverEntity>;
+
+      expect(error.errorMessage, AppStrings.userNotFound);
 
       verify(remoteDataSource.profile()).called(1);
     });
 
     test(
-      'should return userNotFound when driver is null',
-      () async {
-        final profileResponse = ProfileResponse(
-          driver: null,
-        );
-
-        when(
-          remoteDataSource.profile(),
-        ).thenAnswer(
-          (_) async => SuccessBaseResponse<ProfileResponse>(
-            profileResponse,
-          ),
-        );
-
-        final result = await repo.profile();
-
-        expect(
-          result,
-          isA<ErrorBaseResponse<DriverEntity>>(),
-        );
-
-        final error =
-            result as ErrorBaseResponse<DriverEntity>;
-
-        expect(
-          error.errorMessage,
-          AppStrings.userNotFound,
-        );
-
-        verify(remoteDataSource.profile()).called(1);
-      },
-    );
-
-    test(
       'should return error response when remote data source fails',
       () async {
-        when(
-          remoteDataSource.profile(),
-        ).thenAnswer(
-          (_) async => ErrorBaseResponse<ProfileResponse>(
-            'server error',
-          ),
+        when(remoteDataSource.profile()).thenAnswer(
+          (_) async => ErrorBaseResponse<ProfileResponse>('server error'),
         );
 
         final result = await repo.profile();
 
-        expect(
-          result,
-          isA<ErrorBaseResponse<DriverEntity>>(),
-        );
+        expect(result, isA<ErrorBaseResponse<DriverEntity>>());
 
-        final error =
-            result as ErrorBaseResponse<DriverEntity>;
+        final error = result as ErrorBaseResponse<DriverEntity>;
 
-        expect(
-          error.errorMessage,
-          'server error',
-        );
+        expect(error.errorMessage, 'server error');
 
         verify(remoteDataSource.profile()).called(1);
       },

@@ -5,7 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 class ProfileTile extends StatelessWidget {
   const ProfileTile({
     super.key,
-     this.leading,
+    this.leading,
     required this.child,
     required this.onTap,
   });
@@ -34,7 +34,7 @@ class ProfileTile extends StatelessWidget {
         ),
         child: Row(
           children: [
-            leading??SizedBox(),
+            leading ?? SizedBox(),
             SizedBox(width: 16.w),
             Expanded(child: child),
             IconButton(

@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'config/cache/hive_helper.dart';
 import 'config/di/di.dart';
+import 'config/services/firebase_service.dart';
 import 'core/utils/app_constants.dart';
 import 'core/utils/app_routes.dart';
 import 'core/utils/app_theme.dart';
@@ -12,6 +13,9 @@ import 'core/utils/app_theme.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
+
+  // Initialize Firebase
+  await FirebaseService.init();
 
   configureDependencies();
 
