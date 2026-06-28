@@ -12,11 +12,15 @@ abstract class AppEndPoints {
   static const String resetPassword = "$baseUrl/drivers/resetPassword";
   static const String changePassword = '$baseUrl/drivers/change-password';
   static const String logout = "$baseUrl/drivers/logout";
+  static const String vehcicls = "$baseUrl/vehicles";
 
   // Driver Profile:
   static const String profileData = "$baseUrl/drivers/profile-Data";
   static const String editProfile = "$baseUrl/drivers/editProfile";
   static const String uploadPhoto = "$baseUrl/drivers/upload-photo";
+
+  // Orders:
+  static const String pendingOrders = "$baseUrl/orders/pending-orders";
 
   // General:
   static const String addresses = "$baseUrl/addresses";
