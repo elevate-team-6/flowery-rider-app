@@ -77,7 +77,8 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
       ),
       body: BlocBuilder<HomeCubit, HomeStates>(
         buildWhen: (previous, current) =>
-            previous.pendingOrdersState != current.pendingOrdersState,
+            previous.pendingOrdersState != current.pendingOrdersState ||
+            previous.rejectingOrderId != current.rejectingOrderId,
         builder: (context, state) {
           final ordersState = state.pendingOrdersState;
 
@@ -109,8 +110,11 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
               itemBuilder: (context, index) {
                 final order = orders[index];
                 final cubit = context.read<HomeCubit>();
+                final isRejecting =
+                    order.id != null && state.rejectingOrderId == order.id;
                 return OrderCard(
                   order: order,
+                  isRejecting: isRejecting,
                   onAccept: () => cubit.doEvent(AcceptOrderEvent(order)),
                   onReject: () => cubit.doEvent(RejectOrderEvent(order.id)),
                 );

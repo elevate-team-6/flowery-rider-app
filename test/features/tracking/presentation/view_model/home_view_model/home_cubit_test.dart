@@ -184,10 +184,15 @@ void main() {
       act: (cubit) => cubit.doEvent(const RejectOrderEvent('1')),
       expect: () => [
         isA<HomeStates>().having(
-          (s) => s.pendingOrdersState.data?.orders,
-          'orders',
-          [order2],
+          (s) => s.rejectingOrderId,
+          'rejectingOrderId',
+          '1',
         ),
+        isA<HomeStates>()
+            .having((s) => s.pendingOrdersState.data?.orders, 'orders', [
+              order2,
+            ])
+            .having((s) => s.rejectingOrderId, 'rejectingOrderId', isNull),
       ],
     );
 
