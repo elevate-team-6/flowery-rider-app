@@ -24,5 +24,24 @@ class ProfileRepoImpl implements ProfileRepoContract {
   Future<BaseResponse<String>> changePassword(
     String password,
     String newPassword,
-  ) => _remoteDataSource.changePassword(password, newPassword);
+  ) async {
+    final result = await _remoteDataSource.changePassword(
+      password,
+      newPassword,
+    );
+
+    switch (result) {
+      case SuccessBaseResponse<String>():
+        if (result.data != null && result.data!.isNotEmpty) {
+          await _secureCacheHelper.writeData(
+            key: AppKeys.tokenKey,
+            value: result.data!,
+          );
+        }
+        return result;
+
+      case ErrorBaseResponse<String>():
+        return result;
+    }
+  }
 }

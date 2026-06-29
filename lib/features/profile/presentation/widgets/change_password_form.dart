@@ -1,6 +1,7 @@
 import 'package:flowery_rider_app/config/validations/app_validations.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/change_password/change_password_cubit.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/change_password/change_password_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -91,16 +92,17 @@ class _ChangePasswordFormState extends State<ChangePasswordForm> {
               textInputAction: TextInputAction.done,
             ),
             SizedBox(height: 40.h),
-            UpdatePasswordButton(
-              isFormValid: _isFormValid,
-              isLoading: context
-                  .watch<ChangePasswordCubit>()
-                  .state
-                  .changePasswordState
-                  .isLoading,
-              formKey: widget.formKey,
-              currentPassword: widget.currentPasswordController.text,
-              newPassword: widget.newPasswordController.text,
+            BlocSelector<ChangePasswordCubit, ChangePasswordState, bool>(
+              selector: (state) => state.changePasswordState.isLoading,
+              builder: (context, isLoading) {
+                return UpdatePasswordButton(
+                  isFormValid: _isFormValid,
+                  isLoading: isLoading,
+                  formKey: widget.formKey,
+                  currentPassword: widget.currentPasswordController.text,
+                  newPassword: widget.newPasswordController.text,
+                );
+              },
             ),
           ],
         ),
