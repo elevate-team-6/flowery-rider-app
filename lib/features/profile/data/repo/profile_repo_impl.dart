@@ -1,13 +1,19 @@
-import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'dart:io';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/features/profile/data/models/response/profile_response.dart';
-import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../config/base_response/base_response.dart';
 import '../../../../config/cache/secure_cache_helper.dart';
+import '../../../../core/exceptions/missing_field_exception.dart';
 import '../../../../core/utils/app_keys.dart';
+import '../../../../core/utils/app_strings.dart';
+import '../../domain/entities/driver_entity.dart';
 import '../../domain/repo/profile_repo_contract.dart';
 import '../data_sources/profile_remote_data_source_contract.dart';
+import '../models/request/edit_profile_request.dart';
+import '../models/response/profile_response_model.dart';
 
 @Injectable(as: ProfileRepoContract)
 class ProfileRepoImpl implements ProfileRepoContract {
@@ -38,6 +44,45 @@ class ProfileRepoImpl implements ProfileRepoContract {
 
       case ErrorBaseResponse<ProfileResponse>():
         return ErrorBaseResponse<DriverEntity>(response.errorMessage);
+    }
+  }
+
+  @override
+  Future<BaseResponse<DriverEntity>> getProfileData() async {
+    final result = await _remoteDataSource.getProfileData();
+    return _mapToEntity(result);
+  }
+
+  @override
+  Future<BaseResponse<DriverEntity>> editProfile(
+    EditProfileRequest request,
+  ) async {
+    final result = await _remoteDataSource.editProfile(request);
+    return _mapToEntity(result);
+  }
+
+  @override
+  Future<BaseResponse<DriverEntity>> uploadPhoto(File photo) async {
+    final result = await _remoteDataSource.uploadPhoto(photo);
+    return _mapToEntity(result);
+  }
+
+  BaseResponse<DriverEntity> _mapToEntity(
+    BaseResponse<ProfileResponseModel> result,
+  ) {
+    return switch (result) {
+      SuccessBaseResponse<ProfileResponseModel>() => _mapDriver(result.data),
+      ErrorBaseResponse<ProfileResponseModel>() => ErrorBaseResponse(
+        result.errorMessage,
+      ),
+    };
+  }
+
+  BaseResponse<DriverEntity> _mapDriver(ProfileResponseModel? data) {
+    try {
+      return SuccessBaseResponse(data?.driver?.toEntity());
+    } on MissingFieldException {
+      return ErrorBaseResponse(AppStrings.unexpectedError.tr());
     }
   }
 }

@@ -35,6 +35,11 @@ class DriverEntity extends Equatable {
     this.createdAt,
   });
 
+  String get fullName => [
+    firstName,
+    lastName,
+  ].where((part) => part != null && part.isNotEmpty).join(' ');
+
   @override
   List<Object?> get props => [
     id,
