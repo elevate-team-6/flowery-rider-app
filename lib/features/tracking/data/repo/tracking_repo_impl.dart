@@ -20,12 +20,18 @@ class TrackingRepoImpl implements TrackingRepoContract {
   TrackingRepoImpl(this._remoteDataSource, this._hiveHelper);
 
   @override
-  Future<BaseResponse<List<OrderEntity>>> getDriverOrders() async {
-    final response = await _remoteDataSource.getDriverOrders();
+  Future<BaseResponse<DriverOrdersEntity>> getDriverOrders({int? page}) async {
+    final response = await _remoteDataSource.getDriverOrders(page: page);
     return switch (response) {
-      SuccessBaseResponse<AllDriverOrdersResponseModel>() => _handleMapping(
-        () => response.data?.orders?.map((e) => e.toEntity()).toList(),
-      ),
+      SuccessBaseResponse<AllDriverOrdersResponseModel>() => _handleMapping(() {
+        final orders =
+            response.data?.orders?.map((e) => e.toEntity()).toList() ?? [];
+        return DriverOrdersEntity(
+          orders: orders,
+          currentPage: response.data?.metadata?.currentPage ?? 1,
+          totalPages: response.data?.metadata?.totalPages ?? 1,
+        );
+      }),
       ErrorBaseResponse<AllDriverOrdersResponseModel>() => ErrorBaseResponse(
         response.errorMessage,
       ),

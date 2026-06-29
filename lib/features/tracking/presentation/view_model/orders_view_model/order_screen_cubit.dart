@@ -23,23 +23,28 @@ class OrderScreenCubit extends BaseCubit<OrderScreenState, BaseUiEvent> {
         _getDriverOrders();
       case RefreshOrdersEvent():
         _getDriverOrders();
+      case ChangePageEvent():
+        _getDriverOrders(page: event.page);
       case OrderTappedEvent():
         _onOrderTapped(event.order);
     }
   }
 
-  Future<void> _getDriverOrders() async {
+  Future<void> _getDriverOrders({int page = 1}) async {
     emit(state.copyWith(ordersState: const BaseState(isLoading: true)));
 
-    final response = await _getDriverOrdersUseCase();
+    final response = await _getDriverOrdersUseCase(page: page);
 
     switch (response) {
-      case SuccessBaseResponse<List<OrderEntity>>():
-        final orders = response.data ?? [];
+      case SuccessBaseResponse<DriverOrdersEntity>():
+        final driverOrders = response.data;
+        if (driverOrders == null) return;
+
+        final orders = driverOrders.orders;
 
         // Calculate counts based on order state
         final cancelledCount = orders
-            .where((o) => o.state.toLowerCase() == 'cancelled')
+            .where((o) => o.state.toLowerCase() == 'canceled')
             .length;
         final completedCount = orders
             .where((o) => o.state.toLowerCase() == 'completed')
@@ -50,9 +55,11 @@ class OrderScreenCubit extends BaseCubit<OrderScreenState, BaseUiEvent> {
             ordersState: BaseState(data: orders),
             cancelledCount: cancelledCount,
             completedCount: completedCount,
+            currentPage: driverOrders.currentPage,
+            totalPages: driverOrders.totalPages,
           ),
         );
-      case ErrorBaseResponse<List<OrderEntity>>():
+      case ErrorBaseResponse<DriverOrdersEntity>():
         emit(
           state.copyWith(
             ordersState: BaseState(errorMessage: response.errorMessage),

@@ -6,7 +6,9 @@ import '../models/response/pending_orders_response_model.dart';
 import '../models/response/update_order_state_response_model.dart';
 
 abstract interface class TrackingRemoteDataSourceContract {
-  Future<BaseResponse<AllDriverOrdersResponseModel>> getDriverOrders();
+  Future<BaseResponse<AllDriverOrdersResponseModel>> getDriverOrders({
+    int? page,
+  });
 
   Future<BaseResponse<UpdateOrderStateResponseModel>> startOrder(String id);
 

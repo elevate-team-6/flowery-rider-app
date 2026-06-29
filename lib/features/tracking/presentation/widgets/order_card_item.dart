@@ -45,7 +45,7 @@ class OrderCardItem extends StatelessWidget {
                   AppStrings.flowerOrder.tr(),
                   style: AppTextStyles.black16600,
                 ),
-                Text('#${order.orderNumber}', style: AppTextStyles.black16600),
+                Text(order.orderNumber, style: AppTextStyles.black16600),
               ],
             ),
             SizedBox(height: 12.h),

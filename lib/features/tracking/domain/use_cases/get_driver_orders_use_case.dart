@@ -9,7 +9,7 @@ class GetDriverOrdersUseCase {
 
   GetDriverOrdersUseCase(this._repository);
 
-  Future<BaseResponse<List<OrderEntity>>> call() {
-    return _repository.getDriverOrders();
+  Future<BaseResponse<DriverOrdersEntity>> call({int? page}) {
+    return _repository.getDriverOrders(page: page);
   }
 }

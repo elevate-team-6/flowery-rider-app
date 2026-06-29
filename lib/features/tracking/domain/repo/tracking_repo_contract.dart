@@ -3,7 +3,7 @@ import 'package:flowery_rider_app/features/tracking/data/models/request/update_o
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 
 abstract interface class TrackingRepoContract {
-  Future<BaseResponse<List<OrderEntity>>> getDriverOrders();
+  Future<BaseResponse<DriverOrdersEntity>> getDriverOrders({int? page});
 
   Future<BaseResponse<OrderEntity>> startOrder(String id);
 

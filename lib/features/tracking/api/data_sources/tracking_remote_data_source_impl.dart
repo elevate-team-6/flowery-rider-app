@@ -16,8 +16,12 @@ class TrackingRemoteDataSourceImpl implements TrackingRemoteDataSourceContract {
   TrackingRemoteDataSourceImpl(this._apiClient);
 
   @override
-  Future<BaseResponse<AllDriverOrdersResponseModel>> getDriverOrders() {
-    return ErrorHandler.handleApiCall(() => _apiClient.getDriverOrders());
+  Future<BaseResponse<AllDriverOrdersResponseModel>> getDriverOrders({
+    int? page,
+  }) {
+    return ErrorHandler.handleApiCall(
+      () => _apiClient.getDriverOrders(page: page),
+    );
   }
 
   @override

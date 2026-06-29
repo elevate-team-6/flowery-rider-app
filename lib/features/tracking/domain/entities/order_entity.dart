@@ -10,6 +10,21 @@ class PendingOrdersEntity extends Equatable {
   List<Object?> get props => [message, orders];
 }
 
+class DriverOrdersEntity extends Equatable {
+  final List<OrderEntity> orders;
+  final int currentPage;
+  final int totalPages;
+
+  const DriverOrdersEntity({
+    required this.orders,
+    required this.currentPage,
+    required this.totalPages,
+  });
+
+  @override
+  List<Object?> get props => [orders, currentPage, totalPages];
+}
+
 class OrderEntity extends Equatable {
   final String id;
   final String orderNumber;

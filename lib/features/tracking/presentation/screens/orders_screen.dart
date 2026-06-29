@@ -16,6 +16,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 
 import '../widgets/orders_list_view.dart';
 import '../widgets/orders_tab_summary_section.dart';
+import '../widgets/pagination_bar.dart';
 
 class OrdersScreen extends StatefulWidget {
   final bool isActive;
@@ -94,6 +95,26 @@ class _OrdersScreenState extends State<OrdersScreen> with UiEventHandler {
                     ),
                   ),
                   const OrdersListView(),
+                  SliverToBoxAdapter(
+                    child: BlocBuilder<OrderScreenCubit, OrderScreenState>(
+                      buildWhen: (previous, current) =>
+                          previous.currentPage != current.currentPage ||
+                          previous.totalPages != current.totalPages,
+                      builder: (context, state) {
+                        if (state.totalPages <= 1) {
+                          return const SizedBox.shrink();
+                        }
+                        return PaginationBar(
+                          currentPage: state.currentPage,
+                          totalPages: state.totalPages,
+                          onPageChanged: (page) => context
+                              .read<OrderScreenCubit>()
+                              .doEvent(ChangePageEvent(page)),
+                        );
+                      },
+                    ),
+                  ),
+                  SliverToBoxAdapter(child: SizedBox(height: 16.h)),
                 ],
               ),
             );

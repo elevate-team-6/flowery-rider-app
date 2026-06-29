@@ -18,7 +18,9 @@ abstract class TrackingApiClient {
   factory TrackingApiClient(Dio dio) = _TrackingApiClient;
 
   @GET(AppEndPoints.driverOrders)
-  Future<AllDriverOrdersResponseModel> getDriverOrders();
+  Future<AllDriverOrdersResponseModel> getDriverOrders({
+    @Query(ApiParameters.pageQueryParam) int? page,
+  });
 
   @PUT('${AppEndPoints.startOrder}{id}')
   Future<UpdateOrderStateResponseModel> startOrder(@Path('id') String id);
