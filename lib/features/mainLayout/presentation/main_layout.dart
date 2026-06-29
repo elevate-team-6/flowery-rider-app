@@ -17,16 +17,29 @@ class MainLayout extends StatefulWidget {
 class _MainLayoutState extends State<MainLayout> {
   int currentIndex = 0;
 
-  final List<Widget> pages = const [
-    HomeScreen(),
-    OrdersScreen(),
-    ProfileScreen(),
-  ];
+  late final List<Widget> pages;
+
+  @override
+  void initState() {
+    super.initState();
+    pages = [
+      const HomeScreen(),
+      OrdersScreen(isActive: currentIndex == 1),
+      const ProfileScreen(),
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Update pages with new activity status when index changes
+    final currentPages = [
+      const HomeScreen(),
+      OrdersScreen(isActive: currentIndex == 1),
+      const ProfileScreen(),
+    ];
+
     return Scaffold(
-      body: IndexedStack(index: currentIndex, children: pages),
+      body: IndexedStack(index: currentIndex, children: currentPages),
 
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(

@@ -13,6 +13,7 @@ import 'package:flowery_rider_app/features/splash/presentation/pages/splash_scre
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_success_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_cubit.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -32,6 +33,7 @@ abstract class AppRoutes {
   static const String orderDetails = 'orderDetails';
   static const String orderSuccess = 'orderSuccess';
   static const String mapScreen = 'mapScreen';
+  static const String driverOrderDetails = 'driverOrderDetails';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
@@ -71,7 +73,10 @@ abstract class AppRoutes {
           return MaterialPageRoute(builder: (_) => const SuccessApplyScreen());
         case mainLayout:
           return MaterialPageRoute(
-            builder: (_) => const MainLayout(),
+            builder: (_) => BlocProvider(
+              create: (context) => getIt<OrderScreenCubit>(),
+              child: const MainLayout(),
+            ),
             settings: settings,
           );
 
