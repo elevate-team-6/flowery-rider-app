@@ -21,7 +21,9 @@ import 'profile_repo_impl_test.mocks.dart';
 @GenerateMocks([ProfileRemoteDataSourceContract, SecureCacheHelper])
 void main() {
   setUpAll(() {
-    provideDummy<BaseResponse<ProfileResponseModel>>(ErrorBaseResponse('dummy'));
+    provideDummy<BaseResponse<ProfileResponseModel>>(
+      ErrorBaseResponse('dummy'),
+    );
     provideDummy<BaseResponse<ProfileResponse>>(
       ErrorBaseResponse<ProfileResponse>('dummy'),
     );

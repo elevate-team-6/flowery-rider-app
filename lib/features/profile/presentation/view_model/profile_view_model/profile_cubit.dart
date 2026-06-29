@@ -6,11 +6,11 @@ import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/profile/domain/use_cases/profile_use_case.dart';
-import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_events.dart';
-import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_states.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_events.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_states.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../domain/use_cases/logout_use_case.dart';
+import '../../../domain/use_cases/logout_use_case.dart';
 
 @injectable
 class ProfileCubit extends BaseCubit<ProfileStates, BaseUiEvent> {

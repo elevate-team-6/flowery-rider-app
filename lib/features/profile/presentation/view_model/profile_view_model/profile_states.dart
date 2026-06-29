@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-import '../../../../config/base_state/base_state.dart';
-import '../../domain/entities/driver_entity.dart';
+import '../../../../../config/base_state/base_state.dart';
+import '../../../domain/entities/driver_entity.dart';
 
 class ProfileStates extends Equatable {
   final BaseState<DriverEntity> profileState;

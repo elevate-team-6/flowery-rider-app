@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
-import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_events.dart';
-import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_states.dart';
+import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_events.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_states.dart';
 import 'package:flowery_rider_app/features/profile/presentation/widgets/language_bottom_sheet.dart';
 import 'package:flowery_rider_app/features/profile/presentation/widgets/notifications_badge.dart';
 import 'package:flowery_rider_app/features/profile/presentation/widgets/profile_menu_item.dart';
@@ -16,11 +17,12 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../../../../core/utils/app_assets.dart';
 import '../../../../../core/utils/app_colors.dart';
+import '../../../../../core/utils/app_routes.dart';
 import '../../../../../core/utils/app_strings.dart';
 import '../../../../../core/utils/app_text_styles.dart';
 import '../../../../config/base_ui_event/base_ui_event.dart';
 import '../../../../config/base_ui_handler/ui_event_handler_mixin.dart';
-import '../view_model/profile_cubit.dart';
+import '../view_model/profile_view_model/profile_cubit.dart';
 import 'logout_dialog.dart';
 
 class ProfileBody extends StatefulWidget {
@@ -55,7 +57,6 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
       appBar: AppBar(
         actionsPadding: const EdgeInsets.symmetric(horizontal: 12),
         title: Text(AppStrings.profile.tr(), style: AppTextStyles.black20500),
-        leading: Icon(Icons.arrow_back_ios_new_outlined),
         actions: [
           NotificationBadge(
             count: '3',
@@ -91,7 +92,22 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                             child: const Icon(Icons.person),
                           ),
                   ),
-                  onTap: () {},
+                  onTap: () async {
+                    if (driver == null) return;
+                    final cubit = context.read<ProfileCubit>();
+                    final result = await Navigator.pushNamed(
+                      context,
+                      AppRoutes.editProfile,
+                      arguments: driver,
+                    );
+                    if (result is DriverEntity) {
+                      final photo = driver.photo;
+                      if (photo != null && photo.isNotEmpty) {
+                        await NetworkImage(photo).evict();
+                      }
+                      cubit.doEvent(const GetProfileEvent());
+                    }
+                  },
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: Column(

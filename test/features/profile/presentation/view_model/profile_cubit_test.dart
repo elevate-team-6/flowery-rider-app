@@ -9,9 +9,9 @@ import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
 import 'package:flowery_rider_app/features/profile/domain/use_cases/logout_use_case.dart';
 import 'package:flowery_rider_app/features/profile/domain/use_cases/profile_use_case.dart';
-import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_cubit.dart';
-import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_events.dart';
-import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_states.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_cubit.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_events.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_states.dart';
 
 import 'profile_cubit_test.mocks.dart';
 

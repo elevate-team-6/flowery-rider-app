@@ -1,31 +1,65 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+// ignore: depend_on_referenced_packages
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
+import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
 import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
-import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_cubit.dart';
-import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_states.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_cubit.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_states.dart';
 import 'package:flowery_rider_app/features/profile/presentation/widgets/profile_body.dart';
 
 import 'profile_body_test.mocks.dart';
+
+class _InMemoryAssetLoader extends AssetLoader {
+  const _InMemoryAssetLoader(this._data);
+
+  /// Translations keyed by language code (e.g. `en`, `ar`).
+  final Map<String, Map<String, dynamic>> _data;
+
+  @override
+  Future<Map<String, dynamic>> load(String path, Locale locale) async =>
+      _data[locale.languageCode] ?? const {};
+}
 
 @GenerateMocks([ProfileCubit])
 void main() {
   late MockProfileCubit mockProfileCubit;
   late StreamController<BaseUiEvent> uiEventStreamController;
+  late Map<String, Map<String, dynamic>> translations;
 
-  setUpAll(() {
-    TestWidgetsFlutterBinding.ensureInitialized();
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues({});
+    await EasyLocalization.ensureInitialized();
+
+    translations = {
+      AppConstants.englishCode:
+          json.decode(
+                await rootBundle.loadString(
+                  '${AppConstants.translationsPath}/${AppConstants.englishCode}.json',
+                ),
+              )
+              as Map<String, dynamic>,
+      AppConstants.arabicCode:
+          json.decode(
+                await rootBundle.loadString(
+                  '${AppConstants.translationsPath}/${AppConstants.arabicCode}.json',
+                ),
+              )
+              as Map<String, dynamic>,
+    };
   });
 
   setUp(() {
@@ -47,28 +81,25 @@ void main() {
   Widget createWidgetUnderTest() {
     return EasyLocalization(
       supportedLocales: const [Locale('en'), Locale('ar')],
-      path: 'assets/translations',
+      path: AppConstants.translationsPath,
+      fallbackLocale: const Locale('en'),
       startLocale: const Locale('en'),
-      saveLocale: false,
-      useOnlyLangCode: true,
+      assetLoader: _InMemoryAssetLoader(translations),
       child: ScreenUtilInit(
         designSize: const Size(375, 812),
         builder: (_, _) {
-          return DefaultAssetBundle(
-            bundle: TestAssetBundle(),
-            child: Builder(
-              builder: (context) {
-                return MaterialApp(
-                  localizationsDelegates: context.localizationDelegates,
-                  supportedLocales: context.supportedLocales,
-                  locale: context.locale,
-                  home: BlocProvider<ProfileCubit>.value(
-                    value: mockProfileCubit,
-                    child: const ProfileBody(),
-                  ),
-                );
-              },
-            ),
+          return Builder(
+            builder: (context) {
+              return MaterialApp(
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
+                home: BlocProvider<ProfileCubit>.value(
+                  value: mockProfileCubit,
+                  child: const ProfileBody(),
+                ),
+              );
+            },
           );
         },
       ),
@@ -126,22 +157,4 @@ void main() {
       expect(find.text('123 XYZ'), findsOneWidget);
     });
   });
-}
-
-class TestAssetBundle extends CachingAssetBundle {
-  @override
-  Future<ByteData> load(String key) async {
-    if (key.endsWith('.json')) {
-      return ByteData.view(Uint8List.fromList('{}'.codeUnits).buffer);
-    }
-
-    if (key.endsWith('.svg')) {
-      const svg =
-          '<svg width="10" height="10"><rect width="10" height="10"/></svg>';
-
-      return ByteData.view(Uint8List.fromList(svg.codeUnits).buffer);
-    }
-
-    return ByteData(0);
-  }
 }
