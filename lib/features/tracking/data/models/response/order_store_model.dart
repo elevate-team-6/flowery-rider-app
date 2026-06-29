@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 
 class OrderStoreModel extends Equatable {
@@ -30,7 +31,11 @@ class OrderStoreModel extends Equatable {
     List<String>? latLngList = latLong?.split(',');
     return StoreEntity(
       name: name ?? '',
-      image: image ?? '',
+      image: (image != null && image!.isNotEmpty)
+          ? (image!.startsWith('http')
+                ? image!
+                : '${AppConstants.imageBaseUrl}$image')
+          : '',
       address: address ?? '',
       phoneNumber: phoneNumber ?? '',
       lat: (latLngList != null && latLngList.isNotEmpty) ? latLngList[0] : '',
