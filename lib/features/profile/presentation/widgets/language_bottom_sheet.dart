@@ -1,5 +1,6 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/utils/app_colors.dart';
+import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/utils/app_text_styles.dart';
 import 'package:flutter/material.dart';
@@ -41,9 +42,9 @@ class LanguageBottomSheet extends StatelessWidget {
           _buildLanguageItem(
             context: context,
             title: AppStrings.arabic.tr(),
-            isSelected: currentLocale == 'ar',
+            isSelected: currentLocale == AppConstants.arabicCode,
             onSelect: () {
-              context.setLocale(const Locale('ar'));
+              context.setLocale(const Locale(AppConstants.arabicCode));
               Navigator.pop(context);
             },
           ),
@@ -51,9 +52,9 @@ class LanguageBottomSheet extends StatelessWidget {
           _buildLanguageItem(
             context: context,
             title: AppStrings.english.tr(),
-            isSelected: currentLocale == 'en',
+            isSelected: currentLocale == AppConstants.englishCode,
             onSelect: () {
-              context.setLocale(const Locale('en'));
+              context.setLocale(const Locale(AppConstants.englishCode));
               Navigator.pop(context);
             },
           ),

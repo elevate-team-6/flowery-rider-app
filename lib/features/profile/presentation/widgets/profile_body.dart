@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_events.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_states.dart';
@@ -134,7 +135,7 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                     height: 24,
                   ),
                   trailing: Text(
-                    context.locale.languageCode == 'ar'
+                    context.locale.languageCode == AppConstants.arabicCode
                         ? AppStrings.arabic.tr()
                         : AppStrings.english.tr(),
                     style: AppTextStyles.primary12400,
