@@ -49,9 +49,13 @@ Every feature MUST be divided into exactly these 4 layers with these exact folde
 - **Logic Flows**: `Initialize` events should handle the full sequence of startup operations.
 - **Safety First**: NEVER use the null-assertion operator `!` on `state.data`. Always use `if (state.data == null) return;`.
 - **Side Effects**: Mandatory use of `BaseUiEvent` for all UI interactions.
+- **Manual Stream Management (MANDATORY)**: For UI side effects, screens MUST manually subscribe to the Cubit's `uiEvents` stream in `initState()` and cancel it in `dispose()`. Use a `late StreamSubscription<BaseUiEvent> _uiSubscription;`.
 
 ## 5. Screen & UI Standards (Zero Tolerance for Null logic)
 - **Clean UI Logic**: Since Entities are non-nullable, UI code MUST NOT contain null-checks (`?`), null-aware operators (`??`), or assertions (`!`) when accessing Entity properties.
+- **Loading & Empty States**: 
+    - MANDATORY use of `Skeletonizer` for loading states to show the UI structure.
+    - MANDATORY use of `Lottie` for empty states to provide a premium user experience.
 - **Bloc Optimization (Mandatory)**: 
     - `BlocBuilder` MUST ONLY wrap the specific widget(s) that require rebuilding. NEVER wrap a whole screen or large static layouts with a generic `BlocBuilder`.
     - MANDATORY use of `buildWhen`: Every `BlocBuilder` MUST implement `buildWhen` to prevent unnecessary rebuilds by filtering for specific state changes (e.g., `previous.status != current.status`).
