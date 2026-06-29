@@ -1,3 +1,6 @@
+import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'package:flowery_rider_app/features/profile/data/models/response/profile_response.dart';
+import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../config/base_response/base_response.dart';
@@ -18,5 +21,23 @@ class ProfileRepoImpl implements ProfileRepoContract {
     final result = await _remoteDataSource.logout();
     await _secureCacheHelper.deleteData(key: AppKeys.tokenKey);
     return result;
+  }
+
+  @override
+  Future<BaseResponse<DriverEntity>> profile() async {
+    final response = await _remoteDataSource.profile();
+    switch (response) {
+      case SuccessBaseResponse<ProfileResponse>():
+        if (response.data!.driver != null) {
+          return SuccessBaseResponse<DriverEntity>(
+            response.data!.driver!.toEntity(),
+          );
+        } else {
+          return ErrorBaseResponse<DriverEntity>(AppStrings.userNotFound);
+        }
+
+      case ErrorBaseResponse<ProfileResponse>():
+        return ErrorBaseResponse<DriverEntity>(response.errorMessage);
+    }
   }
 }
