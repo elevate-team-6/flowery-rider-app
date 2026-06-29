@@ -25,7 +25,7 @@ class OrdersTabSummarySection extends StatelessWidget {
               Expanded(
                 child: _SummaryBox(
                   count: state.cancelledCount,
-                  label: AppStrings.requestCancelled.tr(),
+                  label: AppStrings.cancelledStatus.tr(),
                   icon: Icons.cancel_outlined,
                   color: AppColors.error,
                 ),

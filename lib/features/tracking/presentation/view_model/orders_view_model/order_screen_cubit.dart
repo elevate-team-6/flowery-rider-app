@@ -1,233 +1,67 @@
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
-import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
-import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
-import 'package:flowery_rider_app/core/utils/app_strings.dart';
-import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
-import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
-import 'package:flowery_rider_app/features/tracking/domain/use_cases/cache_active_order_use_case.dart';
-import 'package:flowery_rider_app/features/tracking/domain/use_cases/clear_active_order_use_case.dart';
-import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_active_order_use_case.dart';
-import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
-import 'package:flowery_rider_app/features/tracking/domain/use_cases/start_order_use_case.dart';
-import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_order_state_use_case.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_states.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_driver_orders_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_events.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_states.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../../../config/base_response/base_response.dart';
 import '../../../../../config/base_state/base_state.dart';
+import '../../../domain/entities/order_entity.dart';
 
 @injectable
-class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
-  final UpdateOrderStateUseCase _updateOrderStateUseCase;
-  final StartOrderUseCase _startOrderUseCase;
-  final OpenCommunicationUseCase _openCommunicationUseCase;
-  final CacheActiveOrderUseCase _cacheActiveOrderUseCase;
-  final GetActiveOrderUseCase _getActiveOrderUseCase;
-  final ClearActiveOrderUseCase _clearActiveOrderUseCase;
+class OrderScreenCubit extends BaseCubit<OrderScreenState, BaseUiEvent> {
+  final GetDriverOrdersUseCase _getDriverOrdersUseCase;
 
-  OrderDetailsCubit(
-    this._updateOrderStateUseCase,
-    this._startOrderUseCase,
-    this._openCommunicationUseCase,
-    this._cacheActiveOrderUseCase,
-    this._getActiveOrderUseCase,
-    this._clearActiveOrderUseCase,
-  ) : super(const OrderDetailsState());
+  OrderScreenCubit(this._getDriverOrdersUseCase)
+    : super(const OrderScreenState());
 
-  void doEvent(OrderDetailsEvents event) {
+  void doEvent(OrdersScreenEvents event) {
     switch (event) {
-      case OrderDetailsInitializeEvent():
-        _onInitialize(event.order, initialStep: event.initialStep);
-      case OrderDetailsNextStepEvent():
-        _onNextStep();
-      case ConfirmBackButtonPressedEvent():
-        _onBackButtonPressed();
-      case RevertOrderToPendingEvent():
-        _onRevertToPending(event.orderId);
-      case NavigateToMapEvent():
-        _onNavigateToMap(event.locationType);
-      case CallPhoneEvent():
-        _onCallPhone(event.phoneNumber);
-      case OpenWhatsAppEvent():
-        _onOpenWhatsApp(event.phoneNumber);
+      case GetDriverOrdersEvent():
+        _getDriverOrders();
+      case RefreshOrdersEvent():
+        _getDriverOrders();
+      case OrderTappedEvent():
+        _onOrderTapped(event.order);
     }
   }
 
-  Future<void> _onInitialize(OrderEntity order, {int? initialStep}) async {
-    final initialBackendStatus = OrderStatus.fromString(order.state);
-    int step = initialStep ?? 1;
+  Future<void> _getDriverOrders() async {
+    emit(state.copyWith(ordersState: const BaseState(isLoading: true)));
 
-    // Check Cache first
-    final cachedData = await _getActiveOrderUseCase();
-    if (cachedData != null) {
-      final cachedOrder = OrderEntity.fromJson(cachedData[AppKeys.order]);
-      if (cachedOrder.id == order.id) {
-        final cachedStep = cachedData[AppKeys.uiStep] as int;
-        emit(
-          state.copyWith(
-            orderDetailsState: BaseState(data: cachedOrder),
-            orderStatus: OrderStatus.fromString(cachedOrder.state),
-            uiStep: cachedStep,
-          ),
-        );
-        return; // Don't call startOrder API if cached
-      }
-    }
+    final response = await _getDriverOrdersUseCase();
 
-    // Fallback if no cache
-    if (initialStep == null) {
-      if (initialBackendStatus == OrderStatus.delivered) {
-        step = 6;
-      } else if (initialBackendStatus == OrderStatus.inProgress) {
-        step = 1;
-      }
-    }
+    switch (response) {
+      case SuccessBaseResponse<List<OrderEntity>>():
+        final orders = response.data ?? [];
 
-    emit(
-      state.copyWith(
-        orderDetailsState: BaseState(data: order),
-        orderStatus: initialBackendStatus,
-        uiStep: step,
-      ),
-    );
-
-    BaseResponse<OrderEntity> startResult = await _startOrderUseCase(order.id);
-
-    if (startResult is SuccessBaseResponse<OrderEntity>) {
-      final updatedOrder = startResult.data;
-      final mergedOrder = order.mergeWith(updatedOrder);
-
-      emit(
-        state.copyWith(
-          orderDetailsState: BaseState(data: mergedOrder),
-          orderStatus: OrderStatus.fromString(mergedOrder.state),
-        ),
-      );
-      await _cacheActiveOrderUseCase(mergedOrder, state.uiStep);
-    }
-  }
-
-  Future<void> _onNextStep() async {
-    final currentStep = state.uiStep;
-    if (currentStep >= 6 || state.updateStepState.isLoading) return;
-
-    final currentOrder = state.orderDetailsState.data;
-    if (currentOrder == null) return;
-
-    final nextStep = currentStep + 1;
-    final orderId = currentOrder.id;
-
-    OrderStatus backendStatus = (nextStep == 6)
-        ? OrderStatus.delivered
-        : OrderStatus.inProgress;
-
-    emitUiEvent(ShowLoadingEvent());
-    emit(state.copyWith(updateStepState: const BaseState(isLoading: true)));
-    final result = await _updateOrderStateUseCase(orderId, backendStatus);
-    emit(state.copyWith(updateStepState: const BaseState(isLoading: false)));
-    emitUiEvent(HideLoadingEvent());
-
-    switch (result) {
-      case SuccessBaseResponse<OrderEntity>():
-        final mergedOrder = currentOrder.mergeWith(result.data);
+        // Calculate counts based on order state
+        final cancelledCount = orders
+            .where((o) => o.state.toLowerCase() == 'cancelled')
+            .length;
+        final completedCount = orders
+            .where((o) => o.state.toLowerCase() == 'completed')
+            .length;
 
         emit(
           state.copyWith(
-            orderDetailsState: BaseState(data: mergedOrder),
-            orderStatus: backendStatus,
-            uiStep: nextStep,
+            ordersState: BaseState(data: orders),
+            cancelledCount: cancelledCount,
+            completedCount: completedCount,
           ),
         );
-        if (nextStep == 6) {
-          await _clearActiveOrderUseCase();
-          emitUiEvent(
-            NavigateEvent(
-              AppRoutes.orderSuccess,
-              navigationType: NavigationType.pushReplacement,
-            ),
-          );
-        } else {
-          await _cacheActiveOrderUseCase(mergedOrder, nextStep);
-        }
-      case ErrorBaseResponse<OrderEntity>():
-        emitUiEvent(DisplayErrorEvent(result.errorMessage));
-    }
-  }
-
-  void _onBackButtonPressed() {
-    emitUiEvent(ShowConfirmationDialogEvent());
-  }
-
-  Future<void> _onRevertToPending(String orderId) async {
-    emit(state.copyWith(canselOrderState: BaseState(isLoading: true)));
-    final result = await _updateOrderStateUseCase(
-      orderId,
-      OrderStatus.canceled,
-    );
-    emit(state.copyWith(canselOrderState: BaseState()));
-    switch (result) {
-      case SuccessBaseResponse<OrderEntity>():
-        await _clearActiveOrderUseCase();
-        emitUiEvent(
-          NavigateEvent(
-            AppRoutes.mainLayout,
-            navigationType: NavigationType.pushAndRemoveUntil,
-          ),
-        );
-      case ErrorBaseResponse<OrderEntity>():
+      case ErrorBaseResponse<List<OrderEntity>>():
         emit(
           state.copyWith(
-            orderDetailsState: BaseState(errorMessage: result.errorMessage),
+            ordersState: BaseState(errorMessage: response.errorMessage),
           ),
         );
     }
   }
 
-  void _onNavigateToMap(LocationType type) {
-    final order = state.orderDetailsState.data;
-    if (order == null) return;
-
-    final lat = type == LocationType.store
-        ? order.store.lat
-        : order.shippingAddress.lat;
-    final long = type == LocationType.store
-        ? order.store.long
-        : order.shippingAddress.long;
-
-    if (lat.isNotEmpty && long.isNotEmpty) {
-      emitUiEvent(
-        NavigateEvent(
-          AppRoutes.mapScreen,
-          arguments: {
-            'targetLat': lat,
-            'targetLong': long,
-            'locationType': type,
-            'order': order,
-          },
-        ),
-      );
-    }
-  }
-
-  Future<void> _onCallPhone(String phoneNumber) async {
-    final success = await _openCommunicationUseCase(
-      phoneNumber,
-      CommunicationType.phone,
-    );
-    if (!success) {
-      emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
-    }
-  }
-
-  Future<void> _onOpenWhatsApp(String phoneNumber) async {
-    final success = await _openCommunicationUseCase(
-      phoneNumber,
-      CommunicationType.whatsapp,
-    );
-    if (!success) {
-      emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
-    }
+  void _onOrderTapped(OrderEntity order) {
+    emitUiEvent(NavigateEvent(AppRoutes.driverOrderDetails, arguments: order));
   }
 }

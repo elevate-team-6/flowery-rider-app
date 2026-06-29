@@ -1,45 +1,31 @@
 import 'package:equatable/equatable.dart';
-import 'package:flowery_rider_app/config/base_state/base_state.dart';
-import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 
-class OrderDetailsState extends Equatable {
-  final OrderStatus? orderStatus;
-  final int
-  uiStep; // 1: Accepted, 2: ArrivedAtPickup, 3: Picked, 4: OutForDelivery, 5: Arrived, 6: Delivered
-  final BaseState canselOrderState;
-  final BaseState orderDetailsState;
-  final BaseState updateStepState;
+import '../../../../../config/base_state/base_state.dart';
+import '../../../domain/entities/order_entity.dart';
 
-  const OrderDetailsState({
-    this.orderStatus,
-    this.uiStep = 1,
-    this.canselOrderState = const BaseState(),
-    this.orderDetailsState = const BaseState(),
-    this.updateStepState = const BaseState(),
+class OrderScreenState extends Equatable {
+  final BaseState<List<OrderEntity>> ordersState;
+  final int cancelledCount;
+  final int completedCount;
+
+  const OrderScreenState({
+    this.ordersState = const BaseState(),
+    this.cancelledCount = 0,
+    this.completedCount = 0,
   });
 
-  @override
-  List<Object?> get props => [
-    orderStatus,
-    uiStep,
-    canselOrderState,
-    orderDetailsState,
-    updateStepState,
-  ];
-
-  OrderDetailsState copyWith({
-    OrderStatus? orderStatus,
-    int? uiStep,
-    BaseState? canselOrderState,
-    BaseState? orderDetailsState,
-    BaseState? updateStepState,
+  OrderScreenState copyWith({
+    BaseState<List<OrderEntity>>? ordersState,
+    int? cancelledCount,
+    int? completedCount,
   }) {
-    return OrderDetailsState(
-      orderStatus: orderStatus ?? this.orderStatus,
-      uiStep: uiStep ?? this.uiStep,
-      canselOrderState: canselOrderState ?? this.canselOrderState,
-      orderDetailsState: orderDetailsState ?? this.orderDetailsState,
-      updateStepState: updateStepState ?? this.updateStepState,
+    return OrderScreenState(
+      ordersState: ordersState ?? this.ordersState,
+      cancelledCount: cancelledCount ?? this.cancelledCount,
+      completedCount: completedCount ?? this.completedCount,
     );
   }
+
+  @override
+  List<Object?> get props => [ordersState, cancelledCount, completedCount];
 }
