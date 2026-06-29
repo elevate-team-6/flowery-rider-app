@@ -5,6 +5,7 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/features/profile/api/api_client/profile_api_client.dart';
 import 'package:flowery_rider_app/features/profile/api/data_sources/profile_remote_data_source_impl.dart';
 import 'package:flowery_rider_app/features/profile/data/models/request/edit_profile_request.dart';
+import 'package:flowery_rider_app/features/profile/data/models/response/profile_response.dart';
 import 'package:flowery_rider_app/features/profile/data/models/response/profile_response_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -109,6 +110,35 @@ void main() {
       final result = await dataSource.uploadPhoto(photo);
 
       expect(result, isA<ErrorBaseResponse<ProfileResponseModel>>());
+    });
+  });
+
+  group('profile', () {
+    test(
+      'should return SuccessBaseResponse<ProfileResponse> when api succeeds',
+      () async {
+        final response = ProfileResponse();
+
+        when(mockApiClient.profile()).thenAnswer((_) async => response);
+
+        final result = await dataSource.profile();
+
+        expect(result, isA<SuccessBaseResponse<ProfileResponse>>());
+
+        verify(mockApiClient.profile()).called(1);
+        verifyNoMoreInteractions(mockApiClient);
+      },
+    );
+
+    test('should return ErrorBaseResponse when api throws exception', () async {
+      when(mockApiClient.profile()).thenThrow(Exception('server error'));
+
+      final result = await dataSource.profile();
+
+      expect(result, isA<ErrorBaseResponse<ProfileResponse>>());
+
+      verify(mockApiClient.profile()).called(1);
+      verifyNoMoreInteractions(mockApiClient);
     });
   });
 

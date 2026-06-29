@@ -46,9 +46,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
   void initState() {
     super.initState();
     final driver = widget.driver;
-    _firstNameController.text = driver.firstName;
-    _lastNameController.text = driver.lastName;
-    _emailController.text = driver.email;
+    _firstNameController.text = driver.firstName ?? '';
+    _lastNameController.text = driver.lastName ?? '';
+    _emailController.text = driver.email ?? '';
     _phoneController.text = PhoneFormatter.toLocal(driver.phone);
     final cubit = context.read<EditProfileCubit>();
     cubit.doEvent(InitEditProfileEvent(driver));

@@ -1,10 +1,13 @@
 import 'dart:io';
+
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/features/profile/data/models/request/edit_profile_request.dart';
 import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
 
 abstract interface class ProfileRepoContract {
   Future<BaseResponse<void>> logout();
+
+  Future<BaseResponse<DriverEntity>> profile();
 
   Future<BaseResponse<DriverEntity>> getProfileData();
 

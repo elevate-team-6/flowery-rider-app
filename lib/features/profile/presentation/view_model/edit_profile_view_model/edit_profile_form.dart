@@ -29,9 +29,9 @@ class EditProfileForm extends Equatable {
   /// Seeds the form from the driver currently being edited.
   factory EditProfileForm.fromDriver(DriverEntity driver) => EditProfileForm(
     initialDriver: driver,
-    firstName: driver.firstName,
-    lastName: driver.lastName,
-    email: driver.email,
+    firstName: driver.firstName ?? '',
+    lastName: driver.lastName ?? '',
+    email: driver.email ?? '',
     phone: PhoneFormatter.toLocal(driver.phone),
   );
 
