@@ -47,6 +47,7 @@ abstract class AppLottie {
   static const String flowerLoading = '${_lottiePath}flower_loading.json';
   static const String onboardingAnimation =
       '${_lottiePath}onboarding_animation.json';
+  static const String empty = '${_lottiePath}empty.json';
 }
 
 abstract class AppJson {

@@ -261,6 +261,8 @@ abstract class AppStrings {
   static const String deliveredOn = 'delivered_on';
   static const String noActiveOrders = 'no_active_orders';
   static const String noCompletedOrders = 'no_completed_orders';
+  static const String recentOrders = 'recent_orders';
+  static const String cancelledStatus = 'cancelled_status';
 
   // Order Details
   static const String orderDetails = 'order_details';
