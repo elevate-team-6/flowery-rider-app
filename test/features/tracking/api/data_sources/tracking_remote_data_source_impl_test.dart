@@ -3,6 +3,7 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/features/tracking/api/api_client/tracking_api_client.dart';
 import 'package:flowery_rider_app/features/tracking/api/data_sources/tracking_remote_data_source_impl.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/all_driver_orders_response_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/pending_orders_response_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/update_order_state_response_model.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -19,6 +20,87 @@ void main() {
   setUp(() {
     mockApiClient = MockTrackingApiClient();
     dataSource = TrackingRemoteDataSourceImpl(mockApiClient);
+  });
+
+  group('getDriverOrders', () {
+    const fakeResponse = AllDriverOrdersResponseModel(message: 'success');
+
+    test(
+      'returns SuccessBaseResponse when api call succeeds with page',
+      () async {
+        when(
+          mockApiClient.getDriverOrders(page: 1),
+        ).thenAnswer((_) async => fakeResponse);
+
+        final result = await dataSource.getDriverOrders(page: 1);
+
+        verify(mockApiClient.getDriverOrders(page: 1)).called(1);
+        expect(
+          result,
+          isA<SuccessBaseResponse<AllDriverOrdersResponseModel>>(),
+        );
+        expect(
+          (result as SuccessBaseResponse<AllDriverOrdersResponseModel>).data,
+          fakeResponse,
+        );
+      },
+    );
+
+    test(
+      'returns SuccessBaseResponse when api call succeeds without page',
+      () async {
+        when(
+          mockApiClient.getDriverOrders(page: null),
+        ).thenAnswer((_) async => fakeResponse);
+
+        final result = await dataSource.getDriverOrders();
+
+        verify(mockApiClient.getDriverOrders(page: null)).called(1);
+        expect(
+          result,
+          isA<SuccessBaseResponse<AllDriverOrdersResponseModel>>(),
+        );
+      },
+    );
+
+    test(
+      'returns ErrorBaseResponse when api call throws DioException',
+      () async {
+        when(mockApiClient.getDriverOrders(page: anyNamed('page'))).thenThrow(
+          DioException(
+            requestOptions: RequestOptions(path: ''),
+            type: DioExceptionType.connectionError,
+          ),
+        );
+
+        final result = await dataSource.getDriverOrders(page: 1);
+
+        expect(result, isA<ErrorBaseResponse<AllDriverOrdersResponseModel>>());
+        expect(
+          (result as ErrorBaseResponse<AllDriverOrdersResponseModel>)
+              .errorMessage,
+          isNotEmpty,
+        );
+      },
+    );
+
+    test(
+      'returns ErrorBaseResponse when api call throws generic Exception',
+      () async {
+        when(
+          mockApiClient.getDriverOrders(page: anyNamed('page')),
+        ).thenThrow(Exception('boom'));
+
+        final result = await dataSource.getDriverOrders(page: 1);
+
+        expect(result, isA<ErrorBaseResponse<AllDriverOrdersResponseModel>>());
+        expect(
+          (result as ErrorBaseResponse<AllDriverOrdersResponseModel>)
+              .errorMessage,
+          'unknownError',
+        );
+      },
+    );
   });
 
   group('getPendingOrders', () {

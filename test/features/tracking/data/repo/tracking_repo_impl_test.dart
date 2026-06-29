@@ -3,6 +3,11 @@ import 'package:flowery_rider_app/config/cache/hive_helper.dart';
 import 'package:flowery_rider_app/features/tracking/data/data_sources/tracking_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/all_driver_orders_response_model.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/driver_order_data_model.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/inner_order_model.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/inner_shipping_address_model.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/metadata_model.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/order_store_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/pending_orders_response_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/shipping_address_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/store_model.dart';
@@ -38,6 +43,79 @@ void main() {
     mockRemoteDataSource = MockTrackingRemoteDataSourceContract();
     mockHiveHelper = MockHiveHelper();
     repo = TrackingRepoImpl(mockRemoteDataSource, mockHiveHelper);
+  });
+
+  group('getDriverOrders', () {
+    const fakeResponse = AllDriverOrdersResponseModel(
+      message: 'success',
+      metadata: MetadataModel(currentPage: 1, totalPages: 5),
+      orders: [
+        DriverOrderDataModel(
+          id: '1',
+          order: InnerOrderModel(
+            id: 'o1',
+            orderNumber: '#123',
+            totalPrice: 100,
+            state: 'completed',
+            user: UserModel(id: 'u1', firstName: 'John'),
+            shippingAddress: InnerShippingAddressModel(
+              street: 'S1',
+              city: 'C1',
+            ),
+          ),
+          store: OrderStoreModel(name: 'Store1', latLong: '1,2'),
+        ),
+      ],
+    );
+
+    test(
+      'maps response to DriverOrdersEntity on success with pagination',
+      () async {
+        when(
+          mockRemoteDataSource.getDriverOrders(page: 1),
+        ).thenAnswer((_) async => SuccessBaseResponse(fakeResponse));
+
+        final result = await repo.getDriverOrders(page: 1);
+
+        verify(mockRemoteDataSource.getDriverOrders(page: 1)).called(1);
+        expect(result, isA<SuccessBaseResponse<DriverOrdersEntity>>());
+        final success = result as SuccessBaseResponse<DriverOrdersEntity>;
+        expect(success.data!.orders, hasLength(1));
+        expect(success.data!.currentPage, 1);
+        expect(success.data!.totalPages, 5);
+        expect(success.data!.orders.first.orderNumber, '#123');
+      },
+    );
+
+    test('returns ErrorBaseResponse when data source fails', () async {
+      when(
+        mockRemoteDataSource.getDriverOrders(page: 1),
+      ).thenAnswer((_) async => ErrorBaseResponse('server error'));
+
+      final result = await repo.getDriverOrders(page: 1);
+
+      expect(result, isA<ErrorBaseResponse<DriverOrdersEntity>>());
+      expect((result as ErrorBaseResponse).errorMessage, 'server error');
+    });
+
+    test(
+      'returns ErrorBaseResponse when mapping fails (Rule 6: try-catch)',
+      () async {
+        // Missing mandatory 'order' in model will cause DriverOrderDataModel.toEntity() to throw
+        const invalidResponse = AllDriverOrdersResponseModel(
+          orders: [DriverOrderDataModel(id: '1', order: null)],
+        );
+
+        when(
+          mockRemoteDataSource.getDriverOrders(page: 1),
+        ).thenAnswer((_) async => SuccessBaseResponse(invalidResponse));
+
+        final result = await repo.getDriverOrders(page: 1);
+
+        expect(result, isA<ErrorBaseResponse<DriverOrdersEntity>>());
+        expect((result as ErrorBaseResponse).errorMessage, contains('Mapping'));
+      },
+    );
   });
 
   group('getPendingOrders', () {
