@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,7 +16,6 @@ import '../../../../core/utils/phone_formatter.dart';
 import '../../../../core/widgets/custom_gender_selector.dart';
 import '../../../../core/widgets/custom_text_field.dart';
 import '../../data/models/request/edit_profile_request.dart';
-import '../../domain/entities/driver_entity.dart';
 import '../view_model/edit_profile_view_model/edit_profile_cubit.dart';
 import '../view_model/edit_profile_view_model/edit_profile_events.dart';
 import '../view_model/edit_profile_view_model/edit_profile_states.dart';
@@ -46,9 +46,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
   void initState() {
     super.initState();
     final driver = widget.driver;
-    _firstNameController.text = driver.firstName ?? '';
-    _lastNameController.text = driver.lastName ?? '';
-    _emailController.text = driver.email ?? '';
+    _firstNameController.text = driver.firstName ;
+    _lastNameController.text = driver.lastName ;
+    _emailController.text = driver.email ;
     _phoneController.text = PhoneFormatter.toLocal(driver.phone);
     final cubit = context.read<EditProfileCubit>();
     cubit.doEvent(InitEditProfileEvent(driver));
@@ -168,22 +168,26 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                     Navigator.pushNamed(context, AppRoutes.changePassword),
               ),
               const SizedBox(height: 24),
-              BlocSelector<EditProfileCubit, EditProfileStates, String>(
-                selector: (state) => state.gender,
-                builder: (context, gender) {
+              BlocBuilder<EditProfileCubit, EditProfileStates>(
+                buildWhen: (previous, current) =>
+                    previous.gender != current.gender,
+                builder: (context, state) {
                   return IgnorePointer(
                     child: CustomGenderSelector(
-                      selectedGender: gender.isEmpty ? null : gender,
+                      selectedGender: state.gender.isEmpty
+                          ? null
+                          : state.gender,
                     ),
                   );
                 },
               ),
               const SizedBox(height: 32),
-              BlocSelector<EditProfileCubit, EditProfileStates, bool>(
-                selector: (state) => state.isFormChanged,
-                builder: (context, isFormChanged) {
+              BlocBuilder<EditProfileCubit, EditProfileStates>(
+                buildWhen: (previous, current) =>
+                    previous.isFormChanged != current.isFormChanged,
+                builder: (context, state) {
                   return ElevatedButton(
-                    onPressed: isFormChanged ? _submit : null,
+                    onPressed: state.isFormChanged ? _submit : null,
                     child: Text(AppStrings.update.tr()),
                   );
                 },

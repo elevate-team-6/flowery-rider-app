@@ -1,7 +1,8 @@
-import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
+
+
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 
 class DriverModel {
-  final String? id;
   final String? country;
   final String? firstName;
   final String? lastName;
@@ -15,10 +16,10 @@ class DriverModel {
   final String? phone;
   final String? photo;
   final String? role;
+  final String? id;
   final DateTime? createdAt;
 
-  const DriverModel({
-    this.id,
+  DriverModel({
     this.country,
     this.firstName,
     this.lastName,
@@ -32,12 +33,12 @@ class DriverModel {
     this.phone,
     this.photo,
     this.role,
+    this.id,
     this.createdAt,
   });
 
   factory DriverModel.fromJson(Map<String, dynamic> json) {
     return DriverModel(
-      id: json['_id'],
       country: json['country'],
       firstName: json['firstName'],
       lastName: json['lastName'],
@@ -51,26 +52,28 @@ class DriverModel {
       phone: json['phone'],
       photo: json['photo'],
       role: json['role'],
+      id: json['_id'],
       createdAt: json['createdAt'] != null
           ? DateTime.tryParse(json['createdAt'])
           : null,
     );
   }
+
   DriverEntity toEntity() => DriverEntity(
-    id: id,
-    country: country,
-    firstName: firstName,
-    lastName: lastName,
-    vehicleType: vehicleType,
-    vehicleNumber: vehicleNumber,
-    vehicleLicense: vehicleLicense,
-    nid: nid,
-    nidImg: nidImg,
-    email: email,
-    gender: gender,
-    phone: phone,
-    photo: photo,
-    role: role,
-    createdAt: createdAt,
+    name: '',
+    country: country ?? '',
+    firstName: firstName ?? '',
+    lastName: lastName ?? '',
+    vehicleType: vehicleType??'',
+    vehicleNumber: vehicleNumber??'',
+    vehicleLicense: vehicleLicense??'',
+    nid: nid??'',
+    nidImg: nidImg??'',
+    email: email??'',
+    gender: gender??'',
+    phone: phone??'',
+    photo: photo??'',
+    role: role??'',
+    id: id??'',
   );
 }

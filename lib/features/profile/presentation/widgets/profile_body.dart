@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
@@ -78,11 +79,9 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
               children: [
                 ProfileTile(
                   leading: ClipOval(
-                    child: driver?.photo != null
-                    // && driver!.photo.isNotEmpty
+                    child: driver?.photo != null && driver!.photo.isNotEmpty
                         ? Image.network(
-                          '',
-                            // driver.photo,
+                            driver.photo,
                             width: 48,
                             height: 48,
                             fit: BoxFit.cover,
@@ -102,7 +101,7 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                     );
 
                     if (result is DriverEntity) {
-                      // context.read<ProfileCubit>().updateProfile(result);
+                      context.read<ProfileCubit>().updateProfile(result);
                     }
                   },
                   child: SingleChildScrollView(
@@ -126,7 +125,7 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                   onTap: () async {
                     final result = await Navigator.pushNamed(
                       context,
-                      AppRoutes.changePassword,
+                      AppRoutes.editVehicle,
                       arguments: driver,
                     );
 
@@ -135,7 +134,7 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                       context.read<ProfileCubit>().emit(
                         // ignore: use_build_context_synchronously
                         context.read<ProfileCubit>().state.copyWith(
-                          // profileState: BaseState(data: result),
+                          profileState: BaseState(data: result),
                         ),
                       );
                     }

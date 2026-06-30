@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,7 +17,6 @@ import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
-import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_cubit.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_states.dart';
 import 'package:flowery_rider_app/features/profile/presentation/widgets/profile_body.dart';
@@ -133,6 +133,14 @@ void main() {
         vehicleType: 'Motorcycle',
         vehicleNumber: '123 XYZ',
         photo: '',
+        country: '',
+        vehicleLicense: '',
+        nid: '',
+        nidImg: '',
+        gender: '',
+        role: '',
+        id: '',
+        name: '',
       );
 
       final state = ProfileStates(profileState: BaseState(data: driver));

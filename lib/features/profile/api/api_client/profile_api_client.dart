@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:flowery_rider_app/core/utils/app_end_points.dart';
+import 'package:flowery_rider_app/features/profile/data/models/response/profile_response_model.dart';
 import 'package:flowery_rider_app/core/utils/app_params.dart';
 import 'package:flowery_rider_app/features/profile/data/models/response/profile_response.dart';
 import 'package:flowery_rider_app/features/profile/data/models/request/change_password_request.dart';
@@ -10,7 +11,6 @@ import 'package:injectable/injectable.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../../data/models/request/edit_profile_request.dart';
-import '../../data/models/response/profile_response_model.dart';
 
 part 'profile_api_client.g.dart';
 
@@ -22,6 +22,8 @@ abstract class ProfileApiClient {
 
   @GET(AppEndPoints.logout)
   Future<void> logout();
+  @PUT(AppEndPoints.editProfile)
+  Future<ProfileResponseModel> editVehicle(@Body() FormData formData);
   @PATCH(AppEndPoints.changePassword)
   Future<ChangePasswordResponse> changePassword(
     @Body() ChangePasswordRequest request,

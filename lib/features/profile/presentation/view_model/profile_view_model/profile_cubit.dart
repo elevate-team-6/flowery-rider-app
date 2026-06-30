@@ -3,6 +3,7 @@ import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/profile/domain/use_cases/profile_use_case.dart';
@@ -63,5 +64,8 @@ class ProfileCubit extends BaseCubit<ProfileStates, BaseUiEvent> {
         navigationType: NavigationType.pushAndRemoveUntil,
       ),
     );
+  }
+    void updateProfile(DriverEntity driver) {
+    emit(state.copyWith(profileState: BaseState(data: driver)));
   }
 }

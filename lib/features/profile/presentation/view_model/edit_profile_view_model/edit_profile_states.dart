@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 
 import '../../../../../config/base_state/base_state.dart';
-import '../../../domain/entities/driver_entity.dart';
 import 'edit_profile_form.dart';
 
 class EditProfileStates extends Equatable {

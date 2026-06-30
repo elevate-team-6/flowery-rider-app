@@ -1,6 +1,7 @@
 import 'dart:io';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
+
 import '../../../data/models/request/edit_profile_request.dart';
-import '../../../domain/entities/driver_entity.dart';
 
 sealed class EditProfileEvents {
   const EditProfileEvents();

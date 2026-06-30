@@ -1,6 +1,6 @@
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/core/exceptions/missing_field_exception.dart';
 import 'package:flowery_rider_app/core/utils/app_params.dart';
-import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
 
 class DriverResponseModel {
   final String? id;
@@ -44,10 +44,16 @@ class DriverResponseModel {
     lastName: requireField(lastName, 'lastName', owner: _owner),
     email: requireField(email, 'email', owner: _owner),
     phone: requireField(phone, 'phone', owner: _owner),
-    gender: gender,
-    photo: photo,
-    vehicleType: vehicleType,
-    vehicleNumber: vehicleNumber,
+    gender: gender ?? '',
+    photo: photo ?? '',
+    vehicleType: vehicleType ?? '',
+    vehicleNumber: vehicleNumber ?? '',
+    country: '',
+    vehicleLicense: '',
+    nid: '',
+    nidImg: '',
+    role: '',
+    name: '',
   );
 
   static const String _owner = 'DriverResponseModel';

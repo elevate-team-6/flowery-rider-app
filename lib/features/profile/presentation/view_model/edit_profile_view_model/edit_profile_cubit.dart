@@ -1,4 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../../config/base_cubit/base_cubit.dart';
@@ -6,7 +7,6 @@ import '../../../../../config/base_response/base_response.dart';
 import '../../../../../config/base_state/base_state.dart';
 import '../../../../../config/base_ui_event/base_ui_event.dart';
 import '../../../../../core/utils/app_strings.dart';
-import '../../../domain/entities/driver_entity.dart';
 import '../../../domain/use_cases/edit_profile_use_case.dart';
 import '../../../domain/use_cases/get_profile_data_use_case.dart';
 import '../../../domain/use_cases/upload_photo_use_case.dart';
@@ -46,7 +46,7 @@ class EditProfileCubit extends BaseCubit<EditProfileStates, BaseUiEvent> {
     emit(
       state.copyWith(
         driver: driver,
-        gender: driver.gender ?? '',
+        gender: driver.gender ,
         form: EditProfileForm.fromDriver(driver),
       ),
     );

@@ -4,11 +4,11 @@ import 'dart:convert';
 import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/widgets/custom_gender_selector.dart';
 import 'package:flowery_rider_app/features/profile/data/models/request/edit_profile_request.dart';
-import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
 import 'package:flowery_rider_app/features/profile/domain/use_cases/edit_profile_use_case.dart';
 import 'package:flowery_rider_app/features/profile/domain/use_cases/get_profile_data_use_case.dart';
 import 'package:flowery_rider_app/features/profile/domain/use_cases/upload_photo_use_case.dart';
@@ -55,6 +55,15 @@ void main() {
     email: 'ahmed@test.com',
     phone: '+201030313971',
     gender: 'male',
+    country: '',
+    vehicleType: '',
+    vehicleNumber: '',
+    vehicleLicense: '',
+    nid: '',
+    nidImg: '',
+    photo: '',
+    role: '',
+    name: '',
   );
 
   const surface = Size(700, 1400);

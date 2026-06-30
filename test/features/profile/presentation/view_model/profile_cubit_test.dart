@@ -1,4 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -6,7 +7,6 @@ import 'package:mockito/mockito.dart' as mockito;
 
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
-import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
 import 'package:flowery_rider_app/features/profile/domain/use_cases/logout_use_case.dart';
 import 'package:flowery_rider_app/features/profile/domain/use_cases/profile_use_case.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/profile_view_model/profile_cubit.dart';
@@ -46,7 +46,23 @@ void main() {
       build: () {
         when(mockProfileUseCase.call()).thenAnswer(
           (_) async => SuccessBaseResponse<DriverEntity>(
-            const DriverEntity(firstName: 'Ahmed', lastName: 'Ali'),
+            const DriverEntity(
+              firstName: 'Ahmed',
+              lastName: 'Ali',
+              country: '',
+              vehicleType: '',
+              vehicleNumber: '',
+              vehicleLicense: '',
+              nid: '',
+              nidImg: '',
+              email: '',
+              gender: '',
+              phone: '',
+              photo: '',
+              role: '',
+              id: '',
+              name: '',
+            ),
           ),
         );
 
@@ -59,7 +75,23 @@ void main() {
         const ProfileStates(profileState: BaseState(isLoading: true)),
         const ProfileStates(
           profileState: BaseState(
-            data: DriverEntity(firstName: 'Ahmed', lastName: 'Ali'),
+            data: DriverEntity(
+              firstName: 'Ahmed',
+              lastName: 'Ali',
+              country: '',
+              vehicleType: '',
+              vehicleNumber: '',
+              vehicleLicense: '',
+              nid: '',
+              nidImg: '',
+              email: '',
+              gender: '',
+              phone: '',
+              photo: '',
+              role: '',
+              id: '',
+              name: '',
+            ),
           ),
         ),
       ],
