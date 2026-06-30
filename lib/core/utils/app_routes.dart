@@ -10,6 +10,10 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_p
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
+import 'package:flowery_rider_app/features/profile/presentation/screens/change_password_screen.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/change_password/change_password_cubit.dart';
+import 'package:flowery_rider_app/features/profile/presentation/screens/edit_profile_screen.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_profile_view_model/edit_profile_cubit.dart';
 import 'package:flowery_rider_app/features/profile/presentation/screens/edit_vehicle_screen.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_vehicle/edit_vehicle_cubit.dart';
 import 'package:flowery_rider_app/features/splash/presentation/pages/splash_screen.dart';
@@ -27,10 +31,12 @@ abstract class AppRoutes {
   static const String submit = 'submit';
   static const String mainLayout = 'mainLayout';
   static const String forgetPassword = '/forgotPassword';
+  static const String changePassword = '/changePassword';
   static const String verifyResetCode = '/VerifyResetCode';
   static const String resetPassword = '/resetPassword';
   static const String editVehicle = '/editVehicle';
   static const String orderDetails = 'orderDetails';
+  static const String editProfile = 'editProfile';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
@@ -66,30 +72,21 @@ abstract class AppRoutes {
               child: const ApplyPage(),
             ),
           );
-        case editVehicle:
+        case changePassword:
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => getIt<ChangePasswordCubit>(),
+              child: const ChangePasswordScreen(),
+            ),
+          );
+
+            case editVehicle:
+          final driver = settings.arguments as DriverEntity;
+
           return MaterialPageRoute(
             builder: (_) => BlocProvider(
               create: (_) => getIt<EditVehicleCubit>(),
-              child: const EditVehicleScreen(
-                driver: DriverEntity(
-                  id: '1',
-                  firstName: 'Youssef',
-                  lastName: 'Singer',
-                  vehicleType: 'Car',
-                  vehicleNumber: 'ABC123',
-                  vehicleLicense:
-                      'https://flower.elevateegy.com/uploads/default-profile.png',
-                  country: '',
-                  nid: '',
-                  nidImg: '',
-                  email: '',
-                  gender: '',
-                  phone: '',
-                  photo: '',
-                  role: '',
-                  name: '',
-                ),
-              ),
+              child:  EditVehicleScreen(driver: driver),
             ),
           );
         case submit:
@@ -105,6 +102,16 @@ abstract class AppRoutes {
             builder: (_) => BlocProvider(
               create: (context) => getIt<ForgetPasswordCubit>(),
               child: const ForgotPasswordScreen(),
+            ),
+            settings: settings,
+          );
+
+        case editProfile:
+          final driver = settings.arguments as DriverEntity;
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (context) => getIt<EditProfileCubit>(),
+              child: EditProfileScreen(driver: driver),
             ),
             settings: settings,
           );

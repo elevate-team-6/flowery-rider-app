@@ -61,7 +61,15 @@ class _EditVehicleScreenState extends State<EditVehicleScreen> {
 
       case DisplaySuccessEvent():
         CustomSnackBar.showSuccessMessage(event.successMessage.tr());
-        Navigator.pop(context);
+        final updatedDriver = widget.driver.copyWith(
+  vehicleType:
+      context.read<EditVehicleCubit>().state.selectedVehicleType?.type,
+  vehicleNumber: vehicleNumberController.text,
+  vehicleLicense:
+      context.read<EditVehicleCubit>().state.drivingLicenseImageUrl,
+);
+
+Navigator.pop(context, updatedDriver);
 
       default:
         break;

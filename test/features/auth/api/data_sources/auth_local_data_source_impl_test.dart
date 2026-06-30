@@ -1,9 +1,9 @@
 import 'dart:convert';
 
+import 'package:flowery_rider_app/core/utils/app_assets.dart';
 import 'package:flowery_rider_app/features/auth/api/data_sources/auth_local_data_source_impl.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flowery_rider_app/core/utils/app_assets.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -23,33 +23,23 @@ void main() {
     ]
     ''';
 
-    TestDefaultBinaryMessengerBinding
-        .instance.defaultBinaryMessenger
-        .setMockMessageHandler(
-      'flutter/assets',
-      (message) async {
-        final key = utf8.decode(message!.buffer.asUint8List());
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMessageHandler('flutter/assets', (message) async {
+          final key = utf8.decode(message!.buffer.asUint8List());
 
-        if (key == AppJson.countryPath) {
-          return ByteData.view(
-            Uint8List.fromList(
-              utf8.encode(jsonData),
-            ).buffer,
-          );
-        }
+          if (key == AppJson.countryPath) {
+            return ByteData.view(
+              Uint8List.fromList(utf8.encode(jsonData)).buffer,
+            );
+          }
 
-        return null;
-      },
-    );
+          return null;
+        });
   });
 
   tearDown(() {
-    TestDefaultBinaryMessengerBinding
-        .instance.defaultBinaryMessenger
-        .setMockMessageHandler(
-      'flutter/assets',
-      null,
-    );
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMessageHandler('flutter/assets', null);
   });
 
   test('should return list of countries', () async {
