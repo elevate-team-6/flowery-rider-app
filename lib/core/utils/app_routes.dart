@@ -11,6 +11,9 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/login_vi
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
 import 'package:flowery_rider_app/features/profile/presentation/screens/change_password_screen.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/change_password/change_password_cubit.dart';
+import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
+import 'package:flowery_rider_app/features/profile/presentation/screens/edit_profile_screen.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_profile_view_model/edit_profile_cubit.dart';
 import 'package:flowery_rider_app/features/splash/presentation/pages/splash_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,6 +33,8 @@ abstract class AppRoutes {
   static const String verifyResetCode = '/VerifyResetCode';
   static const String resetPassword = '/resetPassword';
   static const String orderDetails = 'orderDetails';
+  static const String editProfile = 'editProfile';
+  // TODO(team): add the route case below when the Change Password screen is ready.
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
@@ -86,6 +91,16 @@ abstract class AppRoutes {
             builder: (_) => BlocProvider(
               create: (context) => getIt<ForgetPasswordCubit>(),
               child: const ForgotPasswordScreen(),
+            ),
+            settings: settings,
+          );
+
+        case editProfile:
+          final driver = settings.arguments as DriverEntity;
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (context) => getIt<EditProfileCubit>(),
+              child: EditProfileScreen(driver: driver),
             ),
             settings: settings,
           );

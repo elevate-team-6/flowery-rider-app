@@ -1,9 +1,9 @@
 import 'dart:convert';
 
+import 'package:flowery_rider_app/core/utils/app_assets.dart';
 import 'package:flowery_rider_app/features/auth/api/data_sources/auth_local_data_source_impl.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flowery_rider_app/core/utils/app_assets.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

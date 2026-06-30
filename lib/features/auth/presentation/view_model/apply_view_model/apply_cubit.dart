@@ -3,13 +3,13 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/helpers/image_picker_helper.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
+import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/apply_use_case.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/get_countries_use_case.dart';
 import 'package:flowery_rider_app/features/auth/domain/use_cases/get_vehicle_type_use_case.dart';
-import 'package:flowery_rider_app/core/entities/driver_entity.dart';
-import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
 import 'package:injectable/injectable.dart';
 
 import 'apply_events.dart';

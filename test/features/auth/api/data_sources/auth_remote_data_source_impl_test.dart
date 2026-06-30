@@ -1,28 +1,23 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/annotations.dart';
-import 'package:mockito/mockito.dart';
-
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/services/multi_part_service.dart';
-
 import 'package:flowery_rider_app/features/auth/api/api_client/auth_api_client.dart';
 import 'package:flowery_rider_app/features/auth/api/data_sources/auth_remote_data_source_impl.dart';
-
-import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
-import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/forgot_password_request.dart';
-import 'package:flowery_rider_app/features/auth/data/models/request/verify_reset_code_request.dart';
 import 'package:flowery_rider_app/features/auth/data/models/request/reset_password_request.dart';
-
+import 'package:flowery_rider_app/features/auth/data/models/request/sign_in_request_model.dart';
+import 'package:flowery_rider_app/features/auth/data/models/request/signup/signup_request.dart';
+import 'package:flowery_rider_app/features/auth/data/models/request/verify_reset_code_request.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/forgot_password_response.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/reset_password_response.dart';
+import 'package:flowery_rider_app/features/auth/data/models/response/sign_in_response_model.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/signup/signup_response.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_response.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/signup/vehicle_type_model.dart';
-
-import 'package:flowery_rider_app/features/auth/data/models/response/sign_in_response_model.dart';
-import 'package:flowery_rider_app/features/auth/data/models/response/forgot_password_response.dart';
 import 'package:flowery_rider_app/features/auth/data/models/response/verify_reset_code_response.dart';
-import 'package:flowery_rider_app/features/auth/data/models/response/reset_password_response.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mockito/annotations.dart';
+import 'package:mockito/mockito.dart';
 
 import 'auth_remote_data_source_impl_test.mocks.dart';
 
