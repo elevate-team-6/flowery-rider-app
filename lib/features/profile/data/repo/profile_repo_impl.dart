@@ -1,4 +1,3 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/profile/data/models/request/edit_vehicle_request.dart';
@@ -33,7 +32,7 @@ class ProfileRepoImpl implements ProfileRepoContract {
     switch (response) {
       case SuccessBaseResponse<ProfileResponseModel>():
         if (response.data == null || response.data!.driver == null) {
-          return ErrorBaseResponse(AppStrings.userNotFound.tr());
+          return ErrorBaseResponse(AppStrings.userNotFound);
         }
 
         return SuccessBaseResponse(response.data!.driver!.toEntity());

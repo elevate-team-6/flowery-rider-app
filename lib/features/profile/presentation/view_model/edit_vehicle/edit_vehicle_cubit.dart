@@ -19,7 +19,7 @@ class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
     : super(const EditVehicleState());
 
   String? _vehicleTypeId;
-
+  String? _initialVehicleTypeId;
   Future<void> doIntent(EditVehicleEvent event) async {
     switch (event) {
       case InitializeEditVehicleEvent():
@@ -32,7 +32,7 @@ class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
         emit(
           state.copyWith(
             selectedVehicleType: event.vehicleType,
-            hasChanges: true,
+            hasChanges: event.vehicleType.id != _initialVehicleTypeId,
           ),
         );
 
@@ -52,8 +52,13 @@ class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
 
   void _initialize(InitializeEditVehicleEvent event) {
     _vehicleTypeId = event.vehicleTypeId;
+    _initialVehicleTypeId = event.vehicleTypeId;
 
-    emit(state.copyWith(drivingLicenseImageUrl: event.vehicleLicenseUrl));
+    emit(
+      state.copyWith(
+        drivingLicenseImageUrl: event.vehicleLicenseUrl,
+      ),
+    );
   }
 
   Future<void> _getVehicleTypes() async {
@@ -68,7 +73,11 @@ class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
         if (_vehicleTypeId != null) {
           try {
             selected = result.data?.firstWhere((e) => e.id == _vehicleTypeId);
-          } catch (_) {}
+          } catch (e) {
+            emitUiEvent(
+              DisplayErrorEvent(AppStrings.someThingWentWrong.tr()),
+            );
+          }
         }
 
         emit(
