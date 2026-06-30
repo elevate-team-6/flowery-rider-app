@@ -9,6 +9,8 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_p
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
+import 'package:flowery_rider_app/features/profile/presentation/screens/change_password_screen.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/change_password/change_password_cubit.dart';
 import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity.dart';
 import 'package:flowery_rider_app/features/profile/presentation/screens/edit_profile_screen.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_profile_view_model/edit_profile_cubit.dart';
@@ -27,12 +29,12 @@ abstract class AppRoutes {
   static const String submit = 'submit';
   static const String mainLayout = 'mainLayout';
   static const String forgetPassword = '/forgotPassword';
+  static const String changePassword = '/changePassword';
   static const String verifyResetCode = '/VerifyResetCode';
   static const String resetPassword = '/resetPassword';
   static const String orderDetails = 'orderDetails';
   static const String editProfile = 'editProfile';
   // TODO(team): add the route case below when the Change Password screen is ready.
-  static const String changePassword = 'changePassword';
 
   static MaterialPageRoute<dynamic> onGenerateRoute(RouteSettings settings) {
     try {
@@ -68,6 +70,14 @@ abstract class AppRoutes {
               child: const ApplyPage(),
             ),
           );
+        case changePassword:
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => getIt<ChangePasswordCubit>(),
+              child: const ChangePasswordScreen(),
+            ),
+          );
+
         case submit:
           return MaterialPageRoute(builder: (_) => const SuccessApplyScreen());
         case mainLayout:

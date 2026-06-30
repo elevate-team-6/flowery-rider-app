@@ -6,6 +6,10 @@ import 'package:flowery_rider_app/features/profile/domain/entities/driver_entity
 
 abstract interface class ProfileRepoContract {
   Future<BaseResponse<void>> logout();
+  Future<BaseResponse<String>> changePassword(
+    String password,
+    String newPassword,
+  );
 
   Future<BaseResponse<DriverEntity>> profile();
 

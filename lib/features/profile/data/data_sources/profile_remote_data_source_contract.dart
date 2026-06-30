@@ -8,6 +8,10 @@ import '../models/response/profile_response_model.dart';
 
 abstract interface class ProfileRemoteDataSourceContract {
   Future<BaseResponse<void>> logout();
+  Future<BaseResponse<String>> changePassword(
+    String password,
+    String newPassword,
+  );
 
   Future<BaseResponse<ProfileResponse>> profile();
 
