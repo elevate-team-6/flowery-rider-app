@@ -47,7 +47,7 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
     super.initState();
     final cubit = context.read<HomeCubit>();
     _uiEventSubscription = cubit.eventStream.listen(handleUiEvent);
-    cubit.doEvent(const GetPendingOrdersEvent());
+    cubit.doEvent(const GetPendingOrdersEvent(page: 22));
   }
 
   @override

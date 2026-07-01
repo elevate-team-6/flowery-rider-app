@@ -36,6 +36,10 @@ abstract class AppEndPoints {
   static const String aboutUsUrl =
       "https://elevate-flutter-team.github.io/flower_app_web_views/about.html";
 
+  // FCM Send Notification Endpoint:
+  static String fcmSendUrl(String projectId) =>
+      'https://fcm.googleapis.com/v1/projects/$projectId/messages:send';
+
   // ---------------------------------------------------------------------------
   // TO ADD NEW ENDPOINTS:
   // 1. Group them by feature (e.g., // Products, // Cart).
