@@ -2,6 +2,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/utils/app_colors.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/utils/app_text_styles.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/order_status.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -12,18 +13,25 @@ class OrderStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isCompleted = status.toLowerCase() == 'completed';
-    final isCancelled = status.toLowerCase() == 'canceled';
+    final state = DriverOrderState.fromString(status);
 
-    Color color = AppColors.primary;
-    IconData icon = Icons.info_outline;
+    Color color;
+    IconData icon;
+    String label;
 
-    if (isCompleted) {
-      color = AppColors.success;
-      icon = Icons.check_circle_outline;
-    } else if (isCancelled) {
-      color = AppColors.error;
-      icon = Icons.cancel_outlined;
+    switch (state) {
+      case DriverOrderState.completed:
+        color = AppColors.success;
+        icon = Icons.check_circle_outline;
+        label = status.tr();
+      case DriverOrderState.canceled:
+        color = AppColors.error;
+        icon = Icons.cancel_outlined;
+        label = AppStrings.cancelledStatus.tr();
+      default:
+        color = AppColors.primary;
+        icon = Icons.info_outline;
+        label = status.tr();
     }
 
     return Container(
@@ -39,7 +47,7 @@ class OrderStatusBadge extends StatelessWidget {
           Icon(icon, size: 14.sp, color: color),
           SizedBox(width: 4.w),
           Text(
-            isCancelled ? AppStrings.cancelledStatus.tr() : status.tr(),
+            label,
             style: AppTextStyles.black14400.copyWith(
               color: color,
               fontSize: 12.sp,
