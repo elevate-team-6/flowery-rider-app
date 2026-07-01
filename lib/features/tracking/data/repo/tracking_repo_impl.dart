@@ -86,7 +86,7 @@ class TrackingRepoImpl implements TrackingRepoContract {
   Future<void> cacheActiveOrder(OrderEntity order, int uiStep) async {
     final cacheData = {AppKeys.order: order.toJson(), AppKeys.uiStep: uiStep};
 
-    _hiveHelper.cacheData(
+    await _hiveHelper.cacheData(
       boxName: AppKeys.activeOrderBox,
       key: AppKeys.activeOrderKey,
       value: jsonEncode(cacheData),
@@ -95,16 +95,17 @@ class TrackingRepoImpl implements TrackingRepoContract {
 
   @override
   Future<Map<String, dynamic>?> getCachedActiveOrder() async {
-    final data = _hiveHelper.getData(
+    final String? data = await _hiveHelper.getData<String>(
       boxName: AppKeys.activeOrderBox,
       key: AppKeys.activeOrderKey,
     );
-    return jsonDecode(data as String) as Map<String, dynamic>;
+    if (data == null) return null;
+    return jsonDecode(data) as Map<String, dynamic>;
   }
 
   @override
   Future<void> clearCachedActiveOrder() async {
-    _hiveHelper.deleteData(
+    await _hiveHelper.deleteData(
       boxName: AppKeys.activeOrderBox,
       key: AppKeys.activeOrderKey,
     );
