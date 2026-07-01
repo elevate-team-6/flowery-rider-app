@@ -1,8 +1,10 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/cache/secure_cache_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
+import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/notification/core/notification_strings.dart';
 import 'package:flowery_rider_app/features/notification/data/data_sources/notification_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
@@ -12,6 +14,7 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:injectable/injectable.dart';
 
 import '../models/order_firestore_model.dart';
+import 'package:flowery_rider_app/core/models/rider_session_model.dart';
 
 @Injectable(as: NotificationRepoContract)
 class NotificationRepoImpl implements NotificationRepoContract {
@@ -148,28 +151,41 @@ class NotificationRepoImpl implements NotificationRepoContract {
     String orderId,
     UserNotificationState state,
   ) async {
-    final riderId =
-        await _secureCacheHelper.readData(key: AppKeys.userIdKey) ?? '';
-    final riderName =
-        await _secureCacheHelper.readData(key: AppKeys.riderNameKey) ?? 'Rider';
-    final riderPhone =
-        await _secureCacheHelper.readData(key: AppKeys.riderPhoneKey) ?? '';
+    final session = await _getRiderSession();
 
-    // Fallback logic to avoid sync failure while logging the issue
-    final effectiveRiderId = riderId.isEmpty ? 'TEMP_RIDER_ID' : riderId;
-    final effectiveRiderName = riderName == 'Rider'
-        ? 'Flowery Rider'
-        : riderName;
+    if (!session.hasValidIdentity) {
+      _logError(
+        'Critical: Missing Rider Identity during Firestore sync',
+        'UNKNOWN',
+        orderId,
+      );
+      return;
+    }
+
+    // Use localized default if rider name is missing in session
+    final displayName = session.name.isEmpty
+        ? AppStrings.floweryRider.tr()
+        : session.name;
 
     await _remoteDataSource.updateOrderInFirestore(
       OrderFirestoreModel(
         orderId: orderId,
         status: state.name,
-        riderId: effectiveRiderId,
-        riderName: effectiveRiderName,
-        riderPhone: riderPhone,
+        riderId: session.id,
+        riderName: displayName,
+        riderPhone: session.phone,
       ),
     );
+  }
+
+  Future<RiderSessionModel> _getRiderSession() async {
+    final id = await _secureCacheHelper.readData(key: AppKeys.userIdKey) ?? '';
+    final name =
+        await _secureCacheHelper.readData(key: AppKeys.riderNameKey) ?? '';
+    final phone =
+        await _secureCacheHelper.readData(key: AppKeys.riderPhoneKey) ?? '';
+
+    return RiderSessionModel(id: id, name: name, phone: phone);
   }
 
   void _logError(String reason, String userId, String orderId) {
