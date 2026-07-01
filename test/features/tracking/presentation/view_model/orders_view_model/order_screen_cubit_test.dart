@@ -3,6 +3,7 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/driver_orders_summary.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_driver_orders_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_cubit.dart';
@@ -16,7 +17,7 @@ import 'order_screen_cubit_test.mocks.dart';
 
 @GenerateMocks([GetDriverOrdersUseCase])
 void main() {
-  provideDummy<BaseResponse<DriverOrdersEntity>>(ErrorBaseResponse('dummy'));
+  provideDummy<BaseResponse<DriverOrdersSummary>>(ErrorBaseResponse('dummy'));
 
   late OrderScreenCubit cubit;
   late MockGetDriverOrdersUseCase mockGetDriverOrdersUseCase;
@@ -96,9 +97,15 @@ void main() {
     blocTest<OrderScreenCubit, OrderScreenState>(
       'emits [loading, success] when GetDriverOrdersEvent is successful',
       build: () {
-        when(
-          mockGetDriverOrdersUseCase(page: anyNamed('page')),
-        ).thenAnswer((_) async => SuccessBaseResponse(tDriverOrdersEntity));
+        when(mockGetDriverOrdersUseCase(page: anyNamed('page'))).thenAnswer(
+          (_) async => SuccessBaseResponse(
+            DriverOrdersSummary(
+              driverOrders: tDriverOrdersEntity,
+              completedCount: 1,
+              canceledCount: 1,
+            ),
+          ),
+        );
         return cubit;
       },
       act: (cubit) => cubit.doEvent(GetDriverOrdersEvent()),
@@ -139,10 +146,14 @@ void main() {
       build: () {
         when(mockGetDriverOrdersUseCase(page: 2)).thenAnswer(
           (_) async => SuccessBaseResponse(
-            DriverOrdersEntity(
-              orders: const [tOrder],
-              currentPage: 2,
-              totalPages: 2,
+            DriverOrdersSummary(
+              driverOrders: DriverOrdersEntity(
+                orders: const [tOrder],
+                currentPage: 2,
+                totalPages: 2,
+              ),
+              completedCount: 1,
+              canceledCount: 0,
             ),
           ),
         );

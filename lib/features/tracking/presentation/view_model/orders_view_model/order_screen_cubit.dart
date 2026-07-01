@@ -8,6 +8,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../../../../config/base_response/base_response.dart';
 import '../../../../../config/base_state/base_state.dart';
+import '../../../domain/entities/driver_orders_summary.dart';
 import '../../../domain/entities/order_entity.dart';
 
 @injectable
@@ -36,30 +37,20 @@ class OrderScreenCubit extends BaseCubit<OrderScreenState, BaseUiEvent> {
     final response = await _getDriverOrdersUseCase(page: page);
 
     switch (response) {
-      case SuccessBaseResponse<DriverOrdersEntity>():
-        final driverOrders = response.data;
-        if (driverOrders == null) return;
-
-        final orders = driverOrders.orders;
-
-        // Calculate counts based on order state
-        final cancelledCount = orders
-            .where((o) => o.state.toLowerCase() == 'canceled')
-            .length;
-        final completedCount = orders
-            .where((o) => o.state.toLowerCase() == 'completed')
-            .length;
+      case SuccessBaseResponse<DriverOrdersSummary>():
+        final summary = response.data;
+        if (summary == null) return;
 
         emit(
           state.copyWith(
-            ordersState: BaseState(data: orders),
-            cancelledCount: cancelledCount,
-            completedCount: completedCount,
-            currentPage: driverOrders.currentPage,
-            totalPages: driverOrders.totalPages,
+            ordersState: BaseState(data: summary.driverOrders.orders),
+            cancelledCount: summary.canceledCount,
+            completedCount: summary.completedCount,
+            currentPage: summary.driverOrders.currentPage,
+            totalPages: summary.driverOrders.totalPages,
           ),
         );
-      case ErrorBaseResponse<DriverOrdersEntity>():
+      case ErrorBaseResponse<DriverOrdersSummary>():
         emit(
           state.copyWith(
             ordersState: BaseState(errorMessage: response.errorMessage),
