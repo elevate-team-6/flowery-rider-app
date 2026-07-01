@@ -132,9 +132,7 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
                         order: order,
                         onAccept: () => cubit.doEvent(AcceptOrderEvent(order)),
                         onReject: () {
-                          if (order.id != null) {
-                            cubit.doEvent(RejectOrderEvent(order.id!));
-                          }
+                          cubit.doEvent(RejectOrderEvent(order.id));
                         },
                       );
                     },

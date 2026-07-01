@@ -1,6 +1,11 @@
 import 'package:equatable/equatable.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'product_model.g.dart';
+
+@JsonSerializable()
 class ProductModel extends Equatable {
+  @JsonKey(name: '_id')
   final String? id;
   final String? title;
   final String? slug;
@@ -19,6 +24,7 @@ class ProductModel extends Equatable {
   final bool? isSuperAdmin;
   final String? createdAt;
   final String? updatedAt;
+  @JsonKey(name: '__v')
   final int? v;
 
   const ProductModel({
@@ -43,31 +49,10 @@ class ProductModel extends Equatable {
     this.v,
   });
 
-  factory ProductModel.fromJson(Map<String, dynamic> json) {
-    return ProductModel(
-      id: json['_id'] as String?,
-      title: json['title'] as String?,
-      slug: json['slug'] as String?,
-      description: json['description'] as String?,
-      imgCover: json['imgCover'] as String?,
-      images: (json['images'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-      price: json['price'] as num?,
-      priceAfterDiscount: json['priceAfterDiscount'] as num?,
-      discount: json['discount'] as int?,
-      rateAvg: json['rateAvg'] as num?,
-      rateCount: json['rateCount'] as int?,
-      sold: json['sold'] as int?,
-      quantity: json['quantity'] as int?,
-      category: json['category'] as String?,
-      occasion: json['occasion'] as String?,
-      isSuperAdmin: json['isSuperAdmin'] as bool?,
-      createdAt: json['createdAt'] as String?,
-      updatedAt: json['updatedAt'] as String?,
-      v: json['__v'] as int?,
-    );
-  }
+  factory ProductModel.fromJson(Map<String, dynamic> json) =>
+      _$ProductModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ProductModelToJson(this);
 
   @override
   List<Object?> get props => [

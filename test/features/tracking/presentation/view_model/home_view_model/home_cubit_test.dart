@@ -7,6 +7,7 @@ import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_pending_orders_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_events.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_states.dart';
@@ -21,8 +22,52 @@ void main() {
   late MockGetPendingOrdersUseCase mockUseCase;
   late HomeCubit cubit;
 
-  const order1 = OrderEntity(id: '1', orderNumber: 'ORD-1');
-  const order2 = OrderEntity(id: '2', orderNumber: 'ORD-2');
+  const user = UserEntity(
+    id: 'u1',
+    fullName: 'Test User',
+    phone: '123',
+    photo: '',
+  );
+  const store = StoreEntity(
+    name: 'Test Store',
+    image: '',
+    address: 'Store Address',
+    phoneNumber: '456',
+    lat: '0.0',
+    long: '0.0',
+  );
+  const shipping = ShippingAddressEntity(
+    street: 'Street',
+    city: 'City',
+    phone: '789',
+    lat: '0.0',
+    long: '0.0',
+  );
+
+  const order1 = OrderEntity(
+    id: '1',
+    orderNumber: 'ORD-1',
+    totalPrice: 100,
+    state: 'pending',
+    createdAt: '2021-01-01',
+    paymentType: 'Cash',
+    user: user,
+    store: store,
+    orderItems: [],
+    shippingAddress: shipping,
+  );
+  const order2 = OrderEntity(
+    id: '2',
+    orderNumber: 'ORD-2',
+    totalPrice: 200,
+    state: 'pending',
+    createdAt: '2021-01-01',
+    paymentType: 'Cash',
+    user: user,
+    store: store,
+    orderItems: [],
+    shippingAddress: shipping,
+  );
   const fakeEntity = PendingOrdersEntity(
     message: 'success',
     orders: [order1, order2],
@@ -111,14 +156,18 @@ void main() {
 
   group('AcceptOrderEvent', () {
     test(
-      'emits a NavigateEvent to order details with the order argument',
+      'emits a NavigateEvent to order details with OrderDetailsArgs',
       () async {
         final expectation = expectLater(
           cubit.eventStream,
           emits(
             isA<NavigateEvent>()
                 .having((e) => e.routeName, 'routeName', AppRoutes.orderDetails)
-                .having((e) => e.arguments, 'arguments', order1),
+                .having(
+                  (e) => (e.arguments as OrderDetailsArgs).order,
+                  'arguments.order',
+                  order1,
+                ),
           ),
         );
 
@@ -137,10 +186,15 @@ void main() {
       act: (cubit) => cubit.doEvent(const RejectOrderEvent('1')),
       expect: () => [
         isA<HomeStates>().having(
-          (s) => s.pendingOrdersState.data?.orders,
-          'orders',
-          [order2],
+          (s) => s.rejectingOrderId,
+          'rejectingOrderId',
+          '1',
         ),
+        isA<HomeStates>()
+            .having((s) => s.pendingOrdersState.data?.orders, 'orders', [
+              order2,
+            ])
+            .having((s) => s.rejectingOrderId, 'rejectingOrderId', isNull),
       ],
     );
 

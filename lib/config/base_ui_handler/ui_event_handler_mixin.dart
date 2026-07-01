@@ -33,7 +33,7 @@ mixin UiEventHandler<T extends StatefulWidget> on State<T> {
               arguments: event.arguments,
             );
           case NavigationType.pop:
-            Navigator.pop(context);
+            Navigator.pop(context, event.arguments);
         }
       case ShowLoadingEvent():
         LoadingDialog.show(context: context);
@@ -41,9 +41,14 @@ mixin UiEventHandler<T extends StatefulWidget> on State<T> {
         LoadingDialog.hide(context: context);
       case FillTextFieldEvent():
         onFillTextField(event.text);
+      case ShowConfirmationDialogEvent():
+        onShowConfirmationDialog();
     }
   }
 
   /// Override in screens that own a text field to be filled by the cubit.
   void onFillTextField(String text) {}
+
+  /// Override in screens that need to show a confirmation dialog.
+  void onShowConfirmationDialog() {}
 }

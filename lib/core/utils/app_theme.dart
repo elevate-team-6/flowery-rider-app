@@ -7,6 +7,7 @@ import 'app_text_styles.dart';
 abstract class AppTheme {
   static ThemeData get mainTheme {
     return ThemeData(
+      colorSchemeSeed: AppColors.primary,
       scaffoldBackgroundColor: AppColors.white,
       useMaterial3: true,
       canvasColor: AppColors.white,
@@ -56,7 +57,7 @@ abstract class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(100.r),
           ),
-          textStyle: AppTextStyles.white16500,
+          textStyle: AppTextStyles.white16600,
         ),
       ),
 
@@ -203,6 +204,17 @@ abstract class AppTheme {
 
           return const IconThemeData(color: AppColors.black30);
         }),
+      ),
+
+      // dialog theme
+      dialogTheme: DialogThemeData(
+        backgroundColor: AppColors.white,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16.r),
+        ),
+        titleTextStyle: AppTextStyles.black18600,
+        contentTextStyle: AppTextStyles.black14400,
       ),
     );
   }

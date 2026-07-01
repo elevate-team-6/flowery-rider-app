@@ -65,7 +65,12 @@ class LoginCubit extends BaseCubit<LoginState, BaseUiEvent> {
         final entity = result.data ?? const SignInEntity();
         await _cacheUserSession(entity, request.email);
         emitUiEvent(DisplaySuccessEvent(AppStrings.loginSuccess.tr()));
-        emitUiEvent(NavigateEvent(AppRoutes.mainLayout));
+        emitUiEvent(
+          NavigateEvent(
+            AppRoutes.mainLayout,
+            navigationType: NavigationType.pushAndRemoveUntil,
+          ),
+        );
       case ErrorBaseResponse<SignInEntity>():
         emitUiEvent(DisplayErrorEvent(result.errorMessage));
     }
@@ -76,6 +81,22 @@ class LoginCubit extends BaseCubit<LoginState, BaseUiEvent> {
     if (token != null && token.isNotEmpty) {
       await _secureCacheHelper.writeData(key: AppKeys.tokenKey, value: token);
     }
+
+    // Temporary: Cache dummy rider data for Notification Firestore sync
+    // This will be replaced by the Profile feature in the next sprint
+    await _secureCacheHelper.writeData(
+      key: AppKeys.userIdKey,
+      value: "6a30164f992612ae599a9362",
+    );
+    await _secureCacheHelper.writeData(
+      key: AppKeys.riderNameKey,
+      value: "Ahmed Ali",
+    );
+    await _secureCacheHelper.writeData(
+      key: AppKeys.riderPhoneKey,
+      value: "+201010700888",
+    );
+
     await _secureCacheHelper.writeData(
       key: AppKeys.rememberMeKey,
       value: state.rememberMe.toString(),
