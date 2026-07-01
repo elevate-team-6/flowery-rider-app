@@ -11,4 +11,6 @@ abstract class AppKeys {
   static const String activeOrderBox = 'active_order_box';
   static const String order = 'order';
   static const String uiStep = 'uiStep';
+  static const String riderNameKey = 'riderName';
+  static const String riderPhoneKey = 'riderPhone';
 }

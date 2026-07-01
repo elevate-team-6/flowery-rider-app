@@ -1,9 +1,10 @@
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
-import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
+import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/cache_active_order_use_case.dart';
@@ -17,6 +18,7 @@ import 'package:flowery_rider_app/features/tracking/presentation/view_model/orde
 import 'package:injectable/injectable.dart';
 
 import '../../../../../config/base_state/base_state.dart';
+import '../../../../../core/utils/app_keys.dart';
 
 @injectable
 class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
@@ -26,6 +28,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   final CacheActiveOrderUseCase _cacheActiveOrderUseCase;
   final GetActiveOrderUseCase _getActiveOrderUseCase;
   final ClearActiveOrderUseCase _clearActiveOrderUseCase;
+  final UpdateOrderProgressUseCase _updateOrderProgressUseCase;
 
   OrderDetailsCubit(
     this._updateOrderStateUseCase,
@@ -34,6 +37,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     this._cacheActiveOrderUseCase,
     this._getActiveOrderUseCase,
     this._clearActiveOrderUseCase,
+    this._updateOrderProgressUseCase,
   ) : super(const OrderDetailsState());
 
   void doEvent(OrderDetailsEvents event) {
@@ -106,6 +110,8 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
         ),
       );
       await _cacheActiveOrderUseCase(mergedOrder, state.uiStep);
+      // Notify User: Step 1 (Accepted)
+      _updateProgress(UserNotificationState.accepted);
     }
   }
 
@@ -140,6 +146,19 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
             uiStep: nextStep,
           ),
         );
+
+        // Notification logic for specific user-facing steps
+        final notifyState = switch (nextStep) {
+          2 => UserNotificationState.preparing,
+          4 => UserNotificationState.onWay,
+          6 => UserNotificationState.delivered,
+          _ => null,
+        };
+
+        if (notifyState != null) {
+          _updateProgress(notifyState);
+        }
+
         if (nextStep == 6) {
           await _clearActiveOrderUseCase();
           emitUiEvent(
@@ -154,6 +173,17 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       case ErrorBaseResponse<OrderEntity>():
         emitUiEvent(DisplayErrorEvent(result.errorMessage));
     }
+  }
+
+  Future<void> _updateProgress(UserNotificationState notifyState) async {
+    final order = state.orderDetailsState.data;
+    if (order?.id == null || order?.user?.id == null) return;
+
+    await _updateOrderProgressUseCase(
+      userId: order!.user!.id!,
+      orderId: order.id!,
+      state: notifyState,
+    );
   }
 
   void _onBackButtonPressed() {
@@ -176,6 +206,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
             navigationType: NavigationType.pushAndRemoveUntil,
           ),
         );
+        _updateProgress(UserNotificationState.canceled);
       case ErrorBaseResponse<OrderEntity>():
         emit(
           state.copyWith(
