@@ -26,6 +26,8 @@ class PendingOrdersResponseModel extends Equatable {
   PendingOrdersEntity toEntity() => PendingOrdersEntity(
     message: message ?? '',
     orders: orders?.map((e) => e.toEntity()).toList() ?? [],
+    currentPage: metadata?.currentPage,
+    totalPages: metadata?.totalPages,
   );
 
   @override

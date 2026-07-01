@@ -14,6 +14,7 @@ import 'package:flowery_rider_app/features/tracking/presentation/screens/home_sc
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/widgets/empty_orders_state.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/widgets/order_card.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/pagination_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -274,6 +275,52 @@ void main() {
 
       expect(find.byType(OrderCard), findsOneWidget);
       verify(mockUseCase.call(page: anyNamed('page'))).called(1);
+    });
+
+    testWidgets('shows PaginationBar when totalPages > 1', (tester) async {
+      const paginatedEntity = PendingOrdersEntity(
+        message: 'success',
+        orders: [order1],
+        currentPage: 1,
+        totalPages: 2,
+      );
+
+      when(
+        mockUseCase.call(page: anyNamed('page')),
+      ).thenAnswer((_) async => SuccessBaseResponse(paginatedEntity));
+
+      await pumpHomeScreen(tester);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PaginationBar), findsOneWidget);
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+    });
+
+    testWidgets('tapping a page in PaginationBar triggers new fetch', (
+      tester,
+    ) async {
+      const paginatedEntity = PendingOrdersEntity(
+        message: 'success',
+        orders: [order1],
+        currentPage: 1,
+        totalPages: 3,
+      );
+
+      when(
+        mockUseCase.call(page: anyNamed('page')),
+      ).thenAnswer((_) async => SuccessBaseResponse(paginatedEntity));
+
+      await pumpHomeScreen(tester);
+      await tester.pumpAndSettle();
+
+      // Tap on page 2
+      await tester.tap(find.text('2'));
+      await tester.pumpAndSettle();
+
+      // Verify that the use case was called with page 2
+      // (1st call was on init, 2nd call on tap)
+      verify(mockUseCase.call(page: 2)).called(1);
     });
   });
 }

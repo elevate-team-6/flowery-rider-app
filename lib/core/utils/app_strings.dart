@@ -36,6 +36,7 @@ abstract class AppStrings {
   static const String submitDescription = 'submitDescription';
   static const String enterYourUserName = 'enterYourUserName';
   static const String firstName = 'firstName';
+  static const String lastName = 'lastName';
   static const String enterFirstName = 'enterFirstName';
   static const String secondName = 'secondName';
   static const String enterSecondName = 'enterSecondName';
@@ -106,13 +107,14 @@ abstract class AppStrings {
   static const String notification = 'notification';
   static const String language = 'language';
   static const String changeLanguage = 'changeLanguage';
-  static const String arabic = 'arabic';
-  static const String english = 'english';
+  static const String arabic = 'Arabic';
+  static const String english = 'English';
   static const String aboutUs = 'aboutUs';
   static const String logout = 'logout';
   static const String logoutSuccess = 'logoutSuccess';
   static const String version = 'version';
   static const String confirmLogout = 'confirmLogout';
+  static const String passwordMask = '★★★★★★';
 
   // Address Details Screen
   static const String enableLocationServices = 'enableLocationServices';
@@ -166,8 +168,12 @@ abstract class AppStrings {
   // edit profile
   static const String editProfile = 'editProfile';
   static const String editProfileSuccessfly = 'editProfileSuccessfly';
+  static const String editVehicleSuccessfly = 'Vehicle updated successfully';
   static const String change = 'change';
   static const String update = 'update';
+  static const String vehicleInfo = 'vehicleInfo';
+  static const String photoUpdatedSuccess = 'photoUpdatedSuccess';
+  static const String photoTooLarge = 'photoTooLarge';
   static const String femaleValue = 'female';
   static const String maleValue = 'male';
   static const String photo = 'photo';

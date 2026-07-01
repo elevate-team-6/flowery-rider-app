@@ -3,11 +3,18 @@ import 'package:equatable/equatable.dart';
 class PendingOrdersEntity extends Equatable {
   final String message;
   final List<OrderEntity> orders;
+  final int? currentPage;
+  final int? totalPages;
 
-  const PendingOrdersEntity({required this.message, required this.orders});
+  const PendingOrdersEntity({
+    required this.message,
+    required this.orders,
+    this.currentPage,
+    this.totalPages,
+  });
 
   @override
-  List<Object?> get props => [message, orders];
+  List<Object?> get props => [message, orders, currentPage, totalPages];
 }
 
 class DriverOrdersEntity extends Equatable {

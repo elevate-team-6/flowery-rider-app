@@ -71,6 +71,8 @@ void main() {
   const fakeEntity = PendingOrdersEntity(
     message: 'success',
     orders: [order1, order2],
+    currentPage: 1,
+    totalPages: 5,
   );
 
   setUp(() {

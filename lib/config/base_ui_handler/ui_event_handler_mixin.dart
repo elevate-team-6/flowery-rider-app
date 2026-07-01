@@ -33,7 +33,7 @@ mixin UiEventHandler<T extends StatefulWidget> on State<T> {
               arguments: event.arguments,
             );
           case NavigationType.pop:
-            Navigator.pop(context);
+            Navigator.pop(context, event.arguments);
         }
       case ShowLoadingEvent():
         LoadingDialog.show(context: context);

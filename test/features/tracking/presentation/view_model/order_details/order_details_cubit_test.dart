@@ -4,6 +4,8 @@ import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
+import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
+import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/cache_active_order_use_case.dart';
@@ -28,9 +30,11 @@ import 'order_details_cubit_test.mocks.dart';
   CacheActiveOrderUseCase,
   GetActiveOrderUseCase,
   ClearActiveOrderUseCase,
+  UpdateOrderProgressUseCase,
 ])
 void main() {
   provideDummy<BaseResponse<OrderEntity>>(ErrorBaseResponse('dummy'));
+  provideDummy<BaseResponse<void>>(SuccessBaseResponse(null));
 
   late OrderDetailsCubit cubit;
   late MockUpdateOrderStateUseCase mockUpdateOrderStateUseCase;
@@ -39,6 +43,7 @@ void main() {
   late MockCacheActiveOrderUseCase mockCacheActiveOrderUseCase;
   late MockGetActiveOrderUseCase mockGetActiveOrderUseCase;
   late MockClearActiveOrderUseCase mockClearActiveOrderUseCase;
+  late MockUpdateOrderProgressUseCase mockUpdateOrderProgressUseCase;
 
   setUp(() {
     mockUpdateOrderStateUseCase = MockUpdateOrderStateUseCase();
@@ -47,6 +52,15 @@ void main() {
     mockCacheActiveOrderUseCase = MockCacheActiveOrderUseCase();
     mockGetActiveOrderUseCase = MockGetActiveOrderUseCase();
     mockClearActiveOrderUseCase = MockClearActiveOrderUseCase();
+    mockUpdateOrderProgressUseCase = MockUpdateOrderProgressUseCase();
+
+    when(
+      mockUpdateOrderProgressUseCase(
+        userId: anyNamed('userId'),
+        orderId: anyNamed('orderId'),
+        state: anyNamed('state'),
+      ),
+    ).thenAnswer((_) async => SuccessBaseResponse(null));
 
     cubit = OrderDetailsCubit(
       mockUpdateOrderStateUseCase,
@@ -55,6 +69,7 @@ void main() {
       mockCacheActiveOrderUseCase,
       mockGetActiveOrderUseCase,
       mockClearActiveOrderUseCase,
+      mockUpdateOrderProgressUseCase,
     );
   });
 
@@ -118,6 +133,13 @@ void main() {
       ],
       verify: (_) {
         verify(mockStartOrderUseCase('1')).called(1);
+        verify(
+          mockUpdateOrderProgressUseCase(
+            userId: 'u1',
+            orderId: '1',
+            state: UserNotificationState.accepted,
+          ),
+        ).called(1);
         verify(mockCacheActiveOrderUseCase(any, any)).called(1);
       },
     );
@@ -178,6 +200,13 @@ void main() {
       ],
       verify: (_) {
         verify(mockCacheActiveOrderUseCase(any, 2)).called(1);
+        verify(
+          mockUpdateOrderProgressUseCase(
+            userId: 'u1',
+            orderId: '1',
+            state: UserNotificationState.preparing,
+          ),
+        ).called(1);
       },
     );
 
@@ -208,6 +237,20 @@ void main() {
       );
 
       cubit.doEvent(OrderDetailsNextStepEvent());
+      await untilCalled(
+        mockUpdateOrderProgressUseCase(
+          userId: 'u1',
+          orderId: '1',
+          state: UserNotificationState.delivered,
+        ),
+      );
+      verify(
+        mockUpdateOrderProgressUseCase(
+          userId: 'u1',
+          orderId: '1',
+          state: UserNotificationState.delivered,
+        ),
+      ).called(1);
 
       await untilCalled(mockClearActiveOrderUseCase());
       verify(mockClearActiveOrderUseCase()).called(1);
@@ -224,6 +267,7 @@ void main() {
         when(mockClearActiveOrderUseCase()).thenAnswer((_) async {});
         return cubit;
       },
+      seed: () => OrderDetailsState(orderDetailsState: BaseState(data: tOrder)),
       act: (cubit) => cubit.doEvent(RevertOrderToPendingEvent('1')),
       expect: () => [
         isA<OrderDetailsState>().having(
@@ -239,7 +283,34 @@ void main() {
       ],
       verify: (_) {
         verify(mockClearActiveOrderUseCase()).called(1);
+        verify(
+          mockUpdateOrderProgressUseCase(
+            userId: 'u1',
+            orderId: '1',
+            state: UserNotificationState.canceled,
+          ),
+        ).called(1);
       },
     );
+    test('emits NavigateEvent to mainLayout on success', () async {
+      when(
+        mockUpdateOrderStateUseCase(any, any),
+      ).thenAnswer((_) async => SuccessBaseResponse(tOrder));
+
+      expectLater(
+        cubit.eventStream,
+        emitsThrough(
+          isA<NavigateEvent>()
+              .having((e) => e.routeName, 'routeName', AppRoutes.mainLayout)
+              .having(
+                (e) => e.navigationType,
+                'type',
+                NavigationType.pushAndRemoveUntil,
+              ),
+        ),
+      );
+
+      cubit.doEvent(RevertOrderToPendingEvent('1'));
+    });
   });
 }

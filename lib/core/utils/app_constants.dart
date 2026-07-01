@@ -5,4 +5,48 @@ abstract class AppConstants {
 
   // api images base url
   static const String imageBaseUrl = 'https://flower.elevateegy.com/uploads/';
+  // Firestore Collections
+  static const String usersCollection = "users";
+  static const String ordersCollection = "orders";
+  static const String appConfigsCollection = "app_configs";
+
+  // Firestore Fields
+  static const String fcmTokenField = "fcmToken";
+  static const String languageField = "language";
+  static const String statusField = "status";
+  static const String riderIdField = "riderId";
+  static const String riderNameField = "riderName";
+  static const String riderPhoneField = "riderPhone";
+
+  // Firestore Documents
+  static const String fcmDoc = "fcm";
+  static const String privateKeyField = "privateKey";
+  static const String clientEmailField = "clientEmail";
+  static const String projectIdField = "projectId";
+  static const String serverKeyField = "serverKey";
+
+  // Notification Fields
+  static const String notificationsField = "notifications";
+  static const String titleField = "title";
+  static const String bodyField = "body";
+  static const String sentTimeField = "sentTime";
+  static const String dataField = "data";
+  static const String clickActionField = "click_action";
+  static const String clickActionValue = "FLUTTER_NOTIFICATION_CLICK";
+  static const String typeField = "type";
+  static const String orderUpdateValue = "order_update";
+  static const String orderIdField = "orderId";
+  static const String messageField = "message";
+  static const String tokenField = "token";
+  static const String notificationField = "notification";
+
+  // Headers
+  static const String contentTypeHeader = "Content-Type";
+  static const String applicationJson = "application/json";
+  static const String authorizationHeader = "Authorization";
+  static const String bearer = "Bearer";
+
+  // FCM Scopes
+  static const String fcmScope =
+      'https://www.googleapis.com/auth/firebase.messaging';
 }

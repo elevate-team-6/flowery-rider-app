@@ -1,6 +1,11 @@
+import 'dart:async';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
+import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
+import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/cache_active_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/clear_active_order_use_case.dart';
@@ -10,6 +15,7 @@ import 'package:flowery_rider_app/features/tracking/domain/use_cases/start_order
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_order_state_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_cubit.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/confirm_cancel_dialog.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/widgets/order_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -23,7 +29,9 @@ import 'order_details_screen_test.mocks.dart';
 
 class _InMemoryAssetLoader extends AssetLoader {
   const _InMemoryAssetLoader(this._data);
+
   final Map<String, Map<String, dynamic>> _data;
+
   @override
   Future<Map<String, dynamic>> load(String path, Locale locale) async =>
       _data[locale.languageCode] ?? const {};
@@ -36,11 +44,13 @@ class _InMemoryAssetLoader extends AssetLoader {
   CacheActiveOrderUseCase,
   GetActiveOrderUseCase,
   ClearActiveOrderUseCase,
+  UpdateOrderProgressUseCase,
 ])
 void main() {
   late MockUpdateOrderStateUseCase mockUpdateUseCase;
   late MockStartOrderUseCase mockStartUseCase;
   late MockOpenCommunicationUseCase mockCommUseCase;
+  late MockUpdateOrderProgressUseCase mockUpdateProgressUseCase;
   late MockCacheActiveOrderUseCase mockCacheUseCase;
   late MockGetActiveOrderUseCase mockGetUseCase;
   late MockClearActiveOrderUseCase mockClearUseCase;
@@ -119,8 +129,18 @@ void main() {
     mockCacheUseCase = MockCacheActiveOrderUseCase();
     mockGetUseCase = MockGetActiveOrderUseCase();
     mockClearUseCase = MockClearActiveOrderUseCase();
+    mockUpdateProgressUseCase = MockUpdateOrderProgressUseCase();
 
     provideDummy<BaseResponse<OrderEntity>>(ErrorBaseResponse('dummy'));
+    provideDummy<BaseResponse<void>>(SuccessBaseResponse(null));
+
+    when(
+      mockUpdateProgressUseCase(
+        userId: anyNamed('userId'),
+        orderId: anyNamed('orderId'),
+        state: anyNamed('state'),
+      ),
+    ).thenAnswer((_) async => SuccessBaseResponse(null));
 
     when(mockGetUseCase()).thenAnswer((_) async => null);
     when(
@@ -135,6 +155,7 @@ void main() {
       mockCacheUseCase,
       mockGetUseCase,
       mockClearUseCase,
+      mockUpdateProgressUseCase,
     );
   });
 
@@ -195,6 +216,129 @@ void main() {
       expect(find.text('Nour mohamed'), findsOneWidget);
       expect(find.textContaining('150'), findsOneWidget);
       expect(find.byType(OrderActionButton), findsOneWidget);
+    });
+    testWidgets('shows loading dialog during initial fetch', (tester) async {
+      final completer = Completer<BaseResponse<OrderEntity>>();
+      when(mockStartUseCase(any)).thenAnswer((_) => completer.future);
+
+      await tester.pumpWidget(
+        EasyLocalization(
+          supportedLocales: const [Locale('en')],
+          path: 'assets/translations',
+          startLocale: const Locale('en'),
+          assetLoader: _InMemoryAssetLoader(translations),
+          child: Builder(
+            builder: (context) => ScreenUtilInit(
+              designSize: surface,
+              builder: (_, _) => MaterialApp(
+                localizationsDelegates: context.localizationDelegates,
+                supportedLocales: context.supportedLocales,
+                locale: context.locale,
+                home: BlocProvider<OrderDetailsCubit>.value(
+                  value: cubit,
+                  child: OrderDetailsScreen(
+                    args: OrderDetailsArgs(order: tOrder),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.pump();
+      expect(find.byType(LoadingDialog), findsOneWidget);
+    });
+  });
+
+  group('OrderDetailsScreen Interactions', () {
+    testWidgets('triggers NextStepEvent on button press', (tester) async {
+      when(
+        mockUpdateUseCase(any, any),
+      ).thenAnswer((_) async => SuccessBaseResponse(tOrder));
+
+      await pumpOrderDetailsScreen(tester);
+      await tester.tap(find.byType(OrderActionButton));
+      await tester.pump();
+
+      verify(mockUpdateUseCase('123456', any)).called(1);
+    });
+
+    testWidgets('triggers CallPhoneEvent when phone icon is tapped', (
+      tester,
+    ) async {
+      when(mockCommUseCase(any, any)).thenAnswer((_) async => true);
+
+      await pumpOrderDetailsScreen(tester);
+
+      final phoneIcons = find.byIcon(Icons.phone_outlined);
+      expect(phoneIcons, findsAtLeastNWidgets(1));
+
+      await tester.tap(phoneIcons.first);
+      await tester.pumpAndSettle();
+
+      verify(mockCommUseCase('01000000000', any)).called(1);
+    });
+
+    testWidgets('triggers OpenWhatsAppEvent when WhatsApp icon is tapped', (
+      tester,
+    ) async {
+      when(mockCommUseCase(any, any)).thenAnswer((_) async => true);
+
+      await pumpOrderDetailsScreen(tester);
+
+      final whatsAppIcons = find.byIcon(Icons.chat_outlined);
+      expect(whatsAppIcons, findsAtLeastNWidgets(1));
+
+      await tester.tap(whatsAppIcons.first);
+      await tester.pumpAndSettle();
+
+      verify(mockCommUseCase('01000000000', any)).called(1);
+    });
+
+    testWidgets(
+      'triggers ConfirmBackButtonPressedEvent on AppBar back button',
+      (tester) async {
+        await pumpOrderDetailsScreen(tester);
+
+        await tester.tap(find.byIcon(Icons.arrow_back_ios));
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ConfirmCancelDialog), findsOneWidget);
+      },
+    );
+  });
+
+  group('OrderDetailsScreen Side Effects', () {
+    testWidgets(
+      'shows ConfirmCancelDialog when ShowConfirmationDialogEvent is emitted',
+      (tester) async {
+        await pumpOrderDetailsScreen(tester);
+
+        cubit.emitUiEvent(ShowConfirmationDialogEvent());
+        await tester.pumpAndSettle();
+
+        expect(find.byType(ConfirmCancelDialog), findsOneWidget);
+      },
+    );
+  });
+
+  group('OrderDetailsScreen Edge Cases', () {
+    testWidgets('renders empty items list without crashing', (tester) async {
+      final orderWithoutItems = tOrder.copyWith(orderItems: []);
+      when(
+        mockStartUseCase(any),
+      ).thenAnswer((_) async => SuccessBaseResponse(orderWithoutItems));
+
+      await pumpOrderDetailsScreen(tester);
+
+      expect(
+        find.descendant(
+          of: find.byType(AppBar),
+          matching: find.text('Order details'),
+        ),
+        findsOneWidget,
+      );
     });
   });
 }

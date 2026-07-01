@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'config/cache/hive_helper.dart';
 import 'config/di/di.dart';
+import 'config/services/auth_service.dart';
 import 'config/services/firebase_service.dart';
 import 'core/utils/app_constants.dart';
 import 'core/utils/app_routes.dart';
@@ -14,7 +15,6 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
 
-  // Initialize Firebase
   await FirebaseService.init();
 
   configureDependencies();
@@ -22,6 +22,7 @@ Future<void> main() async {
   // Initialize Hive
   await getIt<HiveHelper>().init();
 
+  final isLoggedIn = await AuthService.isLoggedIn();
   runApp(
     EasyLocalization(
       supportedLocales: const [
@@ -30,13 +31,15 @@ Future<void> main() async {
       ],
       path: AppConstants.translationsPath,
       fallbackLocale: const Locale('en'),
-      child: const MyApp(),
+      child: MyApp(isLoggedIn: isLoggedIn),
     ),
   );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final bool isLoggedIn;
+
+  const MyApp({super.key, this.isLoggedIn = true});
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +56,6 @@ class MyApp extends StatelessWidget {
           title: 'Flowery Rider App',
           theme: AppTheme.mainTheme,
           navigatorKey: AppRoutes.navigatorKey,
-          initialRoute: AppRoutes.splash,
           onGenerateRoute: AppRoutes.onGenerateRoute,
           builder: BotToastInit(),
           navigatorObservers: [BotToastNavigatorObserver()],
