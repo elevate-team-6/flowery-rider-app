@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
+import 'package:flowery_rider_app/config/di/di.dart';
+import 'package:flowery_rider_app/features/mainLayout/presentation/view_model/main_layout_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/orders_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_cubit.dart';
@@ -24,11 +26,13 @@ import 'orders_screen_test.mocks.dart';
 @GenerateMocks([OrderScreenCubit])
 void main() {
   late MockOrderScreenCubit mockCubit;
+  late MainLayoutCubit mainLayoutCubit;
   late StreamController<BaseUiEvent> eventController;
   late StreamController<OrderScreenState> stateController;
 
   setUp(() {
     mockCubit = MockOrderScreenCubit();
+    mainLayoutCubit = MainLayoutCubit();
     eventController = StreamController<BaseUiEvent>.broadcast();
     stateController = StreamController<OrderScreenState>.broadcast();
 
@@ -38,23 +42,35 @@ void main() {
     when(mockCubit.eventStream).thenAnswer((_) => eventController.stream);
     when(mockCubit.close()).thenAnswer((_) async => {});
     when(mockCubit.doEvent(any)).thenReturn(null);
+
+    // Mock getIt
+    if (getIt.isRegistered<OrderScreenCubit>()) {
+      getIt.unregister<OrderScreenCubit>();
+    }
+    getIt.registerFactory<OrderScreenCubit>(() => mockCubit);
   });
 
   tearDown(() {
     eventController.close();
     stateController.close();
+    mainLayoutCubit.close();
+    if (getIt.isRegistered<OrderScreenCubit>()) {
+      getIt.unregister<OrderScreenCubit>();
+    }
   });
 
-  Widget createWidget({bool isActive = true}) {
+  Widget createWidget({int mainIndex = 1}) {
+    mainLayoutCubit.changeIndex(mainIndex);
+
     return MaterialApp(
       home: Scaffold(
         body: ScreenUtilInit(
           designSize: const Size(360, 690),
           minTextAdapt: true,
           splitScreenMode: true,
-          builder: (context, child) => BlocProvider<OrderScreenCubit>.value(
-            value: mockCubit,
-            child: OrdersScreen(isActive: isActive),
+          builder: (context, child) => BlocProvider<MainLayoutCubit>.value(
+            value: mainLayoutCubit,
+            child: const OrdersScreen(),
           ),
         ),
       ),
@@ -88,34 +104,33 @@ void main() {
   );
 
   group('OrdersScreen Lazy Loading Tests', () {
-    testWidgets('calls GetDriverOrdersEvent when isActive is true on init', (
+    testWidgets('calls GetDriverOrdersEvent when index is 1 on init', (
       tester,
     ) async {
-      await tester.pumpWidget(createWidget(isActive: true));
+      await tester.pumpWidget(createWidget(mainIndex: 1));
       verify(mockCubit.doEvent(argThat(isA<GetDriverOrdersEvent>()))).called(1);
     });
 
     testWidgets(
-      'does not call GetDriverOrdersEvent when isActive is false on init',
+      'does not call GetDriverOrdersEvent when index is not 1 on init',
       (tester) async {
-        await tester.pumpWidget(createWidget(isActive: false));
+        await tester.pumpWidget(createWidget(mainIndex: 0));
         verifyNever(mockCubit.doEvent(any));
       },
     );
 
-    testWidgets(
-      'calls GetDriverOrdersEvent when isActive changes from false to true',
-      (tester) async {
-        await tester.pumpWidget(createWidget(isActive: false));
-        verifyNever(mockCubit.doEvent(any));
+    testWidgets('calls GetDriverOrdersEvent when index changes from 0 to 1', (
+      tester,
+    ) async {
+      await tester.pumpWidget(createWidget(mainIndex: 0));
+      verifyNever(mockCubit.doEvent(any));
 
-        // Re-pump with isActive = true
-        await tester.pumpWidget(createWidget(isActive: true));
-        verify(
-          mockCubit.doEvent(argThat(isA<GetDriverOrdersEvent>())),
-        ).called(1);
-      },
-    );
+      // Simulate index change
+      mainLayoutCubit.changeIndex(1);
+
+      await tester.pump();
+      verify(mockCubit.doEvent(argThat(isA<GetDriverOrdersEvent>()))).called(1);
+    });
   });
 
   group('OrdersScreen Widget Rendering Tests', () {
@@ -147,7 +162,6 @@ void main() {
       when(mockCubit.state).thenReturn(state);
 
       await tester.pumpWidget(createWidget());
-      // pump() instead of pumpAndSettle() for infinite animations
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
 
