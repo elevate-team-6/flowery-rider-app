@@ -33,6 +33,29 @@ class DriverEntity extends Equatable {
     required this.id,
     required String name,
   });
+  DriverEntity copyWith({
+    String? vehicleType,
+    String? vehicleNumber,
+    String? vehicleLicense,
+  }) {
+    return DriverEntity(
+      id: id,
+      country: country,
+      firstName: firstName,
+      lastName: lastName,
+      nid: nid,
+      nidImg: nidImg,
+      email: email,
+      gender: gender,
+      phone: phone,
+      photo: photo,
+      role: role,
+      vehicleType: vehicleType ?? this.vehicleType,
+      vehicleNumber: vehicleNumber ?? this.vehicleNumber,
+      vehicleLicense: vehicleLicense ?? this.vehicleLicense,
+      name: '',
+    );
+  }
 
   @override
   List<Object?> get props => [

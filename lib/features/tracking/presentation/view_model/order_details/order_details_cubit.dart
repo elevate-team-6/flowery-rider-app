@@ -1,15 +1,15 @@
-import 'dart:convert';
-
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
-import 'package:flowery_rider_app/config/cache/hive_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
 import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/cache_active_order_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/clear_active_order_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_active_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/start_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_order_state_use_case.dart';
@@ -25,22 +25,26 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   final UpdateOrderStateUseCase _updateOrderStateUseCase;
   final StartOrderUseCase _startOrderUseCase;
   final OpenCommunicationUseCase _openCommunicationUseCase;
+  final CacheActiveOrderUseCase _cacheActiveOrderUseCase;
+  final GetActiveOrderUseCase _getActiveOrderUseCase;
+  final ClearActiveOrderUseCase _clearActiveOrderUseCase;
   final UpdateOrderProgressUseCase _updateOrderProgressUseCase;
-  final HiveHelper _hiveHelper;
 
   OrderDetailsCubit(
     this._updateOrderStateUseCase,
     this._startOrderUseCase,
     this._openCommunicationUseCase,
+    this._cacheActiveOrderUseCase,
+    this._getActiveOrderUseCase,
+    this._clearActiveOrderUseCase,
     this._updateOrderProgressUseCase,
-    this._hiveHelper,
   ) : super(const OrderDetailsState());
 
   void doEvent(OrderDetailsEvents event) {
     switch (event) {
-      case InitializeOrderDetailsEvent():
+      case OrderDetailsInitializeEvent():
         _onInitialize(event.order, initialStep: event.initialStep);
-      case NextStepEvent():
+      case OrderDetailsNextStepEvent():
         _onNextStep();
       case ConfirmBackButtonPressedEvent():
         _onBackButtonPressed();
@@ -59,9 +63,26 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     final initialBackendStatus = OrderStatus.fromString(order.state);
     int step = initialStep ?? 1;
 
-    // If no initialStep is provided, fallback to basic logic
+    // Check Cache first
+    final cachedData = await _getActiveOrderUseCase();
+    if (cachedData != null) {
+      final cachedOrder = OrderEntity.fromJson(cachedData[AppKeys.order]);
+      if (cachedOrder.id == order.id) {
+        final cachedStep = cachedData[AppKeys.uiStep] as int;
+        emit(
+          state.copyWith(
+            orderDetailsState: BaseState(data: cachedOrder),
+            orderStatus: OrderStatus.fromString(cachedOrder.state),
+            uiStep: cachedStep,
+          ),
+        );
+        return; // Don't call startOrder API if cached
+      }
+    }
+
+    // Fallback if no cache
     if (initialStep == null) {
-      if (initialBackendStatus == OrderStatus.completed) {
+      if (initialBackendStatus == OrderStatus.delivered) {
         step = 6;
       } else if (initialBackendStatus == OrderStatus.inProgress) {
         step = 1;
@@ -76,51 +97,47 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       ),
     );
 
-    if (order.id != null) {
-      BaseResponse<OrderEntity> startResult = await _startOrderUseCase(
-        order.id!,
+    BaseResponse<OrderEntity> startResult = await _startOrderUseCase(order.id);
+
+    if (startResult is SuccessBaseResponse<OrderEntity>) {
+      final updatedOrder = startResult.data;
+      final mergedOrder = order.mergeWith(updatedOrder);
+
+      emit(
+        state.copyWith(
+          orderDetailsState: BaseState(data: mergedOrder),
+          orderStatus: OrderStatus.fromString(mergedOrder.state),
+        ),
       );
-
-      if (startResult is SuccessBaseResponse<OrderEntity>) {
-        final updatedOrder = startResult.data;
-        // Merge: Keep the rich data (user/store) from passed entity if API response is partial
-        final mergedOrder = order.mergeWith(updatedOrder);
-
-        emit(
-          state.copyWith(
-            orderDetailsState: BaseState(data: mergedOrder),
-            orderStatus: OrderStatus.fromString(mergedOrder.state),
-          ),
-        );
-        _cacheOrder(mergedOrder);
-
-        // Notify User: Step 1 (Accepted)
-        _updateProgress(UserNotificationState.accepted);
-      }
+      await _cacheActiveOrderUseCase(mergedOrder, state.uiStep);
+      // Notify User: Step 1 (Accepted)
+      _updateProgress(UserNotificationState.accepted);
     }
   }
 
   Future<void> _onNextStep() async {
     final currentStep = state.uiStep;
-    if (currentStep >= 6) return;
+    if (currentStep >= 6 || state.updateStepState.isLoading) return;
+
+    final currentOrder = state.orderDetailsState.data;
+    if (currentOrder == null) return;
 
     final nextStep = currentStep + 1;
-    final currentOrder = state.orderDetailsState.data;
-    final orderId = currentOrder?.id;
-    if (orderId == null) return;
+    final orderId = currentOrder.id;
 
     OrderStatus backendStatus = (nextStep == 6)
-        ? OrderStatus.completed
+        ? OrderStatus.delivered
         : OrderStatus.inProgress;
 
     emitUiEvent(ShowLoadingEvent());
+    emit(state.copyWith(updateStepState: const BaseState(isLoading: true)));
     final result = await _updateOrderStateUseCase(orderId, backendStatus);
+    emit(state.copyWith(updateStepState: const BaseState(isLoading: false)));
     emitUiEvent(HideLoadingEvent());
 
     switch (result) {
       case SuccessBaseResponse<OrderEntity>():
-        // Merge to prevent losing user/store details
-        final mergedOrder = currentOrder!.mergeWith(result.data);
+        final mergedOrder = currentOrder.mergeWith(result.data);
 
         emit(
           state.copyWith(
@@ -143,7 +160,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
         }
 
         if (nextStep == 6) {
-          _clearCache();
+          await _clearActiveOrderUseCase();
           emitUiEvent(
             NavigateEvent(
               AppRoutes.orderSuccess,
@@ -151,7 +168,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
             ),
           );
         } else {
-          _cacheOrder(mergedOrder);
+          await _cacheActiveOrderUseCase(mergedOrder, nextStep);
         }
       case ErrorBaseResponse<OrderEntity>():
         emitUiEvent(DisplayErrorEvent(result.errorMessage));
@@ -169,26 +186,6 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     );
   }
 
-  void _cacheOrder(OrderEntity order) {
-    final cacheData = {
-      AppKeys.order: order.toJson(),
-      AppKeys.uiStep: state.uiStep,
-    };
-
-    _hiveHelper.cacheData(
-      boxName: AppKeys.activeOrderBox,
-      key: AppKeys.activeOrderKey,
-      value: jsonEncode(cacheData),
-    );
-  }
-
-  void _clearCache() {
-    _hiveHelper.deleteData(
-      boxName: AppKeys.activeOrderBox,
-      key: AppKeys.activeOrderKey,
-    );
-  }
-
   void _onBackButtonPressed() {
     emitUiEvent(ShowConfirmationDialogEvent());
   }
@@ -202,7 +199,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     emit(state.copyWith(canselOrderState: BaseState()));
     switch (result) {
       case SuccessBaseResponse<OrderEntity>():
-        _clearCache();
+        await _clearActiveOrderUseCase();
         emitUiEvent(
           NavigateEvent(
             AppRoutes.mainLayout,
@@ -221,14 +218,16 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
 
   void _onNavigateToMap(LocationType type) {
     final order = state.orderDetailsState.data;
-    final lat = type == LocationType.store
-        ? order?.store?.lat
-        : order?.shippingAddress?.lat;
-    final long = type == LocationType.store
-        ? order?.store?.long
-        : order?.shippingAddress?.long;
+    if (order == null) return;
 
-    if (lat != null && long != null && order != null) {
+    final lat = type == LocationType.store
+        ? order.store.lat
+        : order.shippingAddress.lat;
+    final long = type == LocationType.store
+        ? order.store.long
+        : order.shippingAddress.long;
+
+    if (lat.isNotEmpty && long.isNotEmpty) {
       emitUiEvent(
         NavigateEvent(
           AppRoutes.mapScreen,
@@ -248,7 +247,9 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       phoneNumber,
       CommunicationType.phone,
     );
-    if (!success) emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
+    if (!success) {
+      emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
+    }
   }
 
   Future<void> _onOpenWhatsApp(String phoneNumber) async {
@@ -256,6 +257,8 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       phoneNumber,
       CommunicationType.whatsapp,
     );
-    if (!success) emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
+    if (!success) {
+      emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
+    }
   }
 }

@@ -3,11 +3,13 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
-import 'package:flowery_rider_app/config/cache/hive_helper.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
 import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/cache_active_order_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/clear_active_order_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_active_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/start_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_order_state_use_case.dart';
@@ -27,7 +29,9 @@ import 'order_details_screen_test.mocks.dart';
 
 class _InMemoryAssetLoader extends AssetLoader {
   const _InMemoryAssetLoader(this._data);
+
   final Map<String, Map<String, dynamic>> _data;
+
   @override
   Future<Map<String, dynamic>> load(String path, Locale locale) async =>
       _data[locale.languageCode] ?? const {};
@@ -37,15 +41,19 @@ class _InMemoryAssetLoader extends AssetLoader {
   UpdateOrderStateUseCase,
   StartOrderUseCase,
   OpenCommunicationUseCase,
+  CacheActiveOrderUseCase,
+  GetActiveOrderUseCase,
+  ClearActiveOrderUseCase,
   UpdateOrderProgressUseCase,
-  HiveHelper,
 ])
 void main() {
   late MockUpdateOrderStateUseCase mockUpdateUseCase;
   late MockStartOrderUseCase mockStartUseCase;
   late MockOpenCommunicationUseCase mockCommUseCase;
   late MockUpdateOrderProgressUseCase mockUpdateProgressUseCase;
-  late MockHiveHelper mockHiveHelper;
+  late MockCacheActiveOrderUseCase mockCacheUseCase;
+  late MockGetActiveOrderUseCase mockGetUseCase;
+  late MockClearActiveOrderUseCase mockClearUseCase;
   late OrderDetailsCubit cubit;
   late Map<String, Map<String, dynamic>> translations;
 
@@ -55,17 +63,30 @@ void main() {
     orderNumber: '123456',
     state: 'pending',
     createdAt: 'Wed, 03 Sep 2024, 11:00 AM',
+    paymentType: 'Cash',
     store: const StoreEntity(
       name: 'Flowery store',
+      image: '',
       address: '20th st, Sheikh Zayed, Giza',
       phoneNumber: '01000000000',
+      lat: '0.0',
+      long: '0.0',
     ),
     user: const UserEntity(
+      id: 'u1',
       fullName: 'Nour mohamed',
       phone: '01111111111',
-      id: 'user123',
+      photo: '',
     ),
     totalPrice: 150,
+    orderItems: const [],
+    shippingAddress: const ShippingAddressEntity(
+      street: 'Street',
+      city: 'Giza',
+      phone: '333',
+      lat: '0.0',
+      long: '0.0',
+    ),
   );
 
   setUpAll(() async {
@@ -105,8 +126,10 @@ void main() {
     mockUpdateUseCase = MockUpdateOrderStateUseCase();
     mockStartUseCase = MockStartOrderUseCase();
     mockCommUseCase = MockOpenCommunicationUseCase();
+    mockCacheUseCase = MockCacheActiveOrderUseCase();
+    mockGetUseCase = MockGetActiveOrderUseCase();
+    mockClearUseCase = MockClearActiveOrderUseCase();
     mockUpdateProgressUseCase = MockUpdateOrderProgressUseCase();
-    mockHiveHelper = MockHiveHelper();
 
     provideDummy<BaseResponse<OrderEntity>>(ErrorBaseResponse('dummy'));
     provideDummy<BaseResponse<void>>(SuccessBaseResponse(null));
@@ -119,16 +142,20 @@ void main() {
       ),
     ).thenAnswer((_) async => SuccessBaseResponse(null));
 
+    when(mockGetUseCase()).thenAnswer((_) async => null);
     when(
       mockStartUseCase(any),
     ).thenAnswer((_) async => SuccessBaseResponse(tOrder));
+    when(mockCacheUseCase(any, any)).thenAnswer((_) async {});
 
     cubit = OrderDetailsCubit(
       mockUpdateUseCase,
       mockStartUseCase,
       mockCommUseCase,
+      mockCacheUseCase,
+      mockGetUseCase,
+      mockClearUseCase,
       mockUpdateProgressUseCase,
-      mockHiveHelper,
     );
   });
 
@@ -158,7 +185,9 @@ void main() {
               locale: context.locale,
               home: BlocProvider<OrderDetailsCubit>.value(
                 value: cubit,
-                child: OrderDetailsScreen(order: tOrder),
+                child: OrderDetailsScreen(
+                  args: OrderDetailsArgs(order: tOrder),
+                ),
               ),
             ),
           ),
@@ -188,7 +217,6 @@ void main() {
       expect(find.textContaining('150'), findsOneWidget);
       expect(find.byType(OrderActionButton), findsOneWidget);
     });
-
     testWidgets('shows loading dialog during initial fetch', (tester) async {
       final completer = Completer<BaseResponse<OrderEntity>>();
       when(mockStartUseCase(any)).thenAnswer((_) => completer.future);
@@ -208,7 +236,9 @@ void main() {
                 locale: context.locale,
                 home: BlocProvider<OrderDetailsCubit>.value(
                   value: cubit,
-                  child: OrderDetailsScreen(order: tOrder),
+                  child: OrderDetailsScreen(
+                    args: OrderDetailsArgs(order: tOrder),
+                  ),
                 ),
               ),
             ),

@@ -26,11 +26,11 @@ class ShippingAddressModel extends Equatable {
   Map<String, dynamic> toJson() => _$ShippingAddressModelToJson(this);
 
   ShippingAddressEntity toEntity() => ShippingAddressEntity(
-    street: street,
-    city: city,
-    phone: phone,
-    lat: lat,
-    long: long,
+    street: street ?? '_',
+    city: city ?? '_',
+    phone: phone ?? '',
+    lat: lat ?? '',
+    long: long ?? '',
   );
 
   @override

@@ -10,13 +10,8 @@ import '../view_model/order_details/order_details_cubit.dart';
 import '../view_model/order_details/order_details_events.dart';
 
 class ConfirmCancelDialog extends StatelessWidget {
-  final OrderDetailsState state;
   final OrderEntity order;
-  const ConfirmCancelDialog({
-    super.key,
-    required this.state,
-    required this.order,
-  });
+  const ConfirmCancelDialog({super.key, required this.order});
 
   @override
   Widget build(BuildContext context) {
@@ -24,27 +19,41 @@ class ConfirmCancelDialog extends StatelessWidget {
       title: Text(AppStrings.confirmCancelOrderTitle.tr()),
       content: Text(AppStrings.confirmCancelOrderMessage.tr()),
       actions: [
-        TextButton(
-          onPressed: state.canselOrderState.isLoading
-              ? null
-              : () => Navigator.pop(context),
-          child: Text(AppStrings.cancel.tr()),
+        BlocBuilder<OrderDetailsCubit, OrderDetailsState>(
+          buildWhen: (previous, current) =>
+              previous.canselOrderState.isLoading !=
+              current.canselOrderState.isLoading,
+          builder: (context, state) {
+            return TextButton(
+              onPressed: state.canselOrderState.isLoading
+                  ? null
+                  : () => Navigator.pop(context),
+              child: Text(AppStrings.cancel.tr()),
+            );
+          },
         ),
-        TextButton(
-          onPressed: state.canselOrderState.isLoading
-              ? null
-              : () {
-                  context.read<OrderDetailsCubit>().doEvent(
-                    RevertOrderToPendingEvent(order.id ?? ''),
-                  );
-                },
-          child: state.canselOrderState.isLoading
-              ? SizedBox(
-                  width: 20.w,
-                  height: 20.w,
-                  child: const CircularProgressIndicator(strokeWidth: 2),
-                )
-              : Text(AppStrings.confirm.tr()),
+        BlocBuilder<OrderDetailsCubit, OrderDetailsState>(
+          buildWhen: (previous, current) =>
+              previous.canselOrderState.isLoading !=
+              current.canselOrderState.isLoading,
+          builder: (context, state) {
+            return TextButton(
+              onPressed: state.canselOrderState.isLoading
+                  ? null
+                  : () {
+                      context.read<OrderDetailsCubit>().doEvent(
+                        RevertOrderToPendingEvent(order.id),
+                      );
+                    },
+              child: state.canselOrderState.isLoading
+                  ? SizedBox(
+                      width: 20.w,
+                      height: 20.w,
+                      child: const CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : Text(AppStrings.confirm.tr()),
+            );
+          },
         ),
       ],
     );

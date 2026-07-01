@@ -3,8 +3,8 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/features/tracking/api/api_client/tracking_api_client.dart';
 import 'package:flowery_rider_app/features/tracking/api/data_sources/tracking_remote_data_source_impl.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
-import 'package:flowery_rider_app/features/tracking/data/models/response/order_action_response_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/pending_orders_response_model.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/update_order_state_response_model.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -80,7 +80,9 @@ void main() {
   });
 
   group('startOrder', () {
-    const fakeActionResponse = OrderActionResponseModel(message: 'success');
+    const fakeActionResponse = UpdateOrderStateResponseModel(
+      message: 'success',
+    );
 
     test('returns SuccessBaseResponse when api call succeeds', () async {
       when(
@@ -90,9 +92,9 @@ void main() {
       final result = await dataSource.startOrder('123');
 
       verify(mockApiClient.startOrder('123')).called(1);
-      expect(result, isA<SuccessBaseResponse<OrderActionResponseModel>>());
+      expect(result, isA<SuccessBaseResponse<UpdateOrderStateResponseModel>>());
       expect(
-        (result as SuccessBaseResponse<OrderActionResponseModel>).data,
+        (result as SuccessBaseResponse<UpdateOrderStateResponseModel>).data,
         fakeActionResponse,
       );
     });
@@ -109,7 +111,7 @@ void main() {
 
         final result = await dataSource.startOrder('123');
 
-        expect(result, isA<ErrorBaseResponse<OrderActionResponseModel>>());
+        expect(result, isA<ErrorBaseResponse<UpdateOrderStateResponseModel>>());
       },
     );
 
@@ -120,9 +122,10 @@ void main() {
 
         final result = await dataSource.startOrder('123');
 
-        expect(result, isA<ErrorBaseResponse<OrderActionResponseModel>>());
+        expect(result, isA<ErrorBaseResponse<UpdateOrderStateResponseModel>>());
         expect(
-          (result as ErrorBaseResponse<OrderActionResponseModel>).errorMessage,
+          (result as ErrorBaseResponse<UpdateOrderStateResponseModel>)
+              .errorMessage,
           'unknownError',
         );
       },
@@ -130,7 +133,9 @@ void main() {
   });
 
   group('updateOrderState', () {
-    const fakeActionResponse = OrderActionResponseModel(message: 'success');
+    const fakeActionResponse = UpdateOrderStateResponseModel(
+      message: 'success',
+    );
 
     test('returns SuccessBaseResponse when api call succeeds', () async {
       when(
@@ -151,9 +156,9 @@ void main() {
           const UpdateOrderStateRequestModel(state: OrderStatus.inProgress),
         ),
       ).called(1);
-      expect(result, isA<SuccessBaseResponse<OrderActionResponseModel>>());
+      expect(result, isA<SuccessBaseResponse<UpdateOrderStateResponseModel>>());
       expect(
-        (result as SuccessBaseResponse<OrderActionResponseModel>).data,
+        (result as SuccessBaseResponse<UpdateOrderStateResponseModel>).data,
         fakeActionResponse,
       );
     });
@@ -170,10 +175,10 @@ void main() {
 
         final result = await dataSource.updateOrderState(
           '123',
-          OrderStatus.completed,
+          OrderStatus.delivered,
         );
 
-        expect(result, isA<ErrorBaseResponse<OrderActionResponseModel>>());
+        expect(result, isA<ErrorBaseResponse<UpdateOrderStateResponseModel>>());
       },
     );
 
@@ -189,9 +194,10 @@ void main() {
           OrderStatus.inProgress,
         );
 
-        expect(result, isA<ErrorBaseResponse<OrderActionResponseModel>>());
+        expect(result, isA<ErrorBaseResponse<UpdateOrderStateResponseModel>>());
         expect(
-          (result as ErrorBaseResponse<OrderActionResponseModel>).errorMessage,
+          (result as ErrorBaseResponse<UpdateOrderStateResponseModel>)
+              .errorMessage,
           'unknownError',
         );
       },

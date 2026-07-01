@@ -39,7 +39,7 @@ class OrderItemsList extends StatelessWidget {
               child: Row(
                 children: [
                   CustomCachedImage(
-                    imageUrl: item.productImage ?? '',
+                    imageUrl: item.productImage,
                     width: 50.w,
                     height: 50.w,
                     borderRadius: BorderRadius.circular(8.r),
@@ -50,7 +50,7 @@ class OrderItemsList extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.productName ?? '',
+                          item.productName,
                           style: AppTextStyles.black14400.copyWith(
                             color: AppColors.white90,
                           ),

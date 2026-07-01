@@ -29,16 +29,16 @@ class StoreModel extends Equatable {
   StoreEntity toEntity() {
     List<String>? latLngList = latLong?.split(',');
     return StoreEntity(
-      name: name,
+      name: name ?? (throw Exception('Store Name is required')),
       image: (image != null && image!.isNotEmpty)
           ? (image!.startsWith('http')
-                ? image
+                ? image!
                 : '${AppConstants.imageBaseUrl}$image')
-          : image,
-      address: address,
-      phoneNumber: phoneNumber,
-      lat: latLngList != null && latLngList.isNotEmpty ? latLngList[0] : null,
-      long: latLngList != null && latLngList.length > 1 ? latLngList[1] : null,
+          : '',
+      address: address ?? '',
+      phoneNumber: phoneNumber ?? '',
+      lat: (latLngList != null && latLngList.isNotEmpty) ? latLngList[0] : '',
+      long: (latLngList != null && latLngList.length > 1) ? latLngList[1] : '',
     );
   }
 

@@ -13,4 +13,10 @@ abstract interface class TrackingRepoContract {
   );
 
   Future<BaseResponse<PendingOrdersEntity>> getPendingOrders({int? page});
+
+  Future<void> cacheActiveOrder(OrderEntity order, int uiStep);
+
+  Future<Map<String, dynamic>?> getCachedActiveOrder();
+
+  Future<void> clearCachedActiveOrder();
 }

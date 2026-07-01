@@ -8,11 +8,13 @@ import '../../../../core/utils/app_text_styles.dart';
 
 class OrderActionButton extends StatelessWidget {
   final int uiStep;
+  final bool isLoading;
   final VoidCallback onPressed;
 
   const OrderActionButton({
     super.key,
     required this.uiStep,
+    this.isLoading = false,
     required this.onPressed,
   });
 
@@ -36,8 +38,17 @@ class OrderActionButton extends StatelessWidget {
     }
 
     return ElevatedButton(
-      onPressed: onPressed,
-      child: Text(_getButtonText(uiStep).tr(), style: AppTextStyles.white16600),
+      onPressed: isLoading ? null : onPressed,
+      child: isLoading
+          ? SizedBox(
+              height: 20.h,
+              width: 20.h,
+              child: const CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            )
+          : Text(_getButtonText(uiStep).tr(), style: AppTextStyles.white16600),
     );
   }
 

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,6 +16,7 @@ import '../../../../config/cache/hive_helper.dart';
 import '../../../../config/di/di.dart';
 import '../../../../config/services/auth_service.dart';
 import '../../../tracking/domain/entities/order_entity.dart';
+import '../../../tracking/presentation/screens/order_details_screen.dart';
 import '../widgets/petals_painter.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -171,7 +173,10 @@ class _SplashScreenState extends State<SplashScreen>
         Navigator.pushReplacementNamed(
           context,
           AppRoutes.orderDetails,
-          arguments: {'order': cachedOrder, 'uiStep': cachedStep},
+          arguments: OrderDetailsArgs(
+            order: cachedOrder,
+            initialStep: cachedStep,
+          ),
         );
       } else {
         Navigator.pushReplacementNamed(
@@ -275,7 +280,7 @@ class _SplashScreenState extends State<SplashScreen>
                   FadeTransition(
                     opacity: _subtitleFadeAnimation,
                     child: Text(
-                      AppStrings.splashSubtitle,
+                      AppStrings.splashSubtitle.tr(),
                       style: AppTextStyles.gray14400PoppinsSpacing,
                     ),
                   ),

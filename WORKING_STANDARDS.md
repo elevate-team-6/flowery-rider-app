@@ -25,83 +25,69 @@ Every feature MUST be divided into exactly these 4 layers with these exact folde
         - `feature_states.dart`
     - `widgets/`: Feature-specific reusable widgets (to keep screen files small).
 
-## 2. Model Standards (Mandatory)
+## 2. Model Standards & Mapping (Mandatory)
 - MUST use `json_serializable` for all models.
 - Response models MUST have a `toEntity()` method to map data to the domain layer.
+- **Boundary Rule (Strict Data Validation)**:
+    - ALL null-handling MUST happen inside the `toEntity()` method.
+    - If a mandatory field from the server is `null`, `toEntity()` MUST throw an `Exception` (e.g., `throw Exception("Order ID is required")`).
+    - Optional fields MUST be assigned **Safe Defaults** (e.g., `""`, `0`, `[]`, `const PlaceholderEntity()`).
+    - The `toEntity()` method is the ONLY place allowed to handle raw server nullability.
+- **Model Organization**: Every Model/Response Class MUST be in its own separate file.
 - NO business logic in models.
 
-## 3. View Model (Cubit) & MVI Standards
+## 3. Domain Entity Standards (The "No-Null" Policy)
+- **Zero Nullability**: ALL fields in a Domain Entity MUST be **non-nullable** and **required**.
+- **Pure Dart**: Entities MUST be pure Dart classes. No `@JsonSerializable` or framework annotations.
+- **Immutability**: MUST extend `Equatable` and use `final` fields.
+- **Manual Helpers**: If caching is needed, add manual `toJson()` and `factory .fromJson()` methods to the Entity to keep it pure but functional for storage (Hive).
+- **Separation**: Every Entity MUST be in its own separate file.
+
+## 4. View Model (Cubit) & MVI Standards
 - **Inheritance**: MUST extend `BaseCubit<State, BaseUiEvent>` from `lib/config/base_cubit/base_cubit.dart`.
-- **State**: State classes MUST inherit from `BaseState<T>` from `lib/config/base_state/base_state.dart`.
-- **Composite States (Mandatory for Complex Screens)**:
-    - If a screen contains multiple independent operations (e.g., loading on a specific button, fetching details, submitting a form), the main State MUST contain nested `BaseState` objects (e.g., `detailsState`, `cancelState`, `submitState`).
-    - This allows granular UI control, where only the affected part of the screen shows a loader or error without blocking the entire UI.
-- **Events**: All UI actions must be defined in the `feature_events.dart` file using `sealed class`.
-- **Method Structure**:
-    - ONLY one public method: `void doEvent(FeatureEvents event)`.
-    - All other methods MUST be `private` (starting with `_`).
-    - **Logic Flows**: `Initialize` events should handle the full sequence of startup operations (e.g., calling a "Start" API followed by an "Update State" API) to ensure the system reaches a consistent state before user interaction.
-    - Pattern inside methods:
-        1. `emit(state.copyWith(...))` to update state.
-        2. `emitUiEvent(...)` for side effects (Loading, Success, Error, Navigation).
+- **Composite States**: Use nested `BaseState` (e.g., `detailsState`, `cancelState`) for granular UI control.
+- **Logic Flows**: `Initialize` events should handle the full sequence of startup operations.
+- **Safety First**: NEVER use the null-assertion operator `!` on `state.data`. Always use `if (state.data == null) return;`.
 - **Side Effects**: Mandatory use of `BaseUiEvent` for all UI interactions.
 
-## 4. Screen & UI Standards
-- **Zero Hardcoding**: NO hardcoded strings, colors, or dimensions.
-- **Mandatory Utils**: 
-    - Use `lib/core/utils/` for routes, strings, colors, and assets.
-    - Use `ScreenUtil` for ALL dimensions (h, w, sp, r).
-- **Strict Adherence to `AppTheme`**:
-    - MANDATORY use of `AppTheme.mainTheme` for all component styling (Buttons, Dialogs, Inputs, Cards).
-    - PROHIBITED to hardcode styling properties (padding, border radius, colors) in UI files if they are already defined in the global theme.
-    - If a design requires a new global style, it MUST be added to `lib/core/utils/app_theme.dart` first.
-- **Color & Opacity Standard**:
-    - STRICT PROHIBITION of `withOpacity()`.
-    - ALWAYS use `.withValues(alpha: ...)` for transparency to prevent precision loss and ensure compatibility with modern Flutter standards.
-- **Side Effect Handling**: Screens MUST use `UiEventHandler` mixin from `lib/config/base_ui_handler/ui_event_handler_mixin.dart`.
-- **File Size**: Screens MUST be split into small widgets located in the feature's `presentation/widgets/` folder.
+## 5. Screen & UI Standards (Zero Tolerance for Null logic)
+- **Clean UI Logic**: Since Entities are non-nullable, UI code MUST NOT contain null-checks (`?`), null-aware operators (`??`), or assertions (`!`) when accessing Entity properties.
+- **Bloc Optimization (Mandatory)**: 
+    - `BlocBuilder` MUST ONLY wrap the specific widget(s) that require rebuilding. NEVER wrap a whole screen or large static layouts with a generic `BlocBuilder`.
+    - MANDATORY use of `buildWhen`: Every `BlocBuilder` MUST implement `buildWhen` to prevent unnecessary rebuilds by filtering for specific state changes (e.g., `previous.status != current.status`).
+- **Zero Hardcoding**: NO hardcoded strings, colors, or dimensions. Use `lib/core/utils/`.
+- **Dimensions**: ALWAYS use `ScreenUtil` (h, w, sp, r).
+- **Themes**: MANDATORY use of `AppTheme.mainTheme`. Prohibited to hardcode padding/radius/colors in UI.
+- **Modern Standards**: ALWAYS use `.withValues(alpha: ...)` instead of `withOpacity()`.
+- **Side Effect Handling**: Screens MUST use `UiEventHandler` mixin.
 
-## 5. Error Handling & Response Pattern
-- **Centralized Handling**: Every API call in data sources MUST use `ErrorHandler.handleApiCall` from `lib/config/error_handler/error_handler.dart`.
-- **Response Wrapper**: All repository and use case returns MUST use `BaseResponse<T>` from `lib/config/base_response/base_response.dart`.
+## 6. Error Handling & Response Pattern
+- **Centralized Handling**: Every API call in data sources MUST use `ErrorHandler.handleApiCall`.
+- **Response Wrapper**: All repository and use case returns MUST use `BaseResponse<T>`.
+- **Repository Mapping Safety (Mandatory)**: 
+    - Repositories MUST wrap the `toEntity()` call inside a `try-catch` block.
+    - If `toEntity()` throws an exception due to missing mandatory data, the Repository MUST catch it and return an `ErrorBaseResponse` with a descriptive message.
+    - This ensures that the UI never stays in a loading state if a mapping error occurs.
 
-## 6. General Rules
+## 7. General Rules & DI
 - **DI**: Use `@injectable` for all Cubits, Repos, and DataSources.
-- **Logging**: NO `print()`. Use the `logger` package.
-- **Strong Typing**: `dynamic` is forbidden.
-- **Modern API Usage**: 
-    - NEVER use deprecated Flutter/Dart APIs.
-    - Always prefer `withValues()` over `withOpacity()`.
-    - Ensure all code is compatible with the latest stable version of Flutter and Dart.
-- **Clean Code**: Follow SOLID principles and keep methods small and focused.
+- **Strong Typing**: `dynamic` is strictly forbidden.
+- **Clean Code**: Follow SOLID principles. Keep methods small and focused.
+- **No ! Operator**: Usage of the `!` operator on Domain Entities in the Presentation layer is prohibited.
 
-## 7. Mandatory Feature Documentation (The "Docs" Rule)
-Before starting ANY feature, the developer/AI MUST ensure there is a documentation file in `docs/feature_name.md`. If it doesn't exist, it MUST be created.
-Each file MUST contain:
-1. **Design**: Links/References to design images/Figma.
-2. **API Details**: 
-    - Full path for every endpoint.
-    - Detailed Request body/params structure.
-    - Detailed Response body structure.
-3. **Business Requirements**: Detailed feature flow and logic requirements.
-4. **AI Modification History**: A complete log of every change made by an AI model, including the date and the specific task performed.
-5. **Dynamic Updates**: Any new information provided by the user MUST be immediately added to this document.
+## 8. Mandatory Feature Documentation (The "Docs" Rule)
+Before starting ANY feature, a documentation file MUST be created in `docs/feature_name.md`. It must include API details, business logic, and an **AI Modification History**.
 
-## 8. Testing Standards (MANDATORY)
-- **Frameworks**: MUST use `mockito`, `flutter_test`, and `bloc_test`.
-- **Organization**: Tests MUST be organized into `group()` blocks by function or event.
-- **Coverage**: 
-    - MUST test every possible state and side effect.
-    - MUST cover all success and failure scenarios (including edge cases).
-    - Cubit tests MUST use `blocTest` for state changes and `expectLater` for `eventStream` side effects.
-- **Mocks**: Use `@GenerateMocks` for all dependencies (UseCases, CacheHelpers, etc.).
+## 9. Testing Standards (MANDATORY)
+- MUST use `mockito`, `flutter_test`, and `bloc_test`.
+- MUST cover all success and failure scenarios (including edge cases where `toEntity()` throws exceptions).
+- Cubit tests MUST use `blocTest` for state changes and `expectLater` for side effects.
 
-## 8. AI & Developer Execution Protocol (MANDATORY)
-1. **Instruction Review**: MUST read the entire `WORKING_STANDARDS.md` and all feature files before starting any implementation.
-2. **Implementation Plan**: BEFORE writing any code, MUST provide a granular, step-by-step plan of action and get EXPLICIT user approval.
-3. **Execution**: ONLY start coding AFTER the user says "Proceed" or "Approved".
-4. **Final Verification**: AFTER completion, MUST run `flutter analyze` to ensure ZERO errors and ZERO warnings.
+## 10. AI & Developer Execution Protocol (MANDATORY)
+1. **Instruction Review**: MUST read the entire `WORKING_STANDARDS.md` before starting.
+2. **Implementation Plan**: MUST provide a step-by-step plan and get EXPLICIT user approval.
+3. **Final Verification**: MUST run `flutter analyze` to ensure ZERO errors and ZERO warnings.
 
 ---
 > [!CAUTION]
-> **COMPLIANCE IS NON-NEGOTIABLE.** Every line of code will be checked against this document.
+> **COMPLIANCE IS NON-NEGOTIABLE.** Any code containing nullable entities or null-logic in UI will be REJECTED.

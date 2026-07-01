@@ -1,5 +1,5 @@
 import 'package:flowery_rider_app/config/di/di.dart';
-import 'package:flowery_rider_app/core/utils/app_keys.dart';
+import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/apply_page.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/forget_password_screen.dart';
 import 'package:flowery_rider_app/features/auth/presentation/screens/login_screen.dart';
@@ -10,8 +10,13 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_p
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_cubit.dart';
 import 'package:flowery_rider_app/features/auth/presentation/view_model/login_view_model/login_event.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/main_layout.dart';
+import 'package:flowery_rider_app/features/profile/presentation/screens/change_password_screen.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/change_password/change_password_cubit.dart';
+import 'package:flowery_rider_app/features/profile/presentation/screens/edit_profile_screen.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_profile_view_model/edit_profile_cubit.dart';
+import 'package:flowery_rider_app/features/profile/presentation/screens/edit_vehicle_screen.dart';
+import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_vehicle/edit_vehicle_cubit.dart';
 import 'package:flowery_rider_app/features/splash/presentation/pages/splash_screen.dart';
-import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_success_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_cubit.dart';
@@ -29,9 +34,12 @@ abstract class AppRoutes {
   static const String submit = 'submit';
   static const String mainLayout = 'mainLayout';
   static const String forgetPassword = '/forgotPassword';
+  static const String changePassword = '/changePassword';
   static const String verifyResetCode = '/VerifyResetCode';
   static const String resetPassword = '/resetPassword';
+  static const String editVehicle = '/editVehicle';
   static const String orderDetails = 'orderDetails';
+  static const String editProfile = 'editProfile';
   static const String orderSuccess = 'orderSuccess';
   static const String mapScreen = 'mapScreen';
 
@@ -69,6 +77,23 @@ abstract class AppRoutes {
               child: const ApplyPage(),
             ),
           );
+        case changePassword:
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => getIt<ChangePasswordCubit>(),
+              child: const ChangePasswordScreen(),
+            ),
+          );
+
+        case editVehicle:
+          final driver = settings.arguments as DriverEntity;
+
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => getIt<EditVehicleCubit>(),
+              child: EditVehicleScreen(driver: driver),
+            ),
+          );
         case submit:
           return MaterialPageRoute(builder: (_) => const SuccessApplyScreen());
         case mainLayout:
@@ -86,22 +111,23 @@ abstract class AppRoutes {
             settings: settings,
           );
 
-        case orderDetails:
-          OrderEntity order;
-          int? initialStep;
+        case editProfile:
+          final driver = settings.arguments as DriverEntity;
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (context) => getIt<EditProfileCubit>(),
+              child: EditProfileScreen(driver: driver),
+            ),
+            settings: settings,
+          );
 
-          if (settings.arguments is OrderEntity) {
-            order = settings.arguments as OrderEntity;
-          } else {
-            final map = settings.arguments as Map<String, dynamic>;
-            order = map[AppKeys.order] as OrderEntity;
-            initialStep = map[AppKeys.uiStep] as int?;
-          }
+        case orderDetails:
+          final args = settings.arguments as OrderDetailsArgs;
 
           return MaterialPageRoute(
             builder: (_) => BlocProvider(
               create: (context) => getIt<OrderDetailsCubit>(),
-              child: OrderDetailsScreen(order: order, initialStep: initialStep),
+              child: OrderDetailsScreen(args: args),
             ),
             settings: settings,
           );
