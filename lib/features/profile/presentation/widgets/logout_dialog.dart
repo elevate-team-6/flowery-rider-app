@@ -5,9 +5,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/app_text_styles.dart';
-import '../view_model/profile_cubit.dart';
-import '../view_model/profile_events.dart';
-import '../view_model/profile_states.dart';
+import '../view_model/profile_view_model/profile_cubit.dart';
+import '../view_model/profile_view_model/profile_events.dart';
+import '../view_model/profile_view_model/profile_states.dart';
 
 class LogoutDialog extends StatelessWidget {
   const LogoutDialog({super.key});
