@@ -31,43 +31,39 @@ class PaginationBar extends StatelessWidget {
 
           SizedBox(width: 8.w),
 
+          // All page numbers, wrapping onto new lines so none are hidden.
           Expanded(
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              physics: const BouncingScrollPhysics(),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: List.generate(totalPages, (index) {
-                  int page = index + 1;
-                  bool isSelected = page == currentPage;
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              spacing: 8.w,
+              runSpacing: 8.h,
+              children: List.generate(totalPages, (index) {
+                int page = index + 1;
+                bool isSelected = page == currentPage;
 
-                  return GestureDetector(
-                    onTap: () => onPageChanged(page),
-                    child: Container(
-                      width: 32.w,
-                      height: 32.w,
-                      margin: EdgeInsets.symmetric(horizontal: 4.w),
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.primary : AppColors.white,
-                        borderRadius: BorderRadius.circular(4.r),
-                        border: Border.all(color: Colors.grey, width: 1.w),
-                      ),
-                      child: Text(
-                        page.toString(),
-                        style: AppTextStyles.primary14500.copyWith(
-                          color: isSelected
-                              ? AppColors.white
-                              : AppColors.primary,
-                          fontWeight: isSelected
-                              ? FontWeight.bold
-                              : FontWeight.w500,
-                        ),
+                return GestureDetector(
+                  onTap: () => onPageChanged(page),
+                  child: Container(
+                    width: 32.w,
+                    height: 32.w,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primary : AppColors.white,
+                      borderRadius: BorderRadius.circular(4.r),
+                      border: Border.all(color: Colors.grey, width: 1.w),
+                    ),
+                    child: Text(
+                      page.toString(),
+                      style: AppTextStyles.primary14500.copyWith(
+                        color: isSelected ? AppColors.white : AppColors.primary,
+                        fontWeight: isSelected
+                            ? FontWeight.bold
+                            : FontWeight.w500,
                       ),
                     ),
-                  );
-                }),
-              ),
+                  ),
+                );
+              }),
             ),
           ),
 

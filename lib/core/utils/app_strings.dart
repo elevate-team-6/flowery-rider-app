@@ -295,6 +295,17 @@ abstract class AppStrings {
   static const String confirmCancelOrderMessage =
       'confirm_cancel_order_message';
   static const String couldNotLaunchUrl = 'could_not_launch_url';
+  static const String showMap = 'show_map';
+  static const String yourLocation = 'your_location';
+  static const String customer = 'customer';
+  static const String loadingRoute = 'loading_route';
+  static const String showingDirectLine = 'showing_direct_line';
+  static const String noDestinationLocation = 'no_destination_location';
+  static const String locationServicesDisabled = 'location_services_disabled';
+  static const String locationPermissionRequired =
+      'location_permission_required';
+  static const String couldNotGetGpsFix = 'could_not_get_gps_fix';
+  static const String couldNotGetLocation = 'could_not_get_location';
 
   // ===========================================================================
   // API Constants (Values sent directly to Backend - Do NOT Translate)

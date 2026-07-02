@@ -236,6 +236,16 @@
     "confirm_cancel_order_title": "تأكيد الإلغاء",
     "confirm_cancel_order_message": "⚠️ هل أنت متأكد من رغبتك في إلغاء التوصيل وإعادة الطلب لقائمة الانتظار؟",
     "could_not_launch_url": "تعذر فتح الرابط",
+    "show_map": "عرض الخريطة",
+    "your_location": "موقعك",
+    "customer": "العميل",
+    "loading_route": "جارٍ تحميل المسار…",
+    "showing_direct_line": "عرض خط مباشر",
+    "no_destination_location": "لا يوجد موقع للوجهة",
+    "location_services_disabled": "من فضلك فعّل خدمات الموقع (GPS).",
+    "location_permission_required": "إذن الموقع مطلوب لعرض موقعك.",
+    "could_not_get_gps_fix": "تعذّر تحديد الموقع عبر GPS. حاول مرة أخرى.",
+    "could_not_get_location": "تعذّر الحصول على موقعك. حاول مرة أخرى.",
     "canceled": "ملغي",
     "inProgress": "قيد التنفيذ"
 }

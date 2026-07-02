@@ -7,7 +7,9 @@ import '../../../../core/utils/app_text_styles.dart';
 import '../../../../core/widgets/custom_cached_image.dart';
 
 class AddressInfoCard extends StatelessWidget {
-  final String label;
+  /// Optional heading above the card. When null/empty the card renders without
+  /// a built-in label (e.g. the map screen supplies its own label).
+  final String? label;
   final String? imageUrl;
   final String? title;
   final String? address;
@@ -17,7 +19,7 @@ class AddressInfoCard extends StatelessWidget {
 
   const AddressInfoCard({
     super.key,
-    required this.label,
+    this.label,
     this.imageUrl,
     this.title,
     this.address,
@@ -31,8 +33,10 @@ class AddressInfoCard extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label.tr(), style: AppTextStyles.black16600),
-        SizedBox(height: 12.h),
+        if (label != null && label!.isNotEmpty) ...[
+          Text(label!.tr(), style: AppTextStyles.black16600),
+          SizedBox(height: 12.h),
+        ],
         InkWell(
           onTap: onTap,
           borderRadius: BorderRadius.circular(12.r),

@@ -1,15 +1,18 @@
 import 'package:dio/dio.dart';
+import 'package:injectable/injectable.dart';
 import 'package:latlong2/latlong.dart';
 
 /// Fetches a road-following route between two points using the public OSRM
 /// demo server (free, fine for testing — swap for a paid/self-hosted server
 /// in production).
+@lazySingleton
 class OsrmRoutingService {
   final Dio _dio;
 
   OsrmRoutingService({Dio? dio}) : _dio = dio ?? Dio();
 
-  static const String _baseUrl = 'https://router.project-osrm.org/route/v1/driving';
+  static const String _baseUrl =
+      'https://router.project-osrm.org/route/v1/driving';
 
   /// Returns the list of points that draw the driving route from [start] to
   /// [end]. Throws on network / parsing errors so the caller can fall back to

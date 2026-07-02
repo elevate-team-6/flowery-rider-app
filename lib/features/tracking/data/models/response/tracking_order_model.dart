@@ -81,14 +81,18 @@ class TrackingOrderModel extends Equatable {
             long: '',
           ),
       orderItems: orderItems?.map((e) => e.toEntity()).toList() ?? [],
+      // TODO: temporary — the pending-orders API doesn't return shippingAddress,
+      // so the customer has no coordinates. Fall back to a fixed Cairo location
+      // (Nasr City) so the delivery route is testable. Remove once the API
+      // sends the real customer address.
       shippingAddress:
           shippingAddress?.toEntity() ??
           const ShippingAddressEntity(
-            street: '_',
-            city: '_',
+            street: 'Nasr City, Cairo',
+            city: 'Cairo',
             phone: '',
-            lat: '',
-            long: '',
+            lat: '30.0511',
+            long: '31.3656',
           ),
     );
   }

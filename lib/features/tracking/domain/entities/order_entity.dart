@@ -118,7 +118,14 @@ class OrderEntity extends Equatable {
       orderItems: (remote.orderItems.isNotEmpty)
           ? remote.orderItems
           : orderItems,
-      shippingAddress: remote.shippingAddress,
+      // Keep the local shipping address when the remote one is empty — the
+      // start / update-state responses don't include shippingAddress, so
+      // taking it unconditionally would wipe the real coordinates.
+      shippingAddress:
+          (remote.shippingAddress.lat.isNotEmpty &&
+              remote.shippingAddress.long.isNotEmpty)
+          ? remote.shippingAddress
+          : shippingAddress,
     );
   }
 

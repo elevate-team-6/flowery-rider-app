@@ -70,6 +70,8 @@ class HomeCubit extends BaseCubit<HomeStates, BaseUiEvent> {
           data: PendingOrdersEntity(
             message: current.message,
             orders: remaining,
+            currentPage: current.currentPage,
+            totalPages: current.totalPages,
           ),
         ),
         clearRejectingOrderId: true,

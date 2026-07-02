@@ -16,6 +16,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../widgets/address_info_card.dart';
 import '../widgets/order_action_button.dart';
+import '../widgets/order_show_map_button.dart';
 import '../widgets/order_items_list.dart';
 import '../widgets/order_status_card.dart';
 import '../widgets/order_step_indicator.dart';
@@ -207,14 +208,29 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                         previous.updateStepState.isLoading !=
                             current.updateStepState.isLoading,
                     builder: (context, state) {
-                      return OrderActionButton(
-                        uiStep: state.uiStep,
-                        isLoading: state.updateStepState.isLoading,
-                        onPressed: () {
-                          context.read<OrderDetailsCubit>().doEvent(
-                            OrderDetailsNextStepEvent(),
-                          );
-                        },
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          // Route to the store (step 1) or the customer
+                          // (steps 4 & 5). Hidden on every other step.
+                          OrderShowMapButton(
+                            uiStep: state.uiStep,
+                            onShowMap: (type) {
+                              context.read<OrderDetailsCubit>().doEvent(
+                                NavigateToMapEvent(type),
+                              );
+                            },
+                          ),
+                          OrderActionButton(
+                            uiStep: state.uiStep,
+                            isLoading: state.updateStepState.isLoading,
+                            onPressed: () {
+                              context.read<OrderDetailsCubit>().doEvent(
+                                OrderDetailsNextStepEvent(),
+                              );
+                            },
+                          ),
+                        ],
                       );
                     },
                   ),

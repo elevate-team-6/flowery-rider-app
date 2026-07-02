@@ -236,6 +236,16 @@
   "confirm_cancel_order_title": "Confirm Cancel",
   "confirm_cancel_order_message": "⚠️ Are you sure you want to cancel the delivery and return the order to pending?",
   "could_not_launch_url": "Could not launch URL",
+  "show_map": "Show map",
+  "your_location": "Your location",
+  "customer": "Customer",
+  "loading_route": "Loading route…",
+  "showing_direct_line": "Showing direct line",
+  "no_destination_location": "No destination location",
+  "location_services_disabled": "Please turn on location services (GPS).",
+  "location_permission_required": "Location permission is required to show your location.",
+  "could_not_get_gps_fix": "Could not get a GPS fix. Please try again.",
+  "could_not_get_location": "Could not get your location. Please try again.",
   "canceled": "Cancelled",
   "inProgress": "In Progress"
 }
