@@ -12,6 +12,7 @@ import 'package:flowery_rider_app/features/profile/presentation/widgets/language
 import 'package:flowery_rider_app/features/profile/presentation/widgets/notifications_badge.dart';
 import 'package:flowery_rider_app/features/profile/presentation/widgets/profile_menu_item.dart';
 import 'package:flowery_rider_app/features/profile/presentation/widgets/profile_tile.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/screens/map_test_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -174,6 +175,43 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                       builder: (innerContext) => BlocProvider.value(
                         value: context.read<ProfileCubit>(),
                         child: const LanguageBottomSheet(),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+
+                // TODO: temporary buttons to test the map screen — remove later.
+                // Route from my location to the store.
+                ProfileMenuItem(
+                  leading: const Icon(Icons.storefront_outlined, size: 24),
+                  title: 'Route to store',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MapTestScreen(
+                          destination: MapDestination.store,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 10),
+
+                // Route from my location to the customer.
+                ProfileMenuItem(
+                  leading: const Icon(Icons.person_pin_circle_outlined, size: 24),
+                  title: 'Route to customer',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const MapTestScreen(
+                          destination: MapDestination.customer,
+                        ),
                       ),
                     );
                   },
