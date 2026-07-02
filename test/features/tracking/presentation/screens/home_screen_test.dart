@@ -14,6 +14,7 @@ import 'package:flowery_rider_app/features/tracking/presentation/screens/home_sc
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/widgets/empty_orders_state.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/widgets/order_card.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/widgets/pagination_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -43,20 +44,65 @@ void main() {
 
   const surface = Size(700, 1400);
 
+  const user1 = UserEntity(
+    id: 'u1',
+    fullName: 'Ahmed Ali',
+    phone: '123',
+    photo: '',
+  );
+  const user2 = UserEntity(
+    id: 'u2',
+    fullName: 'Sara Mohamed',
+    phone: '456',
+    photo: '',
+  );
+  const store1 = StoreEntity(
+    name: 'Flower Store',
+    image: '',
+    address: 'Cairo',
+    phoneNumber: '111',
+    lat: '0.0',
+    long: '0.0',
+  );
+  const store2 = StoreEntity(
+    name: 'Rose Shop',
+    image: '',
+    address: 'Alex',
+    phoneNumber: '222',
+    lat: '0.0',
+    long: '0.0',
+  );
+  const shipping = ShippingAddressEntity(
+    street: 'Street 1',
+    city: 'Giza',
+    phone: '333',
+    lat: '0.0',
+    long: '0.0',
+  );
+
   const order1 = OrderEntity(
     id: '1',
     orderNumber: 'ORD-1',
     totalPrice: 150,
-    store: StoreEntity(name: 'Flower Store', address: 'Cairo'),
-    user: UserEntity(fullName: 'Ahmed Ali'),
-    shippingAddress: ShippingAddressEntity(street: 'Street 1', city: 'Giza'),
+    state: 'pending',
+    createdAt: '2021-01-01',
+    paymentType: 'Cash',
+    store: store1,
+    user: user1,
+    orderItems: [],
+    shippingAddress: shipping,
   );
   const order2 = OrderEntity(
     id: '2',
     orderNumber: 'ORD-2',
     totalPrice: 200,
-    store: StoreEntity(name: 'Rose Shop', address: 'Alex'),
-    user: UserEntity(fullName: 'Sara Mohamed'),
+    state: 'pending',
+    createdAt: '2021-01-01',
+    paymentType: 'Cash',
+    store: store2,
+    user: user2,
+    orderItems: [],
+    shippingAddress: shipping,
   );
   const ordersEntity = PendingOrdersEntity(
     message: 'success',
@@ -160,7 +206,9 @@ void main() {
       tester,
     ) async {
       when(mockUseCase.call(page: anyNamed('page'))).thenAnswer(
-        (_) async => SuccessBaseResponse(const PendingOrdersEntity(orders: [])),
+        (_) async => SuccessBaseResponse(
+          const PendingOrdersEntity(message: 'success', orders: []),
+        ),
       );
 
       await pumpHomeScreen(tester);
@@ -227,6 +275,52 @@ void main() {
 
       expect(find.byType(OrderCard), findsOneWidget);
       verify(mockUseCase.call(page: anyNamed('page'))).called(1);
+    });
+
+    testWidgets('shows PaginationBar when totalPages > 1', (tester) async {
+      const paginatedEntity = PendingOrdersEntity(
+        message: 'success',
+        orders: [order1],
+        currentPage: 1,
+        totalPages: 2,
+      );
+
+      when(
+        mockUseCase.call(page: anyNamed('page')),
+      ).thenAnswer((_) async => SuccessBaseResponse(paginatedEntity));
+
+      await pumpHomeScreen(tester);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(PaginationBar), findsOneWidget);
+      expect(find.text('1'), findsOneWidget);
+      expect(find.text('2'), findsOneWidget);
+    });
+
+    testWidgets('tapping a page in PaginationBar triggers new fetch', (
+      tester,
+    ) async {
+      const paginatedEntity = PendingOrdersEntity(
+        message: 'success',
+        orders: [order1],
+        currentPage: 1,
+        totalPages: 3,
+      );
+
+      when(
+        mockUseCase.call(page: anyNamed('page')),
+      ).thenAnswer((_) async => SuccessBaseResponse(paginatedEntity));
+
+      await pumpHomeScreen(tester);
+      await tester.pumpAndSettle();
+
+      // Tap on page 2
+      await tester.tap(find.text('2'));
+      await tester.pumpAndSettle();
+
+      // Verify that the use case was called with page 2
+      // (1st call was on init, 2nd call on tap)
+      verify(mockUseCase.call(page: 2)).called(1);
     });
   });
 }

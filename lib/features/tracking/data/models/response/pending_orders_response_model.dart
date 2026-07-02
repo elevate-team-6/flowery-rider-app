@@ -2,12 +2,12 @@ import 'package:equatable/equatable.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 
 import 'metadata_model.dart';
-import 'order_model.dart';
+import 'tracking_order_model.dart';
 
 class PendingOrdersResponseModel extends Equatable {
   final String? message;
   final MetadataModel? metadata;
-  final List<OrderModel>? orders;
+  final List<TrackingOrderModel>? orders;
 
   const PendingOrdersResponseModel({this.message, this.metadata, this.orders});
 
@@ -18,14 +18,16 @@ class PendingOrdersResponseModel extends Equatable {
           ? MetadataModel.fromJson(json['metadata'] as Map<String, dynamic>)
           : null,
       orders: (json['orders'] as List<dynamic>?)
-          ?.map((e) => OrderModel.fromJson(e as Map<String, dynamic>))
+          ?.map((e) => TrackingOrderModel.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 
   PendingOrdersEntity toEntity() => PendingOrdersEntity(
-    message: message,
-    orders: orders?.map((e) => e.toEntity()).toList(),
+    message: message ?? '',
+    orders: orders?.map((e) => e.toEntity()).toList() ?? [],
+    currentPage: metadata?.currentPage,
+    totalPages: metadata?.totalPages,
   );
 
   @override

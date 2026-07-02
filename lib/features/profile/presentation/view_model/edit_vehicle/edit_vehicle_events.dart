@@ -3,6 +3,7 @@ import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_ent
 sealed class EditVehicleEvent {
   const EditVehicleEvent();
 }
+
 class InitializeEditVehicleEvent extends EditVehicleEvent {
   final String vehicleTypeId;
   final String vehicleNumber;
@@ -40,7 +41,5 @@ class RemoveDrivingLicenseImageEvent extends EditVehicleEvent {
 class EditVehicleSubmitEvent extends EditVehicleEvent {
   final String vehicleNumber;
 
-  const EditVehicleSubmitEvent({
-    required this.vehicleNumber,
-  });
+  const EditVehicleSubmitEvent({required this.vehicleNumber});
 }

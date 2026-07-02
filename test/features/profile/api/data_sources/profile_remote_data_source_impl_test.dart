@@ -18,19 +18,19 @@ import 'profile_remote_data_source_impl_test.mocks.dart';
 
 @GenerateMocks([ProfileApiClient, MultipartService])
 void main() {
-late MockProfileApiClient mockApiClient;
-late MockMultipartService mockMultipartService;
-late ProfileRemoteDataSourceImpl dataSource;
+  late MockProfileApiClient mockApiClient;
+  late MockMultipartService mockMultipartService;
+  late ProfileRemoteDataSourceImpl dataSource;
 
-setUp(() {
-  mockApiClient = MockProfileApiClient();
-  mockMultipartService = MockMultipartService();
+  setUp(() {
+    mockApiClient = MockProfileApiClient();
+    mockMultipartService = MockMultipartService();
 
-  dataSource = ProfileRemoteDataSourceImpl(
-    mockApiClient,
-    mockMultipartService,
-  );
-});
+    dataSource = ProfileRemoteDataSourceImpl(
+      mockApiClient,
+      mockMultipartService,
+    );
+  });
 
   const fakeResponse = ProfileResponseModel(message: 'success');
   const request = EditProfileRequest(
@@ -39,11 +39,11 @@ setUp(() {
     email: 'ahmed@test.com',
     phone: '+201030313971',
   );
-const editVehicleRequest = EditVehicleRequest(
-  vehicleType: '1',
-  vehicleNumber: 'ABC123',
-  vehicleLicense: null,
-);
+  const editVehicleRequest = EditVehicleRequest(
+    vehicleType: '1',
+    vehicleNumber: 'ABC123',
+    vehicleLicense: null,
+  );
   DioException buildDioException() => DioException(
     requestOptions: RequestOptions(path: ''),
     type: DioExceptionType.connectionError,
@@ -77,87 +77,71 @@ const editVehicleRequest = EditVehicleRequest(
       );
     });
   });
-group('changePassword', () {
-  test('returns SuccessBaseResponse when api succeeds', () async {
-    when(
-      mockApiClient.changePassword(any),
-    ).thenAnswer(
-      (_) async => const ChangePasswordResponse(
-        token: 'Password changed successfully',
-      ),
-    );
+  group('changePassword', () {
+    test('returns SuccessBaseResponse when api succeeds', () async {
+      when(mockApiClient.changePassword(any)).thenAnswer(
+        (_) async => const ChangePasswordResponse(
+          token: 'Password changed successfully',
+        ),
+      );
 
-    final result = await dataSource.changePassword(
-      'oldPassword',
-      'newPassword',
-    );
+      final result = await dataSource.changePassword(
+        'oldPassword',
+        'newPassword',
+      );
 
-    expect(result, isA<SuccessBaseResponse<String>>());
+      expect(result, isA<SuccessBaseResponse<String>>());
 
-    expect(
-      (result as SuccessBaseResponse<String>).data,
-      'Password changed successfully',
-    );
+      expect(
+        (result as SuccessBaseResponse<String>).data,
+        'Password changed successfully',
+      );
+    });
+
+    test('returns ErrorBaseResponse when api throws', () async {
+      when(mockApiClient.changePassword(any)).thenThrow(buildDioException());
+
+      final result = await dataSource.changePassword(
+        'oldPassword',
+        'newPassword',
+      );
+
+      expect(result, isA<ErrorBaseResponse<String>>());
+    });
   });
+  group('editVehicle', () {
+    test('returns SuccessBaseResponse when api succeeds', () async {
+      final formData = FormData();
 
-  test('returns ErrorBaseResponse when api throws', () async {
-    when(
-      mockApiClient.changePassword(any),
-    ).thenThrow(buildDioException());
+      when(
+        mockMultipartService.createEditVehicleFormData(editVehicleRequest),
+      ).thenAnswer((_) async => formData);
 
-    final result = await dataSource.changePassword(
-      'oldPassword',
-      'newPassword',
-    );
+      when(
+        mockApiClient.editVehicle(formData),
+      ).thenAnswer((_) async => fakeResponse);
 
-    expect(result, isA<ErrorBaseResponse<String>>());
+      final result = await dataSource.editVehicle(editVehicleRequest);
+
+      verify(
+        mockMultipartService.createEditVehicleFormData(editVehicleRequest),
+      ).called(1);
+
+      verify(mockApiClient.editVehicle(formData)).called(1);
+
+      expect(result, isA<SuccessBaseResponse<ProfileResponseModel>>());
+    });
+
+    test('returns ErrorBaseResponse when api throws', () async {
+      when(
+        mockMultipartService.createEditVehicleFormData(editVehicleRequest),
+      ).thenThrow(buildDioException());
+
+      final result = await dataSource.editVehicle(editVehicleRequest);
+
+      expect(result, isA<ErrorBaseResponse<ProfileResponseModel>>());
+    });
   });
-});
-group('editVehicle', () {
-  test('returns SuccessBaseResponse when api succeeds', () async {
-    final formData = FormData();
-
-    when(
-      mockMultipartService.createEditVehicleFormData(
-        editVehicleRequest,
-      ),
-    ).thenAnswer((_) async => formData);
-
-    when(
-      mockApiClient.editVehicle(formData),
-    ).thenAnswer((_) async => fakeResponse);
-
-    final result = await dataSource.editVehicle(
-      editVehicleRequest,
-    );
-
-    verify(
-      mockMultipartService.createEditVehicleFormData(
-        editVehicleRequest,
-      ),
-    ).called(1);
-
-    verify(
-      mockApiClient.editVehicle(formData),
-    ).called(1);
-
-    expect(result, isA<SuccessBaseResponse<ProfileResponseModel>>());
-  });
-
-  test('returns ErrorBaseResponse when api throws', () async {
-    when(
-      mockMultipartService.createEditVehicleFormData(
-        editVehicleRequest,
-      ),
-    ).thenThrow(buildDioException());
-
-    final result = await dataSource.editVehicle(
-      editVehicleRequest,
-    );
-
-    expect(result, isA<ErrorBaseResponse<ProfileResponseModel>>());
-  });
-});
   group('editProfile', () {
     test('returns SuccessBaseResponse when api call succeeds', () async {
       when(

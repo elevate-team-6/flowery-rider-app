@@ -18,22 +18,24 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSourceContract {
   final ProfileApiClient _apiClient;
   final MultipartService _multipartService;
 
-  ProfileRemoteDataSourceImpl(this._apiClient,this._multipartService);
+  ProfileRemoteDataSourceImpl(this._apiClient, this._multipartService);
 
   @override
   Future<BaseResponse<void>> logout() async {
     return await ErrorHandler.handleApiCall(() => _apiClient.logout());
   }
+
   @override
-Future<BaseResponse<ProfileResponseModel>> editVehicle(
-  EditVehicleRequest request,
-) {  return ErrorHandler.handleApiCall(() async {
-    final formData = await _multipartService.createEditVehicleFormData(
-      request,
-    );
-    return _apiClient.editVehicle(formData);
-  });
-}
+  Future<BaseResponse<ProfileResponseModel>> editVehicle(
+    EditVehicleRequest request,
+  ) {
+    return ErrorHandler.handleApiCall(() async {
+      final formData = await _multipartService.createEditVehicleFormData(
+        request,
+      );
+      return _apiClient.editVehicle(formData);
+    });
+  }
 
   @override
   Future<BaseResponse<ProfileResponse>> profile() async {

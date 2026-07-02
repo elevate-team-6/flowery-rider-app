@@ -46,7 +46,7 @@ class EditProfileCubit extends BaseCubit<EditProfileStates, BaseUiEvent> {
     emit(
       state.copyWith(
         driver: driver,
-        gender: driver.gender ,
+        gender: driver.gender,
         form: EditProfileForm.fromDriver(driver),
       ),
     );

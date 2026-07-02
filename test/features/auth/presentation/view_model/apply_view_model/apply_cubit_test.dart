@@ -1,12 +1,13 @@
 import 'dart:io';
+
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/country_entity.dart';
 import 'package:flowery_rider_app/features/auth/domain/entities/vehicle_type_entity.dart';
+import 'package:flowery_rider_app/features/auth/presentation/widgets/apply_form.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flowery_rider_app/features/auth/presentation/widgets/apply_form.dart';
 
 class _InMemoryAssetLoader extends AssetLoader {
   const _InMemoryAssetLoader(this._data);
@@ -185,7 +186,7 @@ void main() {
       await pumpForm(tester);
 
       // للتأكد من وجود الـ TextFields كلها على الشاشة
-      expect(find.byType(TextField), findsNWidgets(9));
+      expect(find.byType(TextField), findsNWidgets(10));
       expect(find.text('First legal name'), findsOneWidget);
       expect(find.text('Second legal name'), findsOneWidget);
       expect(find.text('Email'), findsOneWidget);
@@ -217,19 +218,19 @@ void main() {
 
     testWidgets('triggers image picker callbacks on tap', (tester) async {
       await pumpForm(tester);
-      await tester.tap(
-        find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == 'Vehicle license',
-        ),
+      final drivingLicenseFinder = find.byWidgetPredicate(
+        (w) => w is TextField && w.decoration?.labelText == 'Vehicle license',
       );
+      await tester.ensureVisible(drivingLicenseFinder);
+      await tester.tap(drivingLicenseFinder);
       await tester.pump();
       expect(isDrivingLicensePicked, isTrue);
 
-      await tester.tap(
-        find.byWidgetPredicate(
-          (w) => w is TextField && w.decoration?.labelText == 'ID image',
-        ),
+      final idImageFinder = find.byWidgetPredicate(
+        (w) => w is TextField && w.decoration?.labelText == 'ID image',
       );
+      await tester.ensureVisible(idImageFinder);
+      await tester.tap(idImageFinder);
       await tester.pump();
       expect(isNationalIdPicked, isTrue);
     });

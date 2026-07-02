@@ -19,7 +19,26 @@ abstract class DioModule {
     CacheStore cacheStore,
   ) {
     final dio = Dio();
+    _configureDio(dio, authInterceptor, loggingInterceptor, cacheStore);
+    return dio;
+  }
 
+  @Named('external')
+  @lazySingleton
+  Dio externalDio(LoggingInterceptor loggingInterceptor) {
+    final dio = Dio();
+    dio.options.connectTimeout = const Duration(seconds: 30);
+    dio.options.receiveTimeout = const Duration(seconds: 30);
+    dio.interceptors.add(loggingInterceptor);
+    return dio;
+  }
+
+  void _configureDio(
+    Dio dio,
+    AuthInterceptor authInterceptor,
+    LoggingInterceptor loggingInterceptor,
+    CacheStore cacheStore,
+  ) {
     dio.options.baseUrl = AppEndPoints.baseUrl;
     dio.options.connectTimeout = const Duration(seconds: 30);
     dio.options.receiveTimeout = const Duration(seconds: 30);
@@ -38,7 +57,6 @@ abstract class DioModule {
       maxStale: const Duration(days: 7),
     );
 
-    /// Dynamic cache per request
     dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) {
@@ -65,7 +83,5 @@ abstract class DioModule {
       authInterceptor,
       loggingInterceptor,
     ]);
-
-    return dio;
   }
 }

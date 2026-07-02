@@ -1,6 +1,11 @@
 import 'package:equatable/equatable.dart';
+import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:json_annotation/json_annotation.dart';
 
+part 'store_model.g.dart';
+
+@JsonSerializable()
 class StoreModel extends Equatable {
   final String? name;
   final String? image;
@@ -16,25 +21,24 @@ class StoreModel extends Equatable {
     this.latLong,
   });
 
-  factory StoreModel.fromJson(Map<String, dynamic> json) {
-    return StoreModel(
-      name: json['name'] as String?,
-      image: json['image'] as String?,
-      address: json['address'] as String?,
-      phoneNumber: json['phoneNumber'] as String?,
-      latLong: json['latLong'] as String?,
-    );
-  }
+  factory StoreModel.fromJson(Map<String, dynamic> json) =>
+      _$StoreModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$StoreModelToJson(this);
 
   StoreEntity toEntity() {
     List<String>? latLngList = latLong?.split(',');
     return StoreEntity(
-      name: name,
-      image: image,
-      address: address,
-      phoneNumber: phoneNumber,
-      lat: latLngList != null && latLngList.isNotEmpty ? latLngList[0] : null,
-      long: latLngList != null && latLngList.length > 1 ? latLngList[1] : null,
+      name: name ?? (throw Exception('Store Name is required')),
+      image: (image != null && image!.isNotEmpty)
+          ? (image!.startsWith('http')
+                ? image!
+                : '${AppConstants.imageBaseUrl}$image')
+          : '',
+      address: address ?? '',
+      phoneNumber: phoneNumber ?? '',
+      lat: (latLngList != null && latLngList.isNotEmpty) ? latLngList[0] : '',
+      long: (latLngList != null && latLngList.length > 1) ? latLngList[1] : '',
     );
   }
 

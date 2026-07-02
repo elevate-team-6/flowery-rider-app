@@ -14,7 +14,7 @@ import 'edit_vehicle_cubit_test.mocks.dart';
 
 @GenerateMocks([GetVehicleTypeUseCase])
 void main() {
-    setUpAll(() {
+  setUpAll(() {
     provideDummy<BaseResponse<List<VehicleTypeEntity>>>(
       SuccessBaseResponse<List<VehicleTypeEntity>>([]),
     );

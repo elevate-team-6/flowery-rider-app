@@ -20,21 +20,17 @@ import 'profile_repo_impl_test.mocks.dart';
 
 @GenerateMocks([ProfileRemoteDataSourceContract, SecureCacheHelper])
 void main() {
-setUpAll(() {
-  provideDummy<BaseResponse<ProfileResponseModel>>(
-    ErrorBaseResponse('dummy'),
-  );
-  provideDummy<BaseResponse<ProfileResponse>>(
-    ErrorBaseResponse<ProfileResponse>('dummy'),
-  );
-  provideDummy<BaseResponse<void>>(
-    SuccessBaseResponse<void>(null),
-  );
+  setUpAll(() {
+    provideDummy<BaseResponse<ProfileResponseModel>>(
+      ErrorBaseResponse('dummy'),
+    );
+    provideDummy<BaseResponse<ProfileResponse>>(
+      ErrorBaseResponse<ProfileResponse>('dummy'),
+    );
+    provideDummy<BaseResponse<void>>(SuccessBaseResponse<void>(null));
 
-  provideDummy<BaseResponse<String>>(
-    ErrorBaseResponse<String>('dummy'),
-  );
-});
+    provideDummy<BaseResponse<String>>(ErrorBaseResponse<String>('dummy'));
+  });
 
   late ProfileRepoImpl repo;
   late MockProfileRemoteDataSourceContract mockRemoteDataSource;
@@ -58,7 +54,8 @@ setUpAll(() {
   );
   const editVehicleRequest = EditVehicleRequest(
     vehicleType: '1',
-    vehicleNumber: 'ABC123', vehicleLicense: null,
+    vehicleNumber: 'ABC123',
+    vehicleLicense: null,
   );
   const request = EditProfileRequest(
     firstName: 'Ahmed',
@@ -105,25 +102,28 @@ setUpAll(() {
       expect((result as ErrorBaseResponse).errorMessage, 'network error');
     });
 
-    test('returns success when driver exists even if some fields are missing', () async {
-  final incompleteResponse = ProfileResponseModel(
-    message: 'success',
-    driver: DriverModel(
-      firstName: 'Ahmed',
-      lastName: 'Ali',
-      email: 'ahmed@test.com',
-      phone: '+201030313971',
-    ),
-  );
+    test(
+      'returns success when driver exists even if some fields are missing',
+      () async {
+        final incompleteResponse = ProfileResponseModel(
+          message: 'success',
+          driver: DriverModel(
+            firstName: 'Ahmed',
+            lastName: 'Ali',
+            email: 'ahmed@test.com',
+            phone: '+201030313971',
+          ),
+        );
 
-  when(
-    mockRemoteDataSource.getProfileData(),
-  ).thenAnswer((_) async => SuccessBaseResponse(incompleteResponse));
+        when(
+          mockRemoteDataSource.getProfileData(),
+        ).thenAnswer((_) async => SuccessBaseResponse(incompleteResponse));
 
-  final result = await repo.getProfileData();
+        final result = await repo.getProfileData();
 
-  expect(result, isA<SuccessBaseResponse<DriverEntity>>());
-});
+        expect(result, isA<SuccessBaseResponse<DriverEntity>>());
+      },
+    );
   });
 
   group('editProfile', () {
@@ -180,89 +180,61 @@ setUpAll(() {
     });
   });
   group('changePassword', () {
-      test('should return success response when remote succeeds', () async {
-    when(
-      mockRemoteDataSource.changePassword(
-        'oldPassword',
-        'newPassword',
-      ),
-    ).thenAnswer(
-      (_) async => SuccessBaseResponse<String>(
+    test('should return success response when remote succeeds', () async {
+      when(
+        mockRemoteDataSource.changePassword('oldPassword', 'newPassword'),
+      ).thenAnswer(
+        (_) async =>
+            SuccessBaseResponse<String>('Password changed successfully'),
+      );
+
+      final result = await repo.changePassword('oldPassword', 'newPassword');
+
+      verify(
+        mockRemoteDataSource.changePassword('oldPassword', 'newPassword'),
+      ).called(1);
+
+      expect(result, isA<SuccessBaseResponse<String>>());
+
+      expect(
+        (result as SuccessBaseResponse<String>).data,
         'Password changed successfully',
-      ),
-    );
-
-    final result = await repo.changePassword(
-      'oldPassword',
-      'newPassword',
-    );
-
-    verify(
-      mockRemoteDataSource.changePassword(
-        'oldPassword',
-        'newPassword',
-      ),
-    ).called(1);
-
-    expect(result, isA<SuccessBaseResponse<String>>());
-
-    expect(
-      (result as SuccessBaseResponse<String>).data,
-      'Password changed successfully',
-    );
-  });
+      );
+    });
 
     test('should propagate error when remote fails', () async {
-    when(
-      mockRemoteDataSource.changePassword(
-        'oldPassword',
-        'newPassword',
-      ),
-    ).thenAnswer(
-      (_) async => ErrorBaseResponse<String>('Invalid password'),
-    );
+      when(
+        mockRemoteDataSource.changePassword('oldPassword', 'newPassword'),
+      ).thenAnswer((_) async => ErrorBaseResponse<String>('Invalid password'));
 
-    final result = await repo.changePassword(
-      'oldPassword',
-      'newPassword',
-    );
+      final result = await repo.changePassword('oldPassword', 'newPassword');
 
-    verify(
-      mockRemoteDataSource.changePassword(
-        'oldPassword',
-        'newPassword',
-      ),
-    ).called(1);
+      verify(
+        mockRemoteDataSource.changePassword('oldPassword', 'newPassword'),
+      ).called(1);
 
-    expect(result, isA<ErrorBaseResponse<String>>());
+      expect(result, isA<ErrorBaseResponse<String>>());
 
-    expect(
-      (result as ErrorBaseResponse<String>).errorMessage,
-      'Invalid password',
-    );
-  });
+      expect(
+        (result as ErrorBaseResponse<String>).errorMessage,
+        'Invalid password',
+      );
+    });
   });
   group('editVehicle', () {
-  test('maps response model to entity on success', () async {
-    when(
-      mockRemoteDataSource.editVehicle(editVehicleRequest),
-    ).thenAnswer(
-      (_) async => SuccessBaseResponse(fakeResponse),
-    );
+    test('maps response model to entity on success', () async {
+      when(
+        mockRemoteDataSource.editVehicle(editVehicleRequest),
+      ).thenAnswer((_) async => SuccessBaseResponse(fakeResponse));
 
-    final result = await repo.editVehicle(editVehicleRequest);
+      final result = await repo.editVehicle(editVehicleRequest);
 
-    verify(
-      mockRemoteDataSource.editVehicle(editVehicleRequest),
-    ).called(1);
+      verify(mockRemoteDataSource.editVehicle(editVehicleRequest)).called(1);
 
-    expect(result, isA<SuccessBaseResponse<DriverEntity>>());
+      expect(result, isA<SuccessBaseResponse<DriverEntity>>());
 
-    expect(
-      (result as SuccessBaseResponse<DriverEntity>).data?.id,
-      '1',
-    );
-  });
+      expect((result as SuccessBaseResponse<DriverEntity>).data?.id, '1');
+    });
 
     test('returns userNotFound when driver is null', () async {
       when(mockRemoteDataSource.editVehicle(editVehicleRequest)).thenAnswer(

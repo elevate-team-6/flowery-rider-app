@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:easy_localization/easy_localization.dart';
-import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
@@ -52,6 +51,34 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
     super.dispose();
   }
 
+  Future<void> _onEditProfile(DriverEntity? data) async {
+    final result = await Navigator.pushNamed(
+      context,
+      AppRoutes.editProfile,
+      arguments: data,
+    );
+
+    if (!mounted || result == null) return;
+
+    if (result is DriverEntity) {
+      context.read<ProfileCubit>().updateProfile(result);
+    }
+  }
+
+  Future<void> _onEditVehicle(DriverEntity? driver) async {
+    final result = await Navigator.pushNamed(
+      context,
+      AppRoutes.editVehicle,
+      arguments: driver,
+    );
+
+    if (!mounted || result == null) return;
+
+    if (result is DriverEntity) {
+      context.read<ProfileCubit>().updateProfile(result);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,17 +121,7 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                             child: const Icon(Icons.person),
                           ),
                   ),
-                  onTap: () async {
-                    final result = await Navigator.pushNamed(
-                      context,
-                      AppRoutes.editProfile,
-                      arguments: state.profileState.data,
-                    );
-
-                    if (result is DriverEntity) {
-                      context.read<ProfileCubit>().updateProfile(result);
-                    }
-                  },
+                  onTap: () => _onEditProfile(state.profileState.data),
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: Column(
@@ -123,23 +140,7 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                 const SizedBox(height: 20),
 
                 ProfileTile(
-                  onTap: () async {
-                    final result = await Navigator.pushNamed(
-                      context,
-                      AppRoutes.editVehicle,
-                      arguments: driver,
-                    );
-
-                    if (result is DriverEntity) {
-                      // ignore: use_build_context_synchronously, invalid_use_of_visible_for_testing_member, invalid_use_of_protected_member
-                      context.read<ProfileCubit>().emit(
-                        // ignore: use_build_context_synchronously
-                        context.read<ProfileCubit>().state.copyWith(
-                          profileState: BaseState(data: result),
-                        ),
-                      );
-                    }
-                  },
+                  onTap: () => _onEditVehicle(driver),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

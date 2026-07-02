@@ -34,7 +34,6 @@ abstract class AppImages {
   static const String _imagesPath = 'assets/images/';
 
   // Example: static const String yourIcon = '${_imagesPath}image_name.svg';
-  static const String imageBaseUrl = 'https://flower.elevateegy.com/uploads/';
   static const String imageDefault = '${_imagesPath}Image_default.png';
   static const String appImage = '${_imagesPath}app_image.svg';
   static const String defaultImage = '${_imagesPath}Image_default.png';
@@ -48,6 +47,7 @@ abstract class AppLottie {
   static const String flowerLoading = '${_lottiePath}flower_loading.json';
   static const String onboardingAnimation =
       '${_lottiePath}onboarding_animation.json';
+  static const String empty = '${_lottiePath}empty.json';
 }
 
 abstract class AppJson {

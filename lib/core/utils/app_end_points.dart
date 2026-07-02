@@ -19,6 +19,11 @@ abstract class AppEndPoints {
   static const String editProfile = "$baseUrl/drivers/editProfile";
   static const String uploadPhoto = "$baseUrl/drivers/upload-photo";
 
+  // Tracking:
+  static const String driverOrders = "$baseUrl/orders/driver-orders";
+  static const String startOrder = '$baseUrl/orders/start/';
+  static const String updateOrderState = '$baseUrl/orders/state/';
+
   // Orders:
   static const String pendingOrders = "$baseUrl/orders/pending-orders";
 
@@ -30,6 +35,10 @@ abstract class AppEndPoints {
       "https://elevate-flutter-team.github.io/flower_app_web_views/terms.html";
   static const String aboutUsUrl =
       "https://elevate-flutter-team.github.io/flower_app_web_views/about.html";
+
+  // FCM Send Notification Endpoint:
+  static String fcmSendUrl(String projectId) =>
+      'https://fcm.googleapis.com/v1/projects/$projectId/messages:send';
 
   // ---------------------------------------------------------------------------
   // TO ADD NEW ENDPOINTS:

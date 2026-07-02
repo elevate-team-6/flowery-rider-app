@@ -54,11 +54,7 @@ class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
     _vehicleTypeId = event.vehicleTypeId;
     _initialVehicleTypeId = event.vehicleTypeId;
 
-    emit(
-      state.copyWith(
-        drivingLicenseImageUrl: event.vehicleLicenseUrl,
-      ),
-    );
+    emit(state.copyWith(drivingLicenseImageUrl: event.vehicleLicenseUrl));
   }
 
   Future<void> _getVehicleTypes() async {
@@ -74,9 +70,7 @@ class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
           try {
             selected = result.data?.firstWhere((e) => e.id == _vehicleTypeId);
           } catch (e) {
-            emitUiEvent(
-              DisplayErrorEvent(AppStrings.someThingWentWrong.tr()),
-            );
+            emitUiEvent(DisplayErrorEvent(AppStrings.someThingWentWrong.tr()));
           }
         }
 

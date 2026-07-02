@@ -81,6 +81,7 @@ class LoginCubit extends BaseCubit<LoginState, BaseUiEvent> {
     if (token != null && token.isNotEmpty) {
       await _secureCacheHelper.writeData(key: AppKeys.tokenKey, value: token);
     }
+
     await _secureCacheHelper.writeData(
       key: AppKeys.rememberMeKey,
       value: state.rememberMe.toString(),

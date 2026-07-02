@@ -20,9 +20,7 @@ void main() {
       SuccessBaseResponse<String>('dummy_token'),
     );
 
-    provideDummy<BaseResponse<void>>(
-      SuccessBaseResponse<void>(null),
-    );
+    provideDummy<BaseResponse<void>>(SuccessBaseResponse<void>(null));
   });
 
   late MockChangePasswordUseCase useCase;
@@ -38,9 +36,7 @@ void main() {
     build: () {
       when(
         useCase('oldPass', 'newPass'),
-      ).thenAnswer(
-        (_) async => SuccessBaseResponse<String>('new_token'),
-      );
+      ).thenAnswer((_) async => SuccessBaseResponse<String>('new_token'));
 
       return cubit;
     },
@@ -56,9 +52,7 @@ void main() {
       const ChangePasswordState(
         changePasswordState: BaseState(isLoading: true),
       ),
-      const ChangePasswordState(
-        changePasswordState: BaseState(),
-      ),
+      const ChangePasswordState(changePasswordState: BaseState()),
     ],
     verify: (_) {
       verify(useCase('oldPass', 'newPass')).called(1);
@@ -70,9 +64,7 @@ void main() {
     () async {
       when(
         useCase('oldPass', 'newPass'),
-      ).thenAnswer(
-        (_) async => SuccessBaseResponse<String>('new_token'),
-      );
+      ).thenAnswer((_) async => SuccessBaseResponse<String>('new_token'));
 
       final expectation = expectLater(
         cubit.eventStream,
@@ -95,9 +87,7 @@ void main() {
     build: () {
       when(
         useCase('oldPass', 'newPass'),
-      ).thenAnswer(
-        (_) async => ErrorBaseResponse<String>('wrong password'),
-      );
+      ).thenAnswer((_) async => ErrorBaseResponse<String>('wrong password'));
 
       return cubit;
     },
@@ -119,28 +109,23 @@ void main() {
     ],
   );
 
-  test(
-    'emits DisplayErrorEvent when usecase fails',
-    () async {
-      when(
-        useCase('oldPass', 'newPass'),
-      ).thenAnswer(
-        (_) async => ErrorBaseResponse<String>('wrong password'),
-      );
+  test('emits DisplayErrorEvent when usecase fails', () async {
+    when(
+      useCase('oldPass', 'newPass'),
+    ).thenAnswer((_) async => ErrorBaseResponse<String>('wrong password'));
 
-      final expectation = expectLater(
-        cubit.eventStream,
-        emits(isA<DisplayErrorEvent>()),
-      );
+    final expectation = expectLater(
+      cubit.eventStream,
+      emits(isA<DisplayErrorEvent>()),
+    );
 
-      await cubit.doIntent(
-        const SubmitChangePasswordEvent(
-          currentPassword: 'oldPass',
-          newPassword: 'newPass',
-        ),
-      );
+    await cubit.doIntent(
+      const SubmitChangePasswordEvent(
+        currentPassword: 'oldPass',
+        newPassword: 'newPass',
+      ),
+    );
 
-      await expectation;
-    },
-  );
+    await expectation;
+  });
 }

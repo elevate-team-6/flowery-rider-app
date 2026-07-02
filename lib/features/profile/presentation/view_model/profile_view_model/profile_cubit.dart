@@ -65,7 +65,8 @@ class ProfileCubit extends BaseCubit<ProfileStates, BaseUiEvent> {
       ),
     );
   }
-    void updateProfile(DriverEntity driver) {
+
+  void updateProfile(DriverEntity driver) {
     emit(state.copyWith(profileState: BaseState(data: driver)));
   }
 }

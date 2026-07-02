@@ -23,8 +23,6 @@ class MultipartService {
 
       if (request.vehicleLicense != null)
         'vehicleLicense': await request.vehicleLicense!.toMultipartFile(),
-        
     });
-    
   }
 }

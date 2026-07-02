@@ -23,6 +23,8 @@ class DisplaySuccessEvent extends BaseUiEvent {
   DisplaySuccessEvent(this.successMessage);
 }
 
+class ShowConfirmationDialogEvent extends BaseUiEvent {}
+
 class NavigateEvent extends BaseUiEvent {
   final String routeName;
   final NavigationType navigationType;
