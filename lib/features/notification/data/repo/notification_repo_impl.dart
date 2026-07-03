@@ -2,19 +2,18 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/cache/secure_cache_helper.dart';
+import 'package:flowery_rider_app/core/models/rider_session_model.dart';
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/notification/core/notification_strings.dart';
 import 'package:flowery_rider_app/features/notification/data/data_sources/notification_remote_data_source_contract.dart';
+import 'package:flowery_rider_app/features/notification/data/models/fcm_config_model.dart';
+import 'package:flowery_rider_app/features/notification/data/models/order_firestore_model.dart';
 import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
 import 'package:flowery_rider_app/features/notification/domain/repo/notification_repo_contract.dart';
-import 'package:flutter/foundation.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:injectable/injectable.dart';
-
-import '../models/order_firestore_model.dart';
-import 'package:flowery_rider_app/core/models/rider_session_model.dart';
 
 @Injectable(as: NotificationRepoContract)
 class NotificationRepoImpl implements NotificationRepoContract {
@@ -45,16 +44,11 @@ class NotificationRepoImpl implements NotificationRepoContract {
         return SuccessBaseResponse(null);
       }
 
-      // Debug: Print keys to console to verify matching with AppConstants
-      if (kDebugMode) {
-        print('FCM Config Keys: ${fcmConfig.keys.toList()}');
-      }
-
       // 3. Generate Access Token
       final String? accessToken = await _generateAccessToken(fcmConfig);
-      final String? projectId = fcmConfig[AppConstants.projectIdField];
+      final String projectId = fcmConfig.projectId;
 
-      if (accessToken == null || projectId == null) {
+      if (accessToken == null || projectId.isEmpty) {
         _logError(
           'Failed to generate FCM Access Token or ProjectId missing',
           userId,
@@ -71,7 +65,9 @@ class NotificationRepoImpl implements NotificationRepoContract {
       }
 
       // 5. Send Notification
-      final lang = userData.language == 'ar' ? 'ar' : 'en';
+      final lang = userData.language == AppConstants.arabicCode
+          ? AppConstants.arabicCode
+          : AppConstants.englishCode;
       final notificationResult = await _remoteDataSource.sendPushNotification(
         token: userData.fcmToken,
         title: NotificationStrings.titles[state]?[lang] ?? '',
@@ -88,9 +84,9 @@ class NotificationRepoImpl implements NotificationRepoContract {
             title: NotificationStrings.titles[state]?[lang] ?? '',
             body: NotificationStrings.bodies[state]?[lang] ?? '',
             data: {
-              'type': 'order_update',
-              'orderId': orderId,
-              'state': state.name,
+              AppConstants.typeField: AppConstants.orderUpdateValue,
+              AppConstants.orderIdField: orderId,
+              AppConstants.stateField: state.name,
             },
           );
           return SuccessBaseResponse(null);
@@ -108,30 +104,33 @@ class NotificationRepoImpl implements NotificationRepoContract {
     }
   }
 
-  Future<String?> _generateAccessToken(Map<String, dynamic> config) async {
+  Future<String?> _generateAccessToken(FcmConfigModel config) async {
     try {
-      final privateKey = config[AppConstants.privateKeyField] as String?;
-      final clientEmail = config[AppConstants.clientEmailField] as String?;
-      final projectId = config[AppConstants.projectIdField] as String?;
+      final privateKey = config.privateKey;
+      final clientEmail = config.clientEmail;
+      final projectId = config.projectId;
 
-      if (privateKey == null || clientEmail == null || projectId == null) {
+      if (privateKey.isEmpty || clientEmail.isEmpty || projectId.isEmpty) {
         return null;
       }
 
-      // Ensure correct format for the private key
-      String formattedPrivateKey = privateKey.replaceAll('\\n', '\n');
-      if (!formattedPrivateKey.contains('-----BEGIN PRIVATE KEY-----')) {
+      // Ensure correct format for the private key using constants
+      String formattedPrivateKey = privateKey.replaceAll(
+        AppConstants.escapedNewline,
+        AppConstants.newline,
+      );
+      if (!formattedPrivateKey.contains(AppConstants.pemHeader)) {
         formattedPrivateKey =
-            '-----BEGIN PRIVATE KEY-----\n$formattedPrivateKey\n-----END PRIVATE KEY-----';
+            '${AppConstants.pemHeader}${AppConstants.newline}$formattedPrivateKey${AppConstants.newline}${AppConstants.pemFooter}';
       }
 
       final accountCredentials = ServiceAccountCredentials.fromJson({
-        "private_key": formattedPrivateKey,
-        "client_email": clientEmail,
-        "project_id": projectId,
-        "type": "service_account",
-        "client_id":
-            "118258260233682735322", // Mandatory placeholder for validation
+        AppConstants.privateKeyField: formattedPrivateKey,
+        AppConstants.clientEmailField: clientEmail,
+        AppConstants.projectIdField: projectId,
+        AppConstants.typeField: AppConstants.serviceAccountValue,
+        AppConstants.clientIdField:
+            config.clientId ?? AppConstants.defaultClientId,
       });
 
       final scopes = [AppConstants.fcmScope];
