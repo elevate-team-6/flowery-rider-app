@@ -111,6 +111,25 @@ class TrackingRepoImpl implements TrackingRepoContract {
     );
   }
 
+  @override
+  Future<ShippingAddressEntity?> getOrderShipping(String orderId) async {
+    try {
+      final model = await _remoteDataSource.getOrderShipping(orderId);
+      if (model == null) return null;
+      return ShippingAddressEntity(
+        street: model.street,
+        city: model.city,
+        phone: model.phone,
+        lat: model.lat,
+        long: model.long,
+      );
+    } catch (_) {
+      // Best-effort read: on any Firestore failure fall back to the backend
+      // address the map already has.
+      return null;
+    }
+  }
+
   /// Helper to catch mapping exceptions while using switch expressions
   BaseResponse<T> _handleMapping<T>(T? Function() mapper) {
     try {

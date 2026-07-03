@@ -17,6 +17,12 @@ abstract class AppConstants {
   static const String riderIdField = "riderId";
   static const String riderNameField = "riderName";
   static const String riderPhoneField = "riderPhone";
+  static const String shippingAddressField = "shippingAddress";
+  static const String streetField = "street";
+  static const String cityField = "city";
+  static const String phoneField = "phone";
+  static const String latField = "lat";
+  static const String longField = "long";
 
   // Firestore Documents
   static const String fcmDoc = "fcm";

@@ -6,7 +6,10 @@ import 'package:flowery_rider_app/config/services/location_service.dart';
 import 'package:flowery_rider_app/config/services/osrm_routing_service.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/utils/map_constants.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart'
+    show LocationType;
 import 'package:geolocator/geolocator.dart';
 import 'package:injectable/injectable.dart';
 import 'package:latlong2/latlong.dart';
@@ -19,11 +22,13 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
   final LocationService _locationService;
   final OpenCommunicationUseCase _openCommunicationUseCase;
   final OsrmRoutingService _routingService;
+  final GetOrderShippingUseCase _getOrderShippingUseCase;
 
   MapCubit(
     this._locationService,
     this._openCommunicationUseCase,
     this._routingService,
+    this._getOrderShippingUseCase,
   ) : super(const MapState());
 
   Timer? _locationTimer;
@@ -41,7 +46,7 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
     }
   }
 
-  void _onInitialize(MapInitializeEvent event) {
+  Future<void> _onInitialize(MapInitializeEvent event) async {
     emit(
       MapState(
         order: event.order,
@@ -51,11 +56,24 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
         routeLoading: true,
       ),
     );
-    _resolveCurrentLocation();
+
+    if (event.locationType == LocationType.user) {
+      final shipping = await _getOrderShippingUseCase(event.order.id);
+      if (isClosed) return;
+      if (shipping != null) {
+        final merged = event.order.shippingAddress.mergeWith(shipping);
+        emit(
+          state.copyWith(
+            order: event.order.copyWith(shippingAddress: merged),
+            target: _parseLatLng(merged.lat, merged.long) ?? state.target,
+          ),
+        );
+      }
+    }
+
+    await _resolveCurrentLocation();
   }
 
-  /// Parses a "lat"/"long" string pair into a [LatLng], or null when either is
-  /// missing, unparsable, or the placeholder 0,0 the backend uses for "unset".
   LatLng? _parseLatLng(String lat, String long) {
     final la = double.tryParse(lat);
     final lo = double.tryParse(long);
@@ -64,8 +82,6 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
     return LatLng(la, lo);
   }
 
-  /// Checks service + permission, reads the current position, starts live
-  /// tracking, then loads the route to the target.
   Future<void> _resolveCurrentLocation() async {
     emit(state.copyWith(locating: true, clearLocationError: true));
     try {
@@ -89,16 +105,11 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
         return;
       }
 
-      // Live updates (marker only) every [_liveUpdateInterval].
       _startLiveTracking();
 
-      // 3a) Use the last known fix first — instant, and works on emulators.
       final last = await _locationService.getLastKnownPosition();
       if (isClosed) return;
       if (last != null) _applyLocation(last);
-
-      // 3b) Then get a fresh position, but don't wait forever (emulators may
-      //     never produce a GPS fix). If it times out we keep the last fix.
       try {
         final position = await _locationService.getCurrentPosition(
           settings: const LocationSettings(
@@ -110,12 +121,10 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
         _applyLocation(position);
       } catch (_) {
         if (state.currentLocation == null) {
-          // On an emulator, set a location in Extended controls → Location.
           _fail(AppStrings.couldNotGetGpsFix);
         }
       }
 
-      // Once we have a location, load the road route to the target.
       final target = state.target;
       if (state.currentLocation != null && target != null) {
         await _loadRoute(state.currentLocation!, target);
@@ -127,7 +136,6 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
     }
   }
 
-  /// Applies a resolved position to the state.
   void _applyLocation(Position position) {
     emit(
       state.copyWith(
@@ -138,7 +146,6 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
     );
   }
 
-  /// Polls the current position on a fixed interval and moves the marker only.
   void _startLiveTracking() {
     _locationTimer?.cancel();
     _locationTimer = Timer.periodic(MapConstants.liveUpdateInterval, (_) async {
@@ -154,8 +161,6 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
     });
   }
 
-  /// Asks OSRM for the road route. Falls back to a straight line when OSRM
-  /// can't produce one (empty result / error / points too far apart).
   Future<void> _loadRoute(LatLng start, LatLng end) async {
     emit(
       state.copyWith(
@@ -178,7 +183,6 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
     }
   }
 
-  /// Draws a straight line between [start] and [end] as a last resort.
   void _applyFallbackRoute(LatLng start, LatLng end) {
     emit(
       state.copyWith(

@@ -19,4 +19,6 @@ abstract interface class TrackingRepoContract {
   Future<Map<String, dynamic>?> getCachedActiveOrder();
 
   Future<void> clearCachedActiveOrder();
+
+  Future<ShippingAddressEntity?> getOrderShipping(String orderId);
 }

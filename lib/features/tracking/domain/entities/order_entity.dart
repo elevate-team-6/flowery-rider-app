@@ -289,6 +289,21 @@ class ShippingAddressEntity extends Equatable {
     );
   }
 
+  /// Overlays [other] (e.g. a Firestore address) on top of this one, keeping
+  /// this value for any field [other] left empty.
+  ShippingAddressEntity mergeWith(ShippingAddressEntity? other) {
+    if (other == null) return this;
+    String pick(String value, String fallback) =>
+        value.isNotEmpty ? value : fallback;
+    return ShippingAddressEntity(
+      street: pick(other.street, street),
+      city: pick(other.city, city),
+      phone: pick(other.phone, phone),
+      lat: pick(other.lat, lat),
+      long: pick(other.long, long),
+    );
+  }
+
   Map<String, dynamic> toJson() => {
     'street': street,
     'city': city,

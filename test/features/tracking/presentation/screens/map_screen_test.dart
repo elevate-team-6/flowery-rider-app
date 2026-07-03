@@ -3,6 +3,7 @@ import 'package:flowery_rider_app/config/services/location_service.dart';
 import 'package:flowery_rider_app/config/services/osrm_routing_service.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/map_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/map_view_model/map_cubit.dart';
@@ -30,12 +31,18 @@ class _InMemoryAssetLoader extends AssetLoader {
       _data[locale.languageCode] ?? const {};
 }
 
-@GenerateMocks([LocationService, OpenCommunicationUseCase, OsrmRoutingService])
+@GenerateMocks([
+  LocationService,
+  OpenCommunicationUseCase,
+  OsrmRoutingService,
+  GetOrderShippingUseCase,
+])
 void main() {
   late MapCubit cubit;
   late MockLocationService mockLocationService;
   late MockOpenCommunicationUseCase mockOpenCommunicationUseCase;
   late MockOsrmRoutingService mockRoutingService;
+  late MockGetOrderShippingUseCase mockGetOrderShippingUseCase;
   late Map<String, Map<String, dynamic>> translations;
 
   const surface = Size(700, 1400);
@@ -92,6 +99,8 @@ void main() {
     mockLocationService = MockLocationService();
     mockOpenCommunicationUseCase = MockOpenCommunicationUseCase();
     mockRoutingService = MockOsrmRoutingService();
+    mockGetOrderShippingUseCase = MockGetOrderShippingUseCase();
+    when(mockGetOrderShippingUseCase(any)).thenAnswer((_) async => null);
 
     // Permission denied → the cubit fails fast and never starts the live
     // tracking timer, keeping the widget test free of pending timers.
@@ -109,6 +118,7 @@ void main() {
       mockLocationService,
       mockOpenCommunicationUseCase,
       mockRoutingService,
+      mockGetOrderShippingUseCase,
     );
   });
 

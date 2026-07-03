@@ -6,6 +6,7 @@ import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_pending_orders_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_cubit.dart';
@@ -17,9 +18,10 @@ import 'package:mockito/mockito.dart';
 
 import 'home_cubit_test.mocks.dart';
 
-@GenerateMocks([GetPendingOrdersUseCase])
+@GenerateMocks([GetPendingOrdersUseCase, GetOrderShippingUseCase])
 void main() {
   late MockGetPendingOrdersUseCase mockUseCase;
+  late MockGetOrderShippingUseCase mockGetOrderShippingUseCase;
   late HomeCubit cubit;
 
   const user = UserEntity(
@@ -77,7 +79,10 @@ void main() {
 
   setUp(() {
     mockUseCase = MockGetPendingOrdersUseCase();
-    cubit = HomeCubit(mockUseCase);
+    mockGetOrderShippingUseCase = MockGetOrderShippingUseCase();
+    // Default: Firestore has no address, so orders keep their backend address.
+    when(mockGetOrderShippingUseCase(any)).thenAnswer((_) async => null);
+    cubit = HomeCubit(mockUseCase, mockGetOrderShippingUseCase);
 
     provideDummy<BaseResponse<PendingOrdersEntity>>(ErrorBaseResponse('dummy'));
   });
@@ -129,6 +134,69 @@ void main() {
       await future;
       expect(completed, isTrue);
     });
+
+    blocTest<HomeCubit, HomeStates>(
+      'uses the Firestore address for each order over the backend',
+      setUp: () {
+        when(
+          mockUseCase.call(page: anyNamed('page')),
+        ).thenAnswer((_) async => SuccessBaseResponse(fakeEntity));
+        when(mockGetOrderShippingUseCase(any)).thenAnswer(
+          (_) async => const ShippingAddressEntity(
+            street: 'FS Street',
+            city: 'FS City',
+            phone: '',
+            lat: '10.0',
+            long: '11.0',
+          ),
+        );
+      },
+      build: () => cubit,
+      act: (cubit) => cubit.doEvent(const GetPendingOrdersEvent(page: 1)),
+      expect: () => [
+        isA<HomeStates>().having(
+          (s) => s.pendingOrdersState.isLoading,
+          'isLoading',
+          true,
+        ),
+        isA<HomeStates>().having(
+          (s) => s.pendingOrdersState.data?.orders
+              .map(
+                (o) => '${o.shippingAddress.street}, ${o.shippingAddress.city}',
+              )
+              .toList(),
+          'addresses',
+          // Firestore ('FS Street', 'FS City') replaces the backend address.
+          ['FS Street, FS City', 'FS Street, FS City'],
+        ),
+      ],
+      verify: (_) => verify(mockGetOrderShippingUseCase(any)).called(2),
+    );
+
+    blocTest<HomeCubit, HomeStates>(
+      'keeps the backend address when the order has no Firestore doc',
+      setUp: () {
+        when(
+          mockUseCase.call(page: anyNamed('page')),
+        ).thenAnswer((_) async => SuccessBaseResponse(fakeEntity));
+        when(mockGetOrderShippingUseCase(any)).thenAnswer((_) async => null);
+      },
+      build: () => cubit,
+      act: (cubit) => cubit.doEvent(const GetPendingOrdersEvent(page: 1)),
+      expect: () => [
+        isA<HomeStates>().having(
+          (s) => s.pendingOrdersState.isLoading,
+          'isLoading',
+          true,
+        ),
+        isA<HomeStates>().having(
+          (s) => s.pendingOrdersState.data?.orders.first.shippingAddress.street,
+          'street',
+          // Falls back to the backend order (street 'Street').
+          'Street',
+        ),
+      ],
+    );
 
     blocTest<HomeCubit, HomeStates>(
       'emits loading then error message on failure',
