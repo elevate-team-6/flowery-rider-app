@@ -3,6 +3,7 @@ import 'package:flowery_rider_app/config/services/location_service.dart';
 import 'package:flowery_rider_app/config/services/osrm_routing_service.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/map_view_model/map_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/map_view_model/map_events.dart';
@@ -15,12 +16,18 @@ import 'package:mockito/mockito.dart';
 
 import 'map_cubit_test.mocks.dart';
 
-@GenerateMocks([LocationService, OpenCommunicationUseCase, OsrmRoutingService])
+@GenerateMocks([
+  LocationService,
+  OpenCommunicationUseCase,
+  OsrmRoutingService,
+  GetOrderShippingUseCase,
+])
 void main() {
   late MapCubit cubit;
   late MockLocationService mockLocationService;
   late MockOpenCommunicationUseCase mockOpenCommunicationUseCase;
   late MockOsrmRoutingService mockRoutingService;
+  late MockGetOrderShippingUseCase mockGetOrderShippingUseCase;
 
   Position makePosition(double lat, double lng) => Position(
     latitude: lat,
@@ -94,10 +101,14 @@ void main() {
     mockLocationService = MockLocationService();
     mockOpenCommunicationUseCase = MockOpenCommunicationUseCase();
     mockRoutingService = MockOsrmRoutingService();
+    mockGetOrderShippingUseCase = MockGetOrderShippingUseCase();
+    // Default: Firestore has no address, so the map keeps the backend one.
+    when(mockGetOrderShippingUseCase(any)).thenAnswer((_) async => null);
     cubit = MapCubit(
       mockLocationService,
       mockOpenCommunicationUseCase,
       mockRoutingService,
+      mockGetOrderShippingUseCase,
     );
   });
 
@@ -161,6 +172,82 @@ void main() {
       expect(cubit.state.routeError, true);
       expect(cubit.state.currentLocation, isNotNull);
       verifyNever(mockRoutingService.getRoute(any, any));
+    });
+
+    test('Firestore address wins over the backend for the user leg', () async {
+      stubLocationGranted();
+      when(mockGetOrderShippingUseCase(tOrder.id)).thenAnswer(
+        (_) async => const ShippingAddressEntity(
+          street: 'FS Street',
+          city: 'FS City',
+          phone: '0199',
+          lat: '25.5',
+          long: '26.5',
+        ),
+      );
+
+      cubit.doEvent(
+        initEvent(type: LocationType.user, lat: '30.1', long: '31.1'),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+
+      // Firestore values replace the backend ones (St/City, 30.1/31.1).
+      expect(cubit.state.target, const LatLng(25.5, 26.5));
+      expect(cubit.state.order?.shippingAddress.street, 'FS Street');
+      expect(cubit.state.order?.shippingAddress.city, 'FS City');
+      verify(mockGetOrderShippingUseCase(tOrder.id)).called(1);
+    });
+
+    test('keeps the backend address when the order has no Firestore doc',
+        () async {
+      stubLocationGranted();
+      when(
+        mockGetOrderShippingUseCase(tOrder.id),
+      ).thenAnswer((_) async => null);
+
+      cubit.doEvent(
+        initEvent(type: LocationType.user, lat: '30.1', long: '31.1'),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+
+      // Backend shipping (street 'St', city 'City', 30.1/31.1) is preserved.
+      expect(cubit.state.order?.shippingAddress.street, 'St');
+      expect(cubit.state.target, const LatLng(30.1, 31.1));
+    });
+
+    test('empty Firestore fields fall back to the backend', () async {
+      stubLocationGranted();
+      when(mockGetOrderShippingUseCase(tOrder.id)).thenAnswer(
+        (_) async => const ShippingAddressEntity(
+          street: '',
+          city: 'FS City',
+          phone: '',
+          lat: '',
+          long: '',
+        ),
+      );
+
+      cubit.doEvent(
+        initEvent(type: LocationType.user, lat: '30.1', long: '31.1'),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+
+      // Firestore's empty street/coords fall back to backend; city comes from FS.
+      expect(cubit.state.order?.shippingAddress.street, 'St');
+      expect(cubit.state.order?.shippingAddress.city, 'FS City');
+      expect(cubit.state.target, const LatLng(30.1, 31.1));
+    });
+
+    test('store leg never reads the Firestore address', () async {
+      stubLocationGranted();
+
+      cubit.doEvent(
+        initEvent(type: LocationType.store, lat: '30.0', long: '31.0'),
+      );
+      await Future<void>.delayed(const Duration(milliseconds: 30));
+
+      expect(cubit.state.target, const LatLng(30.0, 31.0));
+      verifyNever(mockGetOrderShippingUseCase(any));
     });
   });
 
