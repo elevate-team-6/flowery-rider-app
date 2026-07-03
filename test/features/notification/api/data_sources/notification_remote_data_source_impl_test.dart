@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/features/notification/api/data_sources/notification_remote_data_source_impl.dart';
+import 'package:flowery_rider_app/features/notification/data/models/fcm_config_model.dart';
 import 'package:flowery_rider_app/features/notification/data/models/order_firestore_model.dart';
 import 'package:flowery_rider_app/features/notification/data/models/user_firestore_model.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -20,7 +21,13 @@ import 'notification_remote_data_source_impl_test.mocks.dart';
     MockSpec<DocumentReference<Map<String, dynamic>>>(
       as: #MockDocumentReference,
     ),
+    MockSpec<DocumentReference<FcmConfigModel>>(
+      as: #MockFcmConfigDocumentReference,
+    ),
     MockSpec<DocumentSnapshot<Map<String, dynamic>>>(as: #MockDocumentSnapshot),
+    MockSpec<DocumentSnapshot<FcmConfigModel>>(
+      as: #MockFcmConfigDocumentSnapshot,
+    ),
   ],
 )
 void main() {
@@ -29,14 +36,18 @@ void main() {
   late MockDio mockDio;
   late MockCollectionReference mockCollectionReference;
   late MockDocumentReference mockDocumentReference;
+  late MockFcmConfigDocumentReference mockFcmConfigDocumentReference;
   late MockDocumentSnapshot mockDocumentSnapshot;
+  late MockFcmConfigDocumentSnapshot mockFcmConfigDocumentSnapshot;
 
   setUp(() {
     mockFirestore = MockFirebaseFirestore();
     mockDio = MockDio();
     mockCollectionReference = MockCollectionReference();
     mockDocumentReference = MockDocumentReference();
+    mockFcmConfigDocumentReference = MockFcmConfigDocumentReference();
     mockDocumentSnapshot = MockDocumentSnapshot();
+    mockFcmConfigDocumentSnapshot = MockFcmConfigDocumentSnapshot();
     dataSource = NotificationRemoteDataSourceImpl(mockFirestore, mockDio);
   });
 
@@ -84,19 +95,32 @@ void main() {
   });
 
   group('getFcmConfig', () {
-    test('should return map when config document exists', () async {
+    test('should return FcmConfigModel when config document exists', () async {
       when(mockFirestore.collection(any)).thenReturn(mockCollectionReference);
       when(mockCollectionReference.doc(any)).thenReturn(mockDocumentReference);
       when(
-        mockDocumentReference.get(),
-      ).thenAnswer((_) async => mockDocumentSnapshot);
-      when(mockDocumentSnapshot.exists).thenReturn(true);
-      when(mockDocumentSnapshot.data()).thenReturn({'apiKey': 'val'});
+        mockDocumentReference.withConverter<FcmConfigModel>(
+          fromFirestore: anyNamed('fromFirestore'),
+          toFirestore: anyNamed('toFirestore'),
+        ),
+      ).thenReturn(mockFcmConfigDocumentReference);
+
+      when(
+        mockFcmConfigDocumentReference.get(),
+      ).thenAnswer((_) async => mockFcmConfigDocumentSnapshot);
+      when(mockFcmConfigDocumentSnapshot.exists).thenReturn(true);
+      when(mockFcmConfigDocumentSnapshot.data()).thenReturn(
+        FcmConfigModel(
+          privateKey: 'key',
+          clientEmail: 'email',
+          projectId: 'project',
+        ),
+      );
 
       final result = await dataSource.getFcmConfig();
 
-      expect(result, isA<Map<String, dynamic>>());
-      expect(result?['apiKey'], 'val');
+      expect(result, isA<FcmConfigModel>());
+      expect(result?.projectId, 'project');
     });
   });
 

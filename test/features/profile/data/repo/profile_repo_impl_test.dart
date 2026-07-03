@@ -80,15 +80,18 @@ void main() {
       expect(success.data?.email, 'ahmed@test.com');
     });
 
-    test('returns null entity data when driver is null', () async {
+    test('returns userNotFound when driver is null', () async {
       when(mockRemoteDataSource.getProfileData()).thenAnswer(
         (_) async => SuccessBaseResponse(const ProfileResponseModel()),
       );
 
       final result = await repo.getProfileData();
 
-      expect(result, isA<SuccessBaseResponse<DriverEntity>>());
-      expect((result as SuccessBaseResponse<DriverEntity>).data, isNull);
+      expect(result, isA<ErrorBaseResponse<DriverEntity>>());
+      expect(
+        (result as ErrorBaseResponse<DriverEntity>).errorMessage,
+        AppStrings.userNotFound,
+      );
     });
 
     test('propagates error message on failure', () async {
@@ -336,6 +339,9 @@ void main() {
 
       verify(mockRemoteDataSource.logout()).called(1);
       verify(mockCache.deleteData(key: AppKeys.tokenKey)).called(1);
+      verify(mockCache.deleteData(key: AppKeys.userIdKey)).called(1);
+      verify(mockCache.deleteData(key: AppKeys.riderNameKey)).called(1);
+      verify(mockCache.deleteData(key: AppKeys.riderPhoneKey)).called(1);
       expect(result, isA<SuccessBaseResponse<void>>());
     });
 
