@@ -3,6 +3,7 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/cache/secure_cache_helper.dart';
 import 'package:flowery_rider_app/features/notification/data/data_sources/notification_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/notification/data/repo/notification_repo_impl.dart';
+import 'package:flowery_rider_app/features/notification/data/models/fcm_config_model.dart';
 import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
@@ -71,10 +72,11 @@ void main() {
           mockRemoteDataSource.updateOrderInFirestore(any),
         ).thenAnswer((_) async {});
         when(mockRemoteDataSource.getFcmConfig()).thenAnswer(
-          (_) async => {
-            'project_id': 'project',
-            // missing private_key and client_email
-          },
+          (_) async => FcmConfigModel(
+            privateKey: '',
+            clientEmail: '',
+            projectId: 'project',
+          ),
         );
 
         final result = await repo.updateOrderProgress(
@@ -105,11 +107,11 @@ void main() {
           mockRemoteDataSource.updateOrderInFirestore(any),
         ).thenAnswer((_) async {});
         when(mockRemoteDataSource.getFcmConfig()).thenAnswer(
-          (_) async => {
-            'private_key': 'key',
-            'client_email': 'email',
-            'project_id': 'project',
-          },
+          (_) async => FcmConfigModel(
+            privateKey: 'key',
+            clientEmail: 'email',
+            projectId: 'project',
+          ),
         );
 
         when(

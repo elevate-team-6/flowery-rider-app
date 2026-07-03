@@ -5,6 +5,7 @@ import 'package:flowery_rider_app/config/error_handler/error_handler.dart';
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/utils/app_end_points.dart';
 import 'package:flowery_rider_app/features/notification/data/data_sources/notification_remote_data_source_contract.dart';
+import 'package:flowery_rider_app/features/notification/data/models/fcm_config_model.dart';
 import 'package:flowery_rider_app/features/notification/data/models/order_firestore_model.dart';
 import 'package:flowery_rider_app/features/notification/data/models/user_firestore_model.dart';
 import 'package:flutter/foundation.dart';
@@ -38,19 +39,21 @@ class NotificationRemoteDataSourceImpl
   }
 
   @override
-  Future<Map<String, dynamic>?> getFcmConfig() async {
+  Future<FcmConfigModel?> getFcmConfig() async {
     try {
       final doc = await _firestore
           .collection(AppConstants.appConfigsCollection)
           .doc(AppConstants.fcmDoc)
+          .withConverter<FcmConfigModel>(
+            fromFirestore: (snapshot, _) =>
+                FcmConfigModel.fromFirestore(snapshot.data()!),
+            toFirestore: (model, _) => model.toFirestore(),
+          )
           .get();
-      if (doc.exists && doc.data() != null) {
-        return doc.data();
-      }
+      return doc.data();
     } catch (e) {
       rethrow;
     }
-    return null;
   }
 
   @override

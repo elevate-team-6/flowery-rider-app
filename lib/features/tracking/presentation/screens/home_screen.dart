@@ -102,6 +102,7 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
           if (orders.isEmpty) {
             return EmptyOrdersState(onRefresh: _loadOrders);
           }
+          final cubit = context.read<HomeCubit>();
 
           return Column(
             children: [
@@ -120,14 +121,11 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
                           currentPage: ordersState.data!.currentPage ?? 1,
                           totalPages: ordersState.data!.totalPages!,
                           onPageChanged: (page) {
-                            context.read<HomeCubit>().doEvent(
-                              GetPendingOrdersEvent(page: page),
-                            );
+                            cubit.doEvent(GetPendingOrdersEvent(page: page));
                           },
                         );
                       }
                       final order = orders[index];
-                      final cubit = context.read<HomeCubit>();
                       return OrderCard(
                         order: order,
                         onAccept: () => cubit.doEvent(AcceptOrderEvent(order)),
