@@ -4,7 +4,8 @@
       "Bash(flutter test *)",
       "Bash(flutter pub *)",
       "Bash(dart run *)",
-      "Bash(flutter --version)"
+      "Bash(flutter --version)",
+      "Bash(awk '/^  easy_localization:/{f=1} /^  pin_code_fields:/{f=1} f&&/version:/{print; f=0}' pubspec.lock)"
     ]
   }
 }
