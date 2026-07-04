@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
@@ -17,13 +18,32 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'forget_password_screen_test.mocks.dart';
+
+/// Serves translations from memory so `.tr()` is deterministic without touching
+/// the asset bundle. An empty map makes `.tr()` echo the key back, which is
+/// exactly what the `find.text(AppStrings.*)` assertions expect.
+class _InMemoryAssetLoader extends AssetLoader {
+  const _InMemoryAssetLoader(this._data);
+
+  final Map<String, Map<String, dynamic>> _data;
+
+  @override
+  Future<Map<String, dynamic>> load(String path, Locale locale) async =>
+      _data[locale.languageCode] ?? const {};
+}
 
 @GenerateMocks([ForgetPasswordCubit])
 void main() {
   late MockForgetPasswordCubit mockCubit;
   late StreamController<BaseUiEvent> eventController;
+
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues({});
+    await EasyLocalization.ensureInitialized();
+  });
 
   setUp(() {
     mockCubit = MockForgetPasswordCubit();
@@ -41,16 +61,33 @@ void main() {
     eventController.close();
   });
 
+  /// Wraps [home] in an initialized EasyLocalization + MaterialApp so `.tr()`
+  /// resolves deterministically across platforms (uninitialized `.tr()` behaves
+  /// differently between package versions, which broke this suite on CI).
+  Widget wrapApp(Widget home) {
+    return EasyLocalization(
+      supportedLocales: const [Locale('en')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      startLocale: const Locale('en'),
+      assetLoader: const _InMemoryAssetLoader({'en': <String, dynamic>{}}),
+      child: Builder(
+        builder: (context) => MaterialApp(
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          home: home,
+        ),
+      ),
+    );
+  }
+
   Widget createWidgetUnderTest() {
-    return MaterialApp(
-      onGenerateRoute: (settings) {
-        return MaterialPageRoute(
-          builder: (context) => BlocProvider<ForgetPasswordCubit>.value(
-            value: mockCubit,
-            child: const ForgotPasswordScreen(),
-          ),
-        );
-      },
+    return wrapApp(
+      BlocProvider<ForgetPasswordCubit>.value(
+        value: mockCubit,
+        child: const ForgotPasswordScreen(),
+      ),
     );
   }
 
@@ -59,6 +96,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pump();
 
       // Initial Step: Email
       expect(find.byType(EmailStepWidget), findsOneWidget);
@@ -81,6 +119,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pump();
 
       // Move to OTP Step
       eventController.add(
@@ -105,6 +144,7 @@ void main() {
 
     testWidgets('back button navigates to previous step', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
+      await tester.pump();
 
       // Move to OTP Step
       eventController.add(
@@ -129,13 +169,14 @@ void main() {
   group('Step Widgets Individual Tests', () {
     testWidgets('EmailStepWidget calls doEvent on confirm', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<ForgetPasswordCubit>.value(
+        wrapApp(
+          BlocProvider<ForgetPasswordCubit>.value(
             value: mockCubit,
             child: const Scaffold(body: EmailStepWidget()),
           ),
         ),
       );
+      await tester.pump();
 
       await tester.enterText(find.byType(TextField), 'test@example.com');
       await tester.tap(find.widgetWithText(ElevatedButton, AppStrings.confirm));
@@ -146,8 +187,8 @@ void main() {
 
     testWidgets('OtpStepWidget calls doEvent on completed PIN', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<ForgetPasswordCubit>.value(
+        wrapApp(
+          BlocProvider<ForgetPasswordCubit>.value(
             value: mockCubit,
             child: const Scaffold(
               body: OtpStepWidget(email: 'test@example.com'),
@@ -155,6 +196,7 @@ void main() {
           ),
         ),
       );
+      await tester.pump();
 
       await tester.enterText(find.byType(PinCodeTextField), '123456');
       await tester.pump(const Duration(milliseconds: 300));
@@ -166,8 +208,8 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<ForgetPasswordCubit>.value(
+        wrapApp(
+          BlocProvider<ForgetPasswordCubit>.value(
             value: mockCubit,
             child: const Scaffold(
               body: ResetPasswordStepWidget(email: 'test@example.com'),
@@ -175,6 +217,7 @@ void main() {
           ),
         ),
       );
+      await tester.pump();
 
       final passwordFields = find.byType(CustomTextField);
       await tester.enterText(passwordFields.at(0), 'Password123!');
