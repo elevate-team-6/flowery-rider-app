@@ -31,6 +31,9 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
+    // Make the entire layout reactive to locale changes
+    context.locale;
+
     return BlocProvider(
       create: (context) => getIt<MainLayoutCubit>(),
       child: BlocBuilder<MainLayoutCubit, int>(
@@ -65,7 +68,7 @@ class _MainLayoutState extends State<MainLayout> {
                         BlendMode.srcIn,
                       ),
                     ),
-                    label: AppStrings.home.tr(),
+                    label: AppStrings.home.tr(context: context),
                   ),
                   NavigationDestination(
                     icon: SvgPicture.asset(
@@ -82,7 +85,7 @@ class _MainLayoutState extends State<MainLayout> {
                         BlendMode.srcIn,
                       ),
                     ),
-                    label: AppStrings.orders.tr(),
+                    label: AppStrings.orders.tr(context: context),
                   ),
                   NavigationDestination(
                     icon: SvgPicture.asset(
@@ -99,7 +102,7 @@ class _MainLayoutState extends State<MainLayout> {
                         BlendMode.srcIn,
                       ),
                     ),
-                    label: AppStrings.profile.tr(),
+                    label: AppStrings.profile.tr(context: context),
                   ),
                 ],
               ),

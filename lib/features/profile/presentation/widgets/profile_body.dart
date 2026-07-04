@@ -80,6 +80,9 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
 
   @override
   Widget build(BuildContext context) {
+    // Make the screen reactive to locale changes
+    context.locale;
+
     return Scaffold(
       appBar: AppBar(
         actionsPadding: EdgeInsets.symmetric(horizontal: 12.w),
