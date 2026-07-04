@@ -39,10 +39,24 @@ class _InMemoryAssetLoader extends AssetLoader {
 void main() {
   late MockForgetPasswordCubit mockCubit;
   late StreamController<BaseUiEvent> eventController;
+  late Map<String, Map<String, dynamic>> translations;
 
   setUpAll(() async {
     SharedPreferences.setMockInitialValues({});
     await EasyLocalization.ensureInitialized();
+
+    // Identity translations: each asserted key maps to itself so `.tr()` returns
+    // the key text the assertions look for, regardless of how the installed
+    // easy_localization version handles missing keys (key vs empty string).
+    translations = {
+      'en': {
+        AppStrings.forgetPasswordTitle: AppStrings.forgetPasswordTitle,
+        AppStrings.emailVerification: AppStrings.emailVerification,
+        AppStrings.resetPasswordTitle: AppStrings.resetPasswordTitle,
+        AppStrings.confirm: AppStrings.confirm,
+        AppStrings.continueText: AppStrings.continueText,
+      },
+    };
   });
 
   setUp(() {
@@ -70,7 +84,7 @@ void main() {
       path: 'assets/translations',
       fallbackLocale: const Locale('en'),
       startLocale: const Locale('en'),
-      assetLoader: const _InMemoryAssetLoader({'en': <String, dynamic>{}}),
+      assetLoader: _InMemoryAssetLoader(translations),
       child: Builder(
         builder: (context) => MaterialApp(
           localizationsDelegates: context.localizationDelegates,
@@ -97,6 +111,7 @@ void main() {
     ) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Initial Step: Email
       expect(find.byType(EmailStepWidget), findsOneWidget);
@@ -108,7 +123,7 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump(const Duration(milliseconds: 10));
+      await tester.pump(const Duration(milliseconds: 400));
 
       // Should navigate to OTP Step
       expect(find.byType(OtpStepWidget), findsOneWidget);
@@ -120,6 +135,7 @@ void main() {
     ) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Move to OTP Step
       eventController.add(
@@ -127,7 +143,7 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump(const Duration(milliseconds: 10));
+      await tester.pump(const Duration(milliseconds: 400));
 
       // Simulate success event for OTP verification
       eventController.add(
@@ -135,7 +151,7 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump(const Duration(milliseconds: 10));
+      await tester.pump(const Duration(milliseconds: 400));
 
       // Should navigate to Reset Password Step
       expect(find.byType(ResetPasswordStepWidget), findsOneWidget);
@@ -145,6 +161,7 @@ void main() {
     testWidgets('back button navigates to previous step', (tester) async {
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       // Move to OTP Step
       eventController.add(
@@ -152,14 +169,14 @@ void main() {
       );
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump(const Duration(milliseconds: 10));
+      await tester.pump(const Duration(milliseconds: 400));
       expect(find.byType(OtpStepWidget), findsOneWidget);
 
       // Tap back button
       await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump(const Duration(milliseconds: 10));
+      await tester.pump(const Duration(milliseconds: 400));
 
       // Should be back to Email Step
       expect(find.byType(EmailStepWidget), findsOneWidget);
@@ -177,6 +194,7 @@ void main() {
         ),
       );
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       await tester.enterText(find.byType(TextField), 'test@example.com');
       await tester.tap(find.widgetWithText(ElevatedButton, AppStrings.confirm));
@@ -197,6 +215,7 @@ void main() {
         ),
       );
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       await tester.enterText(find.byType(PinCodeTextField), '123456');
       await tester.pump(const Duration(milliseconds: 300));
@@ -218,6 +237,7 @@ void main() {
         ),
       );
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 100));
 
       final passwordFields = find.byType(CustomTextField);
       await tester.enterText(passwordFields.at(0), 'Password123!');
