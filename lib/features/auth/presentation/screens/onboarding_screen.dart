@@ -5,6 +5,7 @@ import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/utils/app_text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:lottie/lottie.dart';
 
 class OnboardingScreen extends StatelessWidget {
@@ -17,7 +18,7 @@ class OnboardingScreen extends StatelessWidget {
     return Scaffold(
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: 16.w),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -34,7 +35,7 @@ class OnboardingScreen extends StatelessWidget {
               ),
 
               Align(
-                alignment: Alignment.centerLeft,
+                alignment: AlignmentDirectional.centerStart,
                 child: RichText(
                   textAlign: TextAlign.start,
                   text: TextSpan(
@@ -52,7 +53,7 @@ class OnboardingScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const Spacer(),
 
               Column(
                 children: [
@@ -63,7 +64,7 @@ class OnboardingScreen extends StatelessWidget {
                     child: Text(AppStrings.login.tr()),
                   ),
 
-                  const SizedBox(height: 12),
+                  SizedBox(height: 12.h),
 
                   OutlinedButton(
                     onPressed: () {
@@ -86,7 +87,7 @@ class OnboardingScreen extends StatelessWidget {
                 style: AppTextStyles.black12400.copyWith(color: AppColors.gray),
               ),
 
-              const SizedBox(height: 30),
+              SizedBox(height: 30.h),
             ],
           ),
         ),

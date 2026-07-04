@@ -320,7 +320,7 @@ void main() {
 
         final result = await dataSource.updateOrderState(
           '123',
-          OrderStatus.delivered,
+          OrderStatus.completed,
         );
 
         expect(result, isA<ErrorBaseResponse<UpdateOrderStateResponseModel>>());
