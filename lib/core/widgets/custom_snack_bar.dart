@@ -18,6 +18,7 @@ abstract class CustomSnackBar {
   static void _show(String msg, bool isSuccess) {
     BotToast.showCustomNotification(
       duration: const Duration(milliseconds: 4500),
+      align: Alignment.topCenter,
       toastBuilder: (cancelFunc) =>
           _PetalToast(msg: msg, isSuccess: isSuccess, cancelFunc: cancelFunc),
     );
@@ -161,40 +162,35 @@ class _PetalToastState extends State<_PetalToast>
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Padding(
-        padding: const EdgeInsets.only(top: 50),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              clipBehavior: Clip.none,
-              alignment: Alignment.center,
-              children: [
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: OverflowBox(
-                      maxHeight: 400,
-                      maxWidth: 600,
-                      child: AnimatedBuilder(
+    return Padding(
+      padding: const EdgeInsets.only(top: 50),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Stack(
+            clipBehavior: Clip.none,
+            alignment: Alignment.center,
+            children: [
+              Positioned.fill(
+                child: OverflowBox(
+                  maxHeight: 400,
+                  maxWidth: 600,
+                  child: AnimatedBuilder(
+                    animation: _confettiController,
+                    builder: (context, _) => CustomPaint(
+                      painter: PetalConfettiPainter(
                         animation: _confettiController,
-                        builder: (context, _) => CustomPaint(
-                          painter: PetalConfettiPainter(
-                            animation: _confettiController,
-                            petals: _petals,
-                            isError: !widget.isSuccess,
-                          ),
-                        ),
+                        petals: _petals,
+                        isError: !widget.isSuccess,
                       ),
                     ),
                   ),
                 ),
-                _buildShakeWrapper(child: _buildMorphCard()),
-              ],
-            ),
-          ],
-        ),
+              ),
+              _buildShakeWrapper(child: _buildMorphCard()),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -249,7 +245,7 @@ class _PetalToastState extends State<_PetalToast>
           child: Opacity(
             opacity: (entrance * 2 - dismiss * 3).clamp(0.0, 1.0),
             child: Material(
-              type: MaterialType.transparency,
+              color: Colors.transparent,
               child: Container(
                 width: cardWidth,
                 constraints: BoxConstraints(minHeight: cardHeight),
