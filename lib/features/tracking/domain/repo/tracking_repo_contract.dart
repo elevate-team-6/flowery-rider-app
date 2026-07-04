@@ -21,4 +21,10 @@ abstract interface class TrackingRepoContract {
   Future<void> clearCachedActiveOrder();
 
   Future<ShippingAddressEntity?> getOrderShipping(String orderId);
+
+  Future<void> updateRiderLocation({
+    required String orderId,
+    required String lat,
+    required String long,
+  });
 }

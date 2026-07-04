@@ -23,4 +23,13 @@ abstract interface class TrackingRemoteDataSourceContract {
   });
 
   Future<OrderShippingFirestoreModel?> getOrderShipping(String orderId);
+
+  /// Writes the rider's live position onto the order doc in Firestore so the
+  /// customer app can show the rider moving on the map. Merges to avoid
+  /// clobbering fields owned by the customer app (shippingAddress, etc.).
+  Future<void> updateRiderLocation({
+    required String orderId,
+    required String lat,
+    required String long,
+  });
 }

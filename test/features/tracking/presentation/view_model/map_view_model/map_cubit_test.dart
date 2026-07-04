@@ -5,6 +5,7 @@ import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_rider_location_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/map_view_model/map_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/map_view_model/map_events.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart';
@@ -21,6 +22,7 @@ import 'map_cubit_test.mocks.dart';
   OpenCommunicationUseCase,
   OsrmRoutingService,
   GetOrderShippingUseCase,
+  UpdateRiderLocationUseCase,
 ])
 void main() {
   late MapCubit cubit;
@@ -28,6 +30,7 @@ void main() {
   late MockOpenCommunicationUseCase mockOpenCommunicationUseCase;
   late MockOsrmRoutingService mockRoutingService;
   late MockGetOrderShippingUseCase mockGetOrderShippingUseCase;
+  late MockUpdateRiderLocationUseCase mockUpdateRiderLocationUseCase;
 
   Position makePosition(double lat, double lng) => Position(
     latitude: lat,
@@ -102,13 +105,22 @@ void main() {
     mockOpenCommunicationUseCase = MockOpenCommunicationUseCase();
     mockRoutingService = MockOsrmRoutingService();
     mockGetOrderShippingUseCase = MockGetOrderShippingUseCase();
+    mockUpdateRiderLocationUseCase = MockUpdateRiderLocationUseCase();
     // Default: Firestore has no address, so the map keeps the backend one.
     when(mockGetOrderShippingUseCase(any)).thenAnswer((_) async => null);
+    when(
+      mockUpdateRiderLocationUseCase(
+        orderId: anyNamed('orderId'),
+        lat: anyNamed('lat'),
+        long: anyNamed('long'),
+      ),
+    ).thenAnswer((_) async {});
     cubit = MapCubit(
       mockLocationService,
       mockOpenCommunicationUseCase,
       mockRoutingService,
       mockGetOrderShippingUseCase,
+      mockUpdateRiderLocationUseCase,
     );
   });
 
@@ -295,6 +307,38 @@ void main() {
 
       expect(cubit.state.usingFallback, true);
       expect(cubit.state.routePoints.length, 2);
+    });
+  });
+
+  group('publish rider location', () {
+    test('user leg publishes the live position to Firestore', () async {
+      stubLocationGranted();
+
+      cubit.doEvent(initEvent(type: LocationType.user));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      verify(
+        mockUpdateRiderLocationUseCase(
+          orderId: tOrder.id,
+          lat: '29.0',
+          long: '30.0',
+        ),
+      ).called(greaterThanOrEqualTo(1));
+    });
+
+    test('store leg never publishes the rider position', () async {
+      stubLocationGranted();
+
+      cubit.doEvent(initEvent(type: LocationType.store));
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      verifyNever(
+        mockUpdateRiderLocationUseCase(
+          orderId: anyNamed('orderId'),
+          lat: anyNamed('lat'),
+          long: anyNamed('long'),
+        ),
+      );
     });
   });
 

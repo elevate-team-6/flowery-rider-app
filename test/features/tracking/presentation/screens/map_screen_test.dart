@@ -5,6 +5,7 @@ import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_rider_location_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/map_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/map_view_model/map_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart';
@@ -36,6 +37,7 @@ class _InMemoryAssetLoader extends AssetLoader {
   OpenCommunicationUseCase,
   OsrmRoutingService,
   GetOrderShippingUseCase,
+  UpdateRiderLocationUseCase,
 ])
 void main() {
   late MapCubit cubit;
@@ -43,6 +45,7 @@ void main() {
   late MockOpenCommunicationUseCase mockOpenCommunicationUseCase;
   late MockOsrmRoutingService mockRoutingService;
   late MockGetOrderShippingUseCase mockGetOrderShippingUseCase;
+  late MockUpdateRiderLocationUseCase mockUpdateRiderLocationUseCase;
   late Map<String, Map<String, dynamic>> translations;
 
   const surface = Size(700, 1400);
@@ -100,7 +103,15 @@ void main() {
     mockOpenCommunicationUseCase = MockOpenCommunicationUseCase();
     mockRoutingService = MockOsrmRoutingService();
     mockGetOrderShippingUseCase = MockGetOrderShippingUseCase();
+    mockUpdateRiderLocationUseCase = MockUpdateRiderLocationUseCase();
     when(mockGetOrderShippingUseCase(any)).thenAnswer((_) async => null);
+    when(
+      mockUpdateRiderLocationUseCase(
+        orderId: anyNamed('orderId'),
+        lat: anyNamed('lat'),
+        long: anyNamed('long'),
+      ),
+    ).thenAnswer((_) async {});
 
     // Permission denied → the cubit fails fast and never starts the live
     // tracking timer, keeping the widget test free of pending timers.
@@ -119,6 +130,7 @@ void main() {
       mockOpenCommunicationUseCase,
       mockRoutingService,
       mockGetOrderShippingUseCase,
+      mockUpdateRiderLocationUseCase,
     );
   });
 

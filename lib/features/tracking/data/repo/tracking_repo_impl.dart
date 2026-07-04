@@ -130,6 +130,24 @@ class TrackingRepoImpl implements TrackingRepoContract {
     }
   }
 
+  @override
+  Future<void> updateRiderLocation({
+    required String orderId,
+    required String lat,
+    required String long,
+  }) async {
+    try {
+      await _remoteDataSource.updateRiderLocation(
+        orderId: orderId,
+        lat: lat,
+        long: long,
+      );
+    } catch (_) {
+      // Best-effort write: a dropped location tick must never disrupt the map
+      // or the delivery flow; the next tick will retry.
+    }
+  }
+
   /// Helper to catch mapping exceptions while using switch expressions
   BaseResponse<T> _handleMapping<T>(T? Function() mapper) {
     try {

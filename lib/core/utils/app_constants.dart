@@ -19,6 +19,8 @@ abstract class AppConstants {
   static const String riderNameField = "riderName";
   static const String riderPhoneField = "riderPhone";
   static const String shippingAddressField = "shippingAddress";
+  static const String riderLocationField = "riderLocation";
+  static const String updatedAtField = "updatedAt";
   static const String streetField = "street";
   static const String cityField = "city";
   static const String phoneField = "phone";

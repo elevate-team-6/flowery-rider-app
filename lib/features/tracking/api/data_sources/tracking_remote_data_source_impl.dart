@@ -65,4 +65,22 @@ class TrackingRemoteDataSourceImpl implements TrackingRemoteDataSourceContract {
     if (!doc.exists || data == null) return null;
     return OrderShippingFirestoreModel.fromFirestore(data);
   }
+
+  @override
+  Future<void> updateRiderLocation({
+    required String orderId,
+    required String lat,
+    required String long,
+  }) async {
+    await _firestore.collection(AppConstants.ordersCollection).doc(orderId).set(
+      {
+        AppConstants.riderLocationField: {
+          AppConstants.latField: lat,
+          AppConstants.longField: long,
+          AppConstants.updatedAtField: FieldValue.serverTimestamp(),
+        },
+      },
+      SetOptions(merge: true),
+    );
+  }
 }

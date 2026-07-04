@@ -8,6 +8,7 @@ import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/utils/map_constants.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_rider_location_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart'
     show LocationType;
 import 'package:geolocator/geolocator.dart';
@@ -23,12 +24,14 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
   final OpenCommunicationUseCase _openCommunicationUseCase;
   final OsrmRoutingService _routingService;
   final GetOrderShippingUseCase _getOrderShippingUseCase;
+  final UpdateRiderLocationUseCase _updateRiderLocationUseCase;
 
   MapCubit(
     this._locationService,
     this._openCommunicationUseCase,
     this._routingService,
     this._getOrderShippingUseCase,
+    this._updateRiderLocationUseCase,
   ) : super(const MapState());
 
   Timer? _locationTimer;
@@ -143,6 +146,23 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
         locating: false,
         clearLocationError: true,
       ),
+    );
+    _publishRiderLocation(position);
+  }
+
+  /// Mirrors the rider's live position onto the order doc in Firestore so the
+  /// customer app can show the rider moving on the map. Only published while
+  /// navigating to the customer ([LocationType.user] == out for delivery /
+  /// "onWay"); the store leg is the rider's own business. Fire-and-forget: the
+  /// repo swallows failures, so a dropped tick never disrupts the map.
+  void _publishRiderLocation(Position position) {
+    if (state.locationType != LocationType.user) return;
+    final orderId = state.order?.id;
+    if (orderId == null || orderId.isEmpty) return;
+    _updateRiderLocationUseCase(
+      orderId: orderId,
+      lat: position.latitude.toString(),
+      long: position.longitude.toString(),
     );
   }
 
