@@ -14,6 +14,7 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_p
 import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -75,6 +76,17 @@ void main() {
     eventController.close();
   });
 
+  /// Sizes the test surface to the ScreenUtil design size so `.w`/`.h` scale
+  /// 1:1. Without this the default 800px-wide surface up-scales the widgets and
+  /// their Rows overflow (the step widgets moved to ScreenUtil on develop).
+  void setPhoneSurface(WidgetTester tester) {
+    // Wide enough that the 6-box OTP row fits at 1:1 scale (matches designSize).
+    tester.view.physicalSize = const Size(430, 900);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+  }
+
   /// Wraps [home] in an initialized EasyLocalization + MaterialApp so `.tr()`
   /// resolves deterministically across platforms (uninitialized `.tr()` behaves
   /// differently between package versions, which broke this suite on CI).
@@ -86,11 +98,14 @@ void main() {
       startLocale: const Locale('en'),
       assetLoader: _InMemoryAssetLoader(translations),
       child: Builder(
-        builder: (context) => MaterialApp(
-          localizationsDelegates: context.localizationDelegates,
-          supportedLocales: context.supportedLocales,
-          locale: context.locale,
-          home: home,
+        builder: (context) => ScreenUtilInit(
+          designSize: const Size(430, 900),
+          child: MaterialApp(
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            home: home,
+          ),
         ),
       ),
     );
@@ -109,6 +124,7 @@ void main() {
     testWidgets('starts with EmailStepWidget and navigates to OtpStepWidget', (
       tester,
     ) async {
+      setPhoneSurface(tester);
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
@@ -133,6 +149,7 @@ void main() {
     testWidgets('navigates from OtpStepWidget to ResetPasswordStepWidget', (
       tester,
     ) async {
+      setPhoneSurface(tester);
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
@@ -159,6 +176,7 @@ void main() {
     });
 
     testWidgets('back button navigates to previous step', (tester) async {
+      setPhoneSurface(tester);
       await tester.pumpWidget(createWidgetUnderTest());
       await tester.pump();
       await tester.pump(const Duration(milliseconds: 100));
@@ -185,6 +203,7 @@ void main() {
 
   group('Step Widgets Individual Tests', () {
     testWidgets('EmailStepWidget calls doEvent on confirm', (tester) async {
+      setPhoneSurface(tester);
       await tester.pumpWidget(
         wrapApp(
           BlocProvider<ForgetPasswordCubit>.value(
@@ -204,6 +223,7 @@ void main() {
     });
 
     testWidgets('OtpStepWidget calls doEvent on completed PIN', (tester) async {
+      setPhoneSurface(tester);
       await tester.pumpWidget(
         wrapApp(
           BlocProvider<ForgetPasswordCubit>.value(
@@ -226,6 +246,7 @@ void main() {
     testWidgets('ResetPasswordStepWidget calls doEvent on continue', (
       tester,
     ) async {
+      setPhoneSurface(tester);
       await tester.pumpWidget(
         wrapApp(
           BlocProvider<ForgetPasswordCubit>.value(
