@@ -91,6 +91,7 @@
   "aboutUs": "About us",
   "version": "Version",
   "logout": "Logout",
+  "cancel" : "Cancel",
   "logoutSuccess": "Logout successfully",
   "confirmLogout": "Confirm Logout",
   "enableLocationServices": "Please enable location services",

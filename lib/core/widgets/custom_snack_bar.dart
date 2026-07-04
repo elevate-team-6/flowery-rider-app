@@ -6,6 +6,7 @@ import 'package:bot_toast/bot_toast.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/widgets/petal_confetti_painter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../utils/app_colors.dart';
@@ -163,7 +164,7 @@ class _PetalToastState extends State<_PetalToast>
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(top: 50),
+      padding: EdgeInsets.only(top: 50.h),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -173,8 +174,8 @@ class _PetalToastState extends State<_PetalToast>
             children: [
               Positioned.fill(
                 child: OverflowBox(
-                  maxHeight: 400,
-                  maxWidth: 600,
+                  maxHeight: 400.h,
+                  maxWidth: 600.w,
                   child: AnimatedBuilder(
                     animation: _confettiController,
                     builder: (context, _) => CustomPaint(
@@ -203,7 +204,7 @@ class _PetalToastState extends State<_PetalToast>
         final double t = _shakeController.value;
         if (t == 0 || t == 1) return child!;
         return Transform.translate(
-          offset: Offset(sin(t * pi * 4) * 8, 0),
+          offset: Offset(sin(t * pi * 4) * 8.w, 0),
           child: child,
         );
       },
@@ -231,17 +232,17 @@ class _PetalToastState extends State<_PetalToast>
         final double startX = (isRTL ? 1 : -1) * (screenWidth / 2 + 50);
         final double currentX = ui.lerpDouble(startX, 0, entrance)!;
 
-        final double targetWidth = screenWidth - 80;
-        final double cardWidth = ui.lerpDouble(40, targetWidth, progress)!;
+        final double targetWidth = screenWidth - 80.w;
+        final double cardWidth = ui.lerpDouble(40.w, targetWidth, progress)!;
         final double cardHeight = ui.lerpDouble(
-          40,
-          64,
+          40.h,
+          64.h,
           progress,
         )!; // Increased min height
-        final double radius = ui.lerpDouble(20, 16, progress)!;
+        final double radius = ui.lerpDouble(20.r, 16.r, progress)!;
 
         return Transform.translate(
-          offset: Offset(currentX, -dismiss * 80),
+          offset: Offset(currentX, -dismiss * 80.h),
           child: Opacity(
             opacity: (entrance * 2 - dismiss * 3).clamp(0.0, 1.0),
             child: Material(
@@ -256,13 +257,13 @@ class _PetalToastState extends State<_PetalToast>
                     color:
                         (widget.isSuccess ? AppColors.primary : AppColors.error)
                             .withValues(alpha: 0.2),
-                    width: 1,
+                    width: 1.w,
                   ),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withValues(alpha: 0.05),
-                      blurRadius: 15,
-                      offset: const Offset(0, 8),
+                      blurRadius: 15.r,
+                      offset: Offset(0, 8.h),
                     ),
                   ],
                 ),
@@ -270,7 +271,7 @@ class _PetalToastState extends State<_PetalToast>
                   borderRadius: BorderRadius.circular(radius),
                   child: Container(
                     padding: EdgeInsets.symmetric(
-                      vertical: progress > 0.4 ? 10 : 0,
+                      vertical: progress > 0.4 ? 10.h : 0,
                     ), // More vertical padding
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
@@ -318,12 +319,12 @@ class _PetalToastState extends State<_PetalToast>
           Opacity(
             opacity: contentOpacity,
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 14,
+              padding: EdgeInsets.symmetric(
+                horizontal: 14.w,
               ), // Slightly more horizontal padding
               child: Row(
                 children: [
-                  const SizedBox(width: 4),
+                  SizedBox(width: 4.w),
                   ScaleTransition(
                     scale: CurvedAnimation(
                       parent: _iconController,
@@ -332,11 +333,11 @@ class _PetalToastState extends State<_PetalToast>
                     child: _buildSwayWrapper(
                       child: Text(
                         widget.isSuccess ? '🛵' : '⚠️',
-                        style: const TextStyle(fontSize: 24),
+                        style: TextStyle(fontSize: 24.sp),
                       ),
                     ), // Back to larger icon
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14.w),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -347,19 +348,19 @@ class _PetalToastState extends State<_PetalToast>
                               ? AppStrings.success.tr()
                               : AppStrings.oops.tr(),
                           style: GoogleFonts.playfairDisplay(
-                            fontSize: 16,
+                            fontSize: 16.sp,
                             fontWeight: FontWeight.w700,
-                            letterSpacing: 0.3, // Back to larger font
+                            letterSpacing: 0.3.w, // Back to larger font
                             color: widget.isSuccess
                                 ? AppColors.black50
                                 : AppColors.error.withValues(alpha: 0.8),
                           ),
                         ),
-                        const SizedBox(height: 3),
+                        SizedBox(height: 3.h),
                         Text(
                           widget.msg,
                           style: GoogleFonts.poppins(
-                            fontSize: 13,
+                            fontSize: 13.sp,
                             height: 1.3,
                             color: AppColors.black50.withValues(alpha: 0.6),
                           ), // Back to larger font
@@ -373,10 +374,10 @@ class _PetalToastState extends State<_PetalToast>
                       onTap: widget.cancelFunc,
                       customBorder: const CircleBorder(),
                       child: Padding(
-                        padding: const EdgeInsets.all(4),
+                        padding: EdgeInsets.all(4.w),
                         child: Icon(
                           Icons.close_rounded,
-                          size: 16,
+                          size: 16.sp,
                           color: AppColors.gray.withValues(alpha: 0.3),
                         ),
                       ),

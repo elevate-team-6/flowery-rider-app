@@ -4,6 +4,7 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_p
 import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../config/validations/app_validations.dart';
 import '../../../../../core/utils/app_strings.dart';
@@ -29,25 +30,25 @@ class _EmailStepWidgetState extends State<EmailStepWidget> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
       child: Column(
         children: [
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           Text(
             AppStrings.forgetPasswordTitle.tr(),
             style: AppTextStyles.black18500,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 44),
+            padding: EdgeInsets.symmetric(horizontal: 44.w),
             child: Text(
               AppStrings.forgetPasswordSubtitle.tr(),
               style: AppTextStyles.black14400,
               textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
           Form(
             key: emailFormKey,
             child: Column(
@@ -60,7 +61,7 @@ class _EmailStepWidgetState extends State<EmailStepWidget> {
                   textInputAction: TextInputAction.done,
                   validator: (value) => AppValidations.validateEmail(value),
                 ),
-                const SizedBox(height: 50),
+                SizedBox(height: 50.h),
                 ElevatedButton(
                   onPressed: () {
                     if (emailFormKey.currentState!.validate()) {
