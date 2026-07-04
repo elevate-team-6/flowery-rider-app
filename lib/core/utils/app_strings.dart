@@ -167,8 +167,8 @@ abstract class AppStrings {
 
   // edit profile
   static const String editProfile = 'editProfile';
-  static const String editProfileSuccessfly = 'editProfileSuccessfly';
-  static const String editVehicleSuccessfly = 'Vehicle updated successfully';
+  static const String editProfileSuccessfully = 'editProfileSuccessfully';
+  static const String editVehicleSuccessfully = 'editVehicleSuccessfully';
   static const String change = 'change';
   static const String update = 'update';
   static const String vehicleInfo = 'vehicleInfo';

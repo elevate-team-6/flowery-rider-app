@@ -1,4 +1,6 @@
 import 'dart:async';
+
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_colors.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
@@ -37,12 +39,14 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   void _handleUiEvent(BaseUiEvent event) {
     switch (event) {
       case DisplaySuccessEvent():
-        CustomSnackBar.showSuccessMessage(AppStrings.passwordChangedSuccess);
+        CustomSnackBar.showSuccessMessage(
+          AppStrings.passwordChangedSuccess.tr(),
+        );
 
         Navigator.pop(context);
 
       case DisplayErrorEvent():
-        CustomSnackBar.showErrorMessage(event.errorMessage);
+        CustomSnackBar.showErrorMessage(event.errorMessage.tr());
 
       default:
         break;
@@ -70,7 +74,7 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
           onPressed: () => Navigator.pop(context),
           icon: const Icon(Icons.arrow_back_ios_new_rounded),
         ),
-        title: Text(AppStrings.resetPassword),
+        title: Text(AppStrings.resetPassword.tr()),
       ),
       body: BlocBuilder<ChangePasswordCubit, ChangePasswordState>(
         builder: (context, state) {

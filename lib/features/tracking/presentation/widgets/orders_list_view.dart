@@ -50,7 +50,7 @@ class OrdersListView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    ordersState.errorMessage!,
+                    ordersState.errorMessage!.tr(),
                     style: AppTextStyles.black14400,
                   ),
                   SizedBox(height: 16.h),

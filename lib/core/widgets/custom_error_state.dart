@@ -26,7 +26,7 @@ class CustomErrorState extends StatelessWidget {
 
             const SizedBox(height: 16),
 
-            Text(message, textAlign: TextAlign.center),
+            Text(message.tr(), textAlign: TextAlign.center),
 
             const SizedBox(height: 20),
 
