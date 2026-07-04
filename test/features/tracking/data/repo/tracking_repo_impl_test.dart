@@ -198,13 +198,13 @@ void main() {
 
     test('maps response to entity on success', () async {
       when(
-        mockRemoteDataSource.updateOrderState('123', OrderStatus.delivered),
+        mockRemoteDataSource.updateOrderState('123', OrderStatus.completed),
       ).thenAnswer((_) async => SuccessBaseResponse(fakeActionResponse));
 
-      final result = await repo.updateOrderState('123', OrderStatus.delivered);
+      final result = await repo.updateOrderState('123', OrderStatus.completed);
 
       verify(
-        mockRemoteDataSource.updateOrderState('123', OrderStatus.delivered),
+        mockRemoteDataSource.updateOrderState('123', OrderStatus.completed),
       ).called(1);
       expect(result, isA<SuccessBaseResponse<OrderEntity>>());
       expect(
