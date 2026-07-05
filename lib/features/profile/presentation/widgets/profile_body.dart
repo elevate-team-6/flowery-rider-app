@@ -173,10 +173,11 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                     style: AppTextStyles.primary12400,
                   ),
                   onTap: () {
+                    final cubit = context.read<ProfileCubit>();
                     showModalBottomSheet(
                       context: context,
                       builder: (innerContext) => BlocProvider.value(
-                        value: context.read<ProfileCubit>(),
+                        value: cubit,
                         child: const LanguageBottomSheet(),
                       ),
                     );
