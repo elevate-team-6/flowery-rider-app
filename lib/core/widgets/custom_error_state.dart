@@ -16,6 +16,8 @@ class CustomErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild this widget's texts when the locale changes (no state reset).
+    context.locale;
     return Center(
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.w),

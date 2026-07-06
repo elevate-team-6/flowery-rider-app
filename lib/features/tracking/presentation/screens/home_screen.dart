@@ -62,6 +62,8 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild this screen's texts when the locale changes (no state reset).
+    context.locale;
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 16.w,
