@@ -31,9 +31,6 @@ class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
-    // Make the entire layout reactive to locale changes
-    context.locale;
-
     return BlocProvider(
       create: (context) => getIt<MainLayoutCubit>(),
       child: BlocBuilder<MainLayoutCubit, int>(

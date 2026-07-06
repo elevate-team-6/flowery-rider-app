@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
@@ -19,46 +18,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import 'forget_password_screen_test.mocks.dart';
-
-/// Serves translations from memory so `.tr()` is deterministic without touching
-/// the asset bundle. An empty map makes `.tr()` echo the key back, which is
-/// exactly what the `find.text(AppStrings.*)` assertions expect.
-class _InMemoryAssetLoader extends AssetLoader {
-  const _InMemoryAssetLoader(this._data);
-
-  final Map<String, Map<String, dynamic>> _data;
-
-  @override
-  Future<Map<String, dynamic>> load(String path, Locale locale) async =>
-      _data[locale.languageCode] ?? const {};
-}
 
 @GenerateMocks([ForgetPasswordCubit])
 void main() {
   late MockForgetPasswordCubit mockCubit;
   late StreamController<BaseUiEvent> eventController;
-  late Map<String, Map<String, dynamic>> translations;
-
-  setUpAll(() async {
-    SharedPreferences.setMockInitialValues({});
-    await EasyLocalization.ensureInitialized();
-
-    // Identity translations: each asserted key maps to itself so `.tr()` returns
-    // the key text the assertions look for, regardless of how the installed
-    // easy_localization version handles missing keys (key vs empty string).
-    translations = {
-      'en': {
-        AppStrings.forgetPasswordTitle: AppStrings.forgetPasswordTitle,
-        AppStrings.emailVerification: AppStrings.emailVerification,
-        AppStrings.resetPasswordTitle: AppStrings.resetPasswordTitle,
-        AppStrings.confirm: AppStrings.confirm,
-        AppStrings.continueText: AppStrings.continueText,
-      },
-    };
-  });
 
   setUp(() {
     mockCubit = MockForgetPasswordCubit();
@@ -70,52 +36,34 @@ void main() {
     ).thenAnswer((_) => const Stream<ForgetPasswordState>.empty());
     when(mockCubit.eventStream).thenAnswer((_) => eventController.stream);
     when(mockCubit.close()).thenAnswer((_) async => {});
+
+    // Set a consistent screen size for tests to avoid overflows
+    final binding = TestWidgetsFlutterBinding.ensureInitialized();
+    binding.platformDispatcher.views.first.physicalSize = const Size(
+      1080,
+      2400,
+    );
+    binding.platformDispatcher.views.first.devicePixelRatio = 1.0;
   });
 
   tearDown(() {
     eventController.close();
   });
 
-  /// Sizes the test surface to the ScreenUtil design size so `.w`/`.h` scale
-  /// 1:1. Without this the default 800px-wide surface up-scales the widgets and
-  /// their Rows overflow (the step widgets moved to ScreenUtil on develop).
-  void setPhoneSurface(WidgetTester tester) {
-    // Wide enough that the 6-box OTP row fits at 1:1 scale (matches designSize).
-    tester.view.physicalSize = const Size(430, 900);
-    tester.view.devicePixelRatio = 1.0;
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-  }
-
-  /// Wraps [home] in an initialized EasyLocalization + MaterialApp so `.tr()`
-  /// resolves deterministically across platforms (uninitialized `.tr()` behaves
-  /// differently between package versions, which broke this suite on CI).
-  Widget wrapApp(Widget home) {
-    return EasyLocalization(
-      supportedLocales: const [Locale('en')],
-      path: 'assets/translations',
-      fallbackLocale: const Locale('en'),
-      startLocale: const Locale('en'),
-      assetLoader: _InMemoryAssetLoader(translations),
-      child: Builder(
-        builder: (context) => ScreenUtilInit(
-          designSize: const Size(430, 900),
-          child: MaterialApp(
-            localizationsDelegates: context.localizationDelegates,
-            supportedLocales: context.supportedLocales,
-            locale: context.locale,
-            home: home,
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget createWidgetUnderTest() {
-    return wrapApp(
-      BlocProvider<ForgetPasswordCubit>.value(
-        value: mockCubit,
-        child: const ForgotPasswordScreen(),
+    return ScreenUtilInit(
+      designSize: const Size(1080, 2400),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (_, child) => MaterialApp(
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (context) => BlocProvider<ForgetPasswordCubit>.value(
+              value: mockCubit,
+              child: const ForgotPasswordScreen(),
+            ),
+          );
+        },
       ),
     );
   }
@@ -124,10 +72,7 @@ void main() {
     testWidgets('starts with EmailStepWidget and navigates to OtpStepWidget', (
       tester,
     ) async {
-      setPhoneSurface(tester);
       await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       // Initial Step: Email
       expect(find.byType(EmailStepWidget), findsOneWidget);
@@ -138,7 +83,6 @@ void main() {
         NavigateEvent(AppRoutes.verifyResetCode, arguments: 'test@example.com'),
       );
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
       await tester.pump(const Duration(milliseconds: 400));
 
       // Should navigate to OTP Step
@@ -149,17 +93,13 @@ void main() {
     testWidgets('navigates from OtpStepWidget to ResetPasswordStepWidget', (
       tester,
     ) async {
-      setPhoneSurface(tester);
       await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       // Move to OTP Step
       eventController.add(
         NavigateEvent(AppRoutes.verifyResetCode, arguments: 'test@example.com'),
       );
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
       await tester.pump(const Duration(milliseconds: 400));
 
       // Simulate success event for OTP verification
@@ -167,7 +107,6 @@ void main() {
         NavigateEvent(AppRoutes.resetPassword, arguments: 'test@example.com'),
       );
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
       await tester.pump(const Duration(milliseconds: 400));
 
       // Should navigate to Reset Password Step
@@ -176,24 +115,19 @@ void main() {
     });
 
     testWidgets('back button navigates to previous step', (tester) async {
-      setPhoneSurface(tester);
       await tester.pumpWidget(createWidgetUnderTest());
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       // Move to OTP Step
       eventController.add(
         NavigateEvent(AppRoutes.verifyResetCode, arguments: 'test@example.com'),
       );
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
       await tester.pump(const Duration(milliseconds: 400));
       expect(find.byType(OtpStepWidget), findsOneWidget);
 
       // Tap back button
       await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
       await tester.pump(const Duration(milliseconds: 400));
 
       // Should be back to Email Step
@@ -203,17 +137,19 @@ void main() {
 
   group('Step Widgets Individual Tests', () {
     testWidgets('EmailStepWidget calls doEvent on confirm', (tester) async {
-      setPhoneSurface(tester);
       await tester.pumpWidget(
-        wrapApp(
-          BlocProvider<ForgetPasswordCubit>.value(
-            value: mockCubit,
-            child: const Scaffold(body: EmailStepWidget()),
+        ScreenUtilInit(
+          designSize: const Size(1080, 2400),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (_, child) => MaterialApp(
+            home: BlocProvider<ForgetPasswordCubit>.value(
+              value: mockCubit,
+              child: const Scaffold(body: EmailStepWidget()),
+            ),
           ),
         ),
       );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       await tester.enterText(find.byType(TextField), 'test@example.com');
       await tester.tap(find.widgetWithText(ElevatedButton, AppStrings.confirm));
@@ -223,22 +159,25 @@ void main() {
     });
 
     testWidgets('OtpStepWidget calls doEvent on completed PIN', (tester) async {
-      setPhoneSurface(tester);
       await tester.pumpWidget(
-        wrapApp(
-          BlocProvider<ForgetPasswordCubit>.value(
-            value: mockCubit,
-            child: const Scaffold(
-              body: OtpStepWidget(email: 'test@example.com'),
+        ScreenUtilInit(
+          designSize: const Size(1080, 2400),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (_, child) => MaterialApp(
+            home: BlocProvider<ForgetPasswordCubit>.value(
+              value: mockCubit,
+              child: const Scaffold(
+                body: OtpStepWidget(email: 'test@example.com'),
+              ),
             ),
           ),
         ),
       );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       await tester.enterText(find.byType(PinCodeTextField), '123456');
-      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
 
       verify(mockCubit.doEvent(argThat(isA<VerifyResetCodeEvent>()))).called(1);
     });
@@ -246,19 +185,21 @@ void main() {
     testWidgets('ResetPasswordStepWidget calls doEvent on continue', (
       tester,
     ) async {
-      setPhoneSurface(tester);
       await tester.pumpWidget(
-        wrapApp(
-          BlocProvider<ForgetPasswordCubit>.value(
-            value: mockCubit,
-            child: const Scaffold(
-              body: ResetPasswordStepWidget(email: 'test@example.com'),
+        ScreenUtilInit(
+          designSize: const Size(1080, 2400),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (_, child) => MaterialApp(
+            home: BlocProvider<ForgetPasswordCubit>.value(
+              value: mockCubit,
+              child: const Scaffold(
+                body: ResetPasswordStepWidget(email: 'test@example.com'),
+              ),
             ),
           ),
         ),
       );
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 100));
 
       final passwordFields = find.byType(CustomTextField);
       await tester.enterText(passwordFields.at(0), 'Password123!');
@@ -269,6 +210,7 @@ void main() {
         find.widgetWithText(ElevatedButton, AppStrings.continueText),
       );
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
 
       verify(mockCubit.doEvent(argThat(isA<ResetPasswordEvent>()))).called(1);
     });
