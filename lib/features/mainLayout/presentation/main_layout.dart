@@ -36,7 +36,11 @@ class _MainLayoutState extends State<MainLayout> {
       child: BlocBuilder<MainLayoutCubit, int>(
         builder: (context, currentIndex) {
           return Scaffold(
-            body: IndexedStack(index: currentIndex, children: _pages),
+            body: IndexedStack(
+              key: ValueKey(context.locale.languageCode),
+              index: currentIndex,
+              children: _pages,
+            ),
             bottomNavigationBar: Container(
               decoration: BoxDecoration(
                 border: Border(

@@ -49,7 +49,7 @@ class MyApp extends StatelessWidget {
       splitScreenMode: true,
       builder: (context, child) {
         return MaterialApp(
-          key: ValueKey(context.locale.languageCode),
+          // key: ValueKey(context.locale.languageCode),
           localizationsDelegates: context.localizationDelegates,
           supportedLocales: context.supportedLocales,
           locale: context.locale,
