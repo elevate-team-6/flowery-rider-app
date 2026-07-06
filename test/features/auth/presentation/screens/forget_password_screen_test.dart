@@ -13,6 +13,7 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_p
 import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
@@ -35,6 +36,14 @@ void main() {
     ).thenAnswer((_) => const Stream<ForgetPasswordState>.empty());
     when(mockCubit.eventStream).thenAnswer((_) => eventController.stream);
     when(mockCubit.close()).thenAnswer((_) async => {});
+
+    // Set a consistent screen size for tests to avoid overflows
+    final binding = TestWidgetsFlutterBinding.ensureInitialized();
+    binding.platformDispatcher.views.first.physicalSize = const Size(
+      1080,
+      2400,
+    );
+    binding.platformDispatcher.views.first.devicePixelRatio = 1.0;
   });
 
   tearDown(() {
@@ -42,15 +51,20 @@ void main() {
   });
 
   Widget createWidgetUnderTest() {
-    return MaterialApp(
-      onGenerateRoute: (settings) {
-        return MaterialPageRoute(
-          builder: (context) => BlocProvider<ForgetPasswordCubit>.value(
-            value: mockCubit,
-            child: const ForgotPasswordScreen(),
-          ),
-        );
-      },
+    return ScreenUtilInit(
+      designSize: const Size(1080, 2400),
+      minTextAdapt: true,
+      splitScreenMode: true,
+      builder: (_, __) => MaterialApp(
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (context) => BlocProvider<ForgetPasswordCubit>.value(
+              value: mockCubit,
+              child: const ForgotPasswordScreen(),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -69,8 +83,7 @@ void main() {
         NavigateEvent(AppRoutes.verifyResetCode, arguments: 'test@example.com'),
       );
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump(const Duration(milliseconds: 10));
+      await tester.pump(const Duration(milliseconds: 400));
 
       // Should navigate to OTP Step
       expect(find.byType(OtpStepWidget), findsOneWidget);
@@ -87,16 +100,14 @@ void main() {
         NavigateEvent(AppRoutes.verifyResetCode, arguments: 'test@example.com'),
       );
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump(const Duration(milliseconds: 10));
+      await tester.pump(const Duration(milliseconds: 400));
 
       // Simulate success event for OTP verification
       eventController.add(
         NavigateEvent(AppRoutes.resetPassword, arguments: 'test@example.com'),
       );
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump(const Duration(milliseconds: 10));
+      await tester.pump(const Duration(milliseconds: 400));
 
       // Should navigate to Reset Password Step
       expect(find.byType(ResetPasswordStepWidget), findsOneWidget);
@@ -111,15 +122,13 @@ void main() {
         NavigateEvent(AppRoutes.verifyResetCode, arguments: 'test@example.com'),
       );
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump(const Duration(milliseconds: 10));
+      await tester.pump(const Duration(milliseconds: 400));
       expect(find.byType(OtpStepWidget), findsOneWidget);
 
       // Tap back button
       await tester.tap(find.byIcon(Icons.arrow_back_ios_new_rounded));
       await tester.pump();
-      await tester.pump(const Duration(milliseconds: 300));
-      await tester.pump(const Duration(milliseconds: 10));
+      await tester.pump(const Duration(milliseconds: 400));
 
       // Should be back to Email Step
       expect(find.byType(EmailStepWidget), findsOneWidget);
@@ -129,10 +138,15 @@ void main() {
   group('Step Widgets Individual Tests', () {
     testWidgets('EmailStepWidget calls doEvent on confirm', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<ForgetPasswordCubit>.value(
-            value: mockCubit,
-            child: const Scaffold(body: EmailStepWidget()),
+        ScreenUtilInit(
+          designSize: const Size(1080, 2400),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (_, __) => MaterialApp(
+            home: BlocProvider<ForgetPasswordCubit>.value(
+              value: mockCubit,
+              child: const Scaffold(body: EmailStepWidget()),
+            ),
           ),
         ),
       );
@@ -146,18 +160,24 @@ void main() {
 
     testWidgets('OtpStepWidget calls doEvent on completed PIN', (tester) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<ForgetPasswordCubit>.value(
-            value: mockCubit,
-            child: const Scaffold(
-              body: OtpStepWidget(email: 'test@example.com'),
+        ScreenUtilInit(
+          designSize: const Size(1080, 2400),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (_, __) => MaterialApp(
+            home: BlocProvider<ForgetPasswordCubit>.value(
+              value: mockCubit,
+              child: const Scaffold(
+                body: OtpStepWidget(email: 'test@example.com'),
+              ),
             ),
           ),
         ),
       );
 
       await tester.enterText(find.byType(PinCodeTextField), '123456');
-      await tester.pump(const Duration(milliseconds: 300));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
 
       verify(mockCubit.doEvent(argThat(isA<VerifyResetCodeEvent>()))).called(1);
     });
@@ -166,11 +186,16 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(
-        MaterialApp(
-          home: BlocProvider<ForgetPasswordCubit>.value(
-            value: mockCubit,
-            child: const Scaffold(
-              body: ResetPasswordStepWidget(email: 'test@example.com'),
+        ScreenUtilInit(
+          designSize: const Size(1080, 2400),
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (_, __) => MaterialApp(
+            home: BlocProvider<ForgetPasswordCubit>.value(
+              value: mockCubit,
+              child: const Scaffold(
+                body: ResetPasswordStepWidget(email: 'test@example.com'),
+              ),
             ),
           ),
         ),
@@ -185,6 +210,7 @@ void main() {
         find.widgetWithText(ElevatedButton, AppStrings.continueText),
       );
       await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
 
       verify(mockCubit.doEvent(argThat(isA<ResetPasswordEvent>()))).called(1);
     });
