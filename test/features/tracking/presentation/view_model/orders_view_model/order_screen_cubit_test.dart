@@ -6,6 +6,7 @@ import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/driver_orders_summary.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_driver_orders_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_events.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_states.dart';
@@ -15,16 +16,22 @@ import 'package:mockito/mockito.dart';
 
 import 'order_screen_cubit_test.mocks.dart';
 
-@GenerateMocks([GetDriverOrdersUseCase])
+@GenerateMocks([GetDriverOrdersUseCase, GetOrderShippingUseCase])
 void main() {
   provideDummy<BaseResponse<DriverOrdersSummary>>(ErrorBaseResponse('dummy'));
 
   late OrderScreenCubit cubit;
   late MockGetDriverOrdersUseCase mockGetDriverOrdersUseCase;
+  late MockGetOrderShippingUseCase mockGetOrderShippingUseCase;
 
   setUp(() {
     mockGetDriverOrdersUseCase = MockGetDriverOrdersUseCase();
-    cubit = OrderScreenCubit(mockGetDriverOrdersUseCase);
+    mockGetOrderShippingUseCase = MockGetOrderShippingUseCase();
+    when(mockGetOrderShippingUseCase(any)).thenAnswer((_) async => null);
+    cubit = OrderScreenCubit(
+      mockGetDriverOrdersUseCase,
+      mockGetOrderShippingUseCase,
+    );
   });
 
   tearDown(() {

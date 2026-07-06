@@ -2,6 +2,7 @@ import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_driver_orders_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_events.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_states.dart';
 import 'package:injectable/injectable.dart';
@@ -14,8 +15,9 @@ import '../../../domain/entities/order_entity.dart';
 @injectable
 class OrderScreenCubit extends BaseCubit<OrderScreenState, BaseUiEvent> {
   final GetDriverOrdersUseCase _getDriverOrdersUseCase;
+  final GetOrderShippingUseCase _getOrderShippingUseCase;
 
-  OrderScreenCubit(this._getDriverOrdersUseCase)
+  OrderScreenCubit(this._getDriverOrdersUseCase, this._getOrderShippingUseCase)
     : super(const OrderScreenState());
 
   void doEvent(OrdersScreenEvents event) {
@@ -41,9 +43,13 @@ class OrderScreenCubit extends BaseCubit<OrderScreenState, BaseUiEvent> {
         final summary = response.data;
         if (summary == null) return;
 
+        final enrichedOrders = await _withFirestoreAddresses(
+          summary.driverOrders.orders,
+        );
+
         emit(
           state.copyWith(
-            ordersState: BaseState(data: summary.driverOrders.orders),
+            ordersState: BaseState(data: enrichedOrders),
             cancelledCount: summary.canceledCount,
             completedCount: summary.completedCount,
             currentPage: summary.driverOrders.currentPage,
@@ -57,6 +63,22 @@ class OrderScreenCubit extends BaseCubit<OrderScreenState, BaseUiEvent> {
           ),
         );
     }
+  }
+
+  Future<List<OrderEntity>> _withFirestoreAddresses(
+    List<OrderEntity> orders,
+  ) async {
+    if (orders.isEmpty) return orders;
+
+    return Future.wait(
+      orders.map((order) async {
+        final shipping = await _getOrderShippingUseCase(order.id);
+        if (shipping == null) return order;
+        return order.copyWith(
+          shippingAddress: order.shippingAddress.mergeWith(shipping),
+        );
+      }),
+    );
   }
 
   void _onOrderTapped(OrderEntity order) {
