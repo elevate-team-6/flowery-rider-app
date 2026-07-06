@@ -55,7 +55,7 @@ void main() {
       designSize: const Size(1080, 2400),
       minTextAdapt: true,
       splitScreenMode: true,
-      builder: (_, __) => MaterialApp(
+      builder: (_, child) => MaterialApp(
         onGenerateRoute: (settings) {
           return MaterialPageRoute(
             builder: (context) => BlocProvider<ForgetPasswordCubit>.value(
@@ -142,7 +142,7 @@ void main() {
           designSize: const Size(1080, 2400),
           minTextAdapt: true,
           splitScreenMode: true,
-          builder: (_, __) => MaterialApp(
+          builder: (_, child) => MaterialApp(
             home: BlocProvider<ForgetPasswordCubit>.value(
               value: mockCubit,
               child: const Scaffold(body: EmailStepWidget()),
@@ -164,7 +164,7 @@ void main() {
           designSize: const Size(1080, 2400),
           minTextAdapt: true,
           splitScreenMode: true,
-          builder: (_, __) => MaterialApp(
+          builder: (_, child) => MaterialApp(
             home: BlocProvider<ForgetPasswordCubit>.value(
               value: mockCubit,
               child: const Scaffold(
@@ -190,7 +190,7 @@ void main() {
           designSize: const Size(1080, 2400),
           minTextAdapt: true,
           splitScreenMode: true,
-          builder: (_, __) => MaterialApp(
+          builder: (_, child) => MaterialApp(
             home: BlocProvider<ForgetPasswordCubit>.value(
               value: mockCubit,
               child: const Scaffold(
