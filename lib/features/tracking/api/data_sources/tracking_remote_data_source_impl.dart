@@ -5,8 +5,10 @@ import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/all_driver_orders_response_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/order_shipping_firestore_model.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/route_response_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/update_order_state_response_model.dart';
 import 'package:injectable/injectable.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../data/data_sources/tracking_remote_data_source_contract.dart';
 import '../../data/models/response/pending_orders_response_model.dart';
@@ -53,6 +55,13 @@ class TrackingRemoteDataSourceImpl implements TrackingRemoteDataSourceContract {
     return ErrorHandler.handleApiCall(
       () => _apiClient.getPendingOrders(page: page),
     );
+  }
+
+  @override
+  Future<BaseResponse<RouteResponseModel>> getRoute(LatLng start, LatLng end) {
+    final coords =
+        '${start.longitude},${start.latitude};${end.longitude},${end.latitude}';
+    return ErrorHandler.handleApiCall(() => _apiClient.getRoute(coords));
   }
 
   @override

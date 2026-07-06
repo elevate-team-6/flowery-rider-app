@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../../../config/base_ui_event/base_ui_event.dart';
 import '../../../../config/base_ui_handler/ui_event_handler_mixin.dart';
@@ -24,19 +25,29 @@ import '../widgets/map/location_error_card.dart';
 import '../widgets/map/map_pill.dart';
 import '../widgets/map/route_status_chip.dart';
 
-class MapScreen extends StatefulWidget {
+class MapArgs {
   final OrderEntity order;
   final LocationType locationType;
   final String targetLat;
   final String targetLong;
 
-  const MapScreen({
-    super.key,
+  const MapArgs({
     required this.order,
     required this.locationType,
     required this.targetLat,
     required this.targetLong,
   });
+}
+
+class MapScreen extends StatefulWidget {
+  final MapArgs args;
+
+  const MapScreen({super.key, required this.args});
+
+  /// Keys for locating the two address cards in widget tests without matching
+  /// on the store/rider names, which also render on the map markers.
+  static const storeAddressCardKey = ValueKey('map.storeAddressCard');
+  static const userAddressCardKey = ValueKey('map.userAddressCard');
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -46,9 +57,6 @@ class _MapScreenState extends State<MapScreen> with UiEventHandler {
   final MapController _mapController = MapController();
   StreamSubscription<BaseUiEvent>? _uiEventSubscription;
 
-  bool _centeredOnce = false;
-  bool _routeFitted = false;
-
   @override
   void initState() {
     super.initState();
@@ -56,10 +64,10 @@ class _MapScreenState extends State<MapScreen> with UiEventHandler {
     _uiEventSubscription = cubit.eventStream.listen(handleUiEvent);
     cubit.doEvent(
       MapInitializeEvent(
-        order: widget.order,
-        locationType: widget.locationType,
-        targetLat: widget.targetLat,
-        targetLong: widget.targetLong,
+        order: widget.args.order,
+        locationType: widget.args.locationType,
+        targetLat: widget.args.targetLat,
+        targetLong: widget.args.targetLong,
       ),
     );
   }
@@ -70,22 +78,18 @@ class _MapScreenState extends State<MapScreen> with UiEventHandler {
     super.dispose();
   }
 
-  /// Drives the camera from state changes: center on the first fix, fit to the
-  /// route once it's available. Live updates afterwards are ignored on purpose.
-  void _syncCamera(MapState state) {
-    if (!_centeredOnce && state.currentLocation != null) {
-      _centeredOnce = true;
-      _mapController.move(state.currentLocation!, MapConstants.defaultZoom);
-    }
-    if (!_routeFitted && state.routePoints.length >= 2) {
-      _routeFitted = true;
-      _mapController.fitCamera(
-        CameraFit.bounds(
-          bounds: LatLngBounds.fromPoints(state.routePoints),
-          padding: EdgeInsets.all(48.w),
-        ),
-      );
-    }
+  @override
+  void onMoveCamera(LatLng target, double zoom) =>
+      _mapController.move(target, zoom);
+
+  @override
+  void onFitCamera(List<LatLng> points) {
+    _mapController.fitCamera(
+      CameraFit.bounds(
+        bounds: LatLngBounds.fromPoints(points),
+        padding: EdgeInsets.all(48.w),
+      ),
+    );
   }
 
   void _contact(String phone, CommunicationType type) =>
@@ -93,61 +97,53 @@ class _MapScreenState extends State<MapScreen> with UiEventHandler {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<MapCubit, MapState>(
-      listener: (context, state) => _syncCamera(state),
-      child: BlocBuilder<MapCubit, MapState>(
-        builder: (context, state) {
-          final order = state.order ?? widget.order;
-          final storeName = order.store.name;
-          final customerName = order.user.fullName;
+    return BlocBuilder<MapCubit, MapState>(
+      builder: (context, state) {
+        final order = state.order ?? widget.args.order;
+        final storeName = order.store.name;
+        final customerName = order.user.fullName;
 
-          return Scaffold(
-            extendBodyBehindAppBar: true,
-            backgroundColor: AppColors.white,
-            appBar: _buildAppBar(state.toStore),
-            body: Stack(
-              children: [
-                _buildMap(state, storeName, customerName),
+        return Scaffold(
+          extendBodyBehindAppBar: true,
+          appBar: _buildAppBar(state.toStore),
+          body: Stack(
+            children: [
+              _buildMap(state, storeName, customerName),
 
-                if (state.locating)
-                  const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
+              if (state.locating)
+                const Center(
+                  child: CircularProgressIndicator(color: AppColors.primary),
+                ),
+              if (state.locationError != null)
+                LocationErrorCard(
+                  message: state.locationError!,
+                  onRetry: () => context.read<MapCubit>().doEvent(
+                    const MapRetryLocationEvent(),
                   ),
-                if (state.locationError != null)
-                  LocationErrorCard(
-                    message: state.locationError!,
-                    onRetry: () => context.read<MapCubit>().doEvent(
-                      const MapRetryLocationEvent(),
-                    ),
-                  ),
+                ),
 
-                if (state.routeLoading ||
-                    state.usingFallback ||
-                    state.routeError)
-                  Positioned(
-                    top:
-                        kToolbarHeight +
-                        MediaQuery.of(context).padding.top +
-                        8.h,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: RouteStatusChip(
-                        loading: state.routeLoading,
-                        fallback: state.usingFallback,
-                        onRetry: () => context.read<MapCubit>().doEvent(
-                          const MapRetryRouteEvent(),
-                        ),
+              if (state.routeLoading || state.usingFallback || state.routeError)
+                Positioned(
+                  top:
+                      kToolbarHeight + MediaQuery.of(context).padding.top + 8.h,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: RouteStatusChip(
+                      loading: state.routeLoading,
+                      fallback: state.usingFallback,
+                      onRetry: () => context.read<MapCubit>().doEvent(
+                        const MapRetryRouteEvent(),
                       ),
                     ),
                   ),
+                ),
 
-                _buildBottomSheet(order, storeName, customerName),
-              ],
-            ),
-          );
-        },
-      ),
+              _buildBottomSheet(order, storeName, customerName),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -278,6 +274,7 @@ class _MapScreenState extends State<MapScreen> with UiEventHandler {
               ),
               SizedBox(height: 8.h),
               AddressInfoCard(
+                key: MapScreen.storeAddressCardKey,
                 imageUrl: order.store.image,
                 title: order.store.name,
                 address: order.store.address,
@@ -299,6 +296,7 @@ class _MapScreenState extends State<MapScreen> with UiEventHandler {
               ),
               SizedBox(height: 8.h),
               AddressInfoCard(
+                key: MapScreen.userAddressCardKey,
                 imageUrl: order.user.photo,
                 title: order.user.fullName,
                 address:

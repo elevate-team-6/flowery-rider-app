@@ -1,3 +1,5 @@
+import 'package:latlong2/latlong.dart';
+
 sealed class BaseUiEvent {}
 
 class ShowLoadingEvent extends BaseUiEvent {}
@@ -37,4 +39,19 @@ class NavigateEvent extends BaseUiEvent {
     this.arguments,
     this.predicate,
   });
+}
+
+/// Asks a map-hosting screen to recenter its camera on [target] at [zoom]
+/// (e.g. centering on the rider's first GPS fix).
+class MoveCameraEvent extends BaseUiEvent {
+  final LatLng target;
+  final double zoom;
+  MoveCameraEvent(this.target, this.zoom);
+}
+
+/// Asks a map-hosting screen to fit its camera so the whole [points] route
+/// (start → destination) is visible.
+class FitCameraEvent extends BaseUiEvent {
+  final List<LatLng> points;
+  FitCameraEvent(this.points);
 }

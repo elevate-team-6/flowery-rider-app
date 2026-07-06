@@ -17,6 +17,8 @@ abstract class MapConstants {
   /// Center shown until the location / target resolves (central Cairo).
   static const LatLng fallbackCenter = LatLng(30.0444, 31.2357);
 
-  /// How often the rider's live position is polled (marker only).
-  static const Duration liveUpdateInterval = Duration(seconds: 5);
+  /// Minimum movement (metres) before the live position stream emits a new
+  /// fix. Keeps the marker updating as the rider moves without waking the GPS
+  /// for a rider standing still.
+  static const int liveDistanceFilter = 10;
 }

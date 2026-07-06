@@ -17,11 +17,9 @@ import 'package:flowery_rider_app/features/profile/presentation/view_model/chang
 import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_profile_view_model/edit_profile_cubit.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_vehicle/edit_vehicle_cubit.dart';
 import 'package:flowery_rider_app/features/splash/presentation/pages/splash_screen.dart';
-import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/map_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/map_view_model/map_cubit.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_success_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_cubit.dart';
 import 'package:flutter/material.dart';
@@ -144,16 +142,11 @@ abstract class AppRoutes {
           );
 
         case mapScreen:
-          final args = settings.arguments as Map<String, dynamic>;
+          final args = settings.arguments as MapArgs;
           return MaterialPageRoute(
             builder: (_) => BlocProvider(
               create: (_) => getIt<MapCubit>(),
-              child: MapScreen(
-                order: args['order'] as OrderEntity,
-                locationType: args['locationType'] as LocationType,
-                targetLat: args['targetLat'] as String,
-                targetLong: args['targetLong'] as String,
-              ),
+              child: MapScreen(args: args),
             ),
             settings: settings,
           );

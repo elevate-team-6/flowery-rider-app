@@ -1,4 +1,5 @@
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 
 class OrderShippingFirestoreModel {
   final String street;
@@ -27,6 +28,14 @@ class OrderShippingFirestoreModel {
       long: _toStr(shipping[AppConstants.longField]),
     );
   }
+
+  ShippingAddressEntity toEntity() => ShippingAddressEntity(
+    street: street,
+    city: city,
+    phone: phone,
+    lat: lat,
+    long: long,
+  );
 
   static String _toStr(dynamic value) {
     if (value == null) return '';

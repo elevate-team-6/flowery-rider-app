@@ -46,14 +46,19 @@ class MapPill extends StatelessWidget {
                   : Icon(icon, size: 8.w, color: AppColors.primary),
             ),
             SizedBox(width: 3.w),
-            Text(
-              label,
-              style: AppTextStyles.white12600.copyWith(
-                fontSize: 10.sp,
-                fontWeight: FontWeight.w400,
+            // Flexible so a long store/rider name shrinks with an ellipsis
+            // instead of overflowing the fixed-width marker.
+            Flexible(
+              child: Text(
+                label,
+                style: AppTextStyles.white12600.copyWith(
+                  fontSize: 10.sp,
+                  fontWeight: FontWeight.w400,
+                ),
+                maxLines: 1,
+                softWrap: false,
+                overflow: TextOverflow.ellipsis,
               ),
-              maxLines: 1,
-              softWrap: false,
             ),
             SizedBox(width: 3.w),
           ],

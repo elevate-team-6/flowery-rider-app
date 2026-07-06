@@ -1,9 +1,11 @@
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../models/request/update_order_state_request_model.dart';
 import '../models/response/all_driver_orders_response_model.dart';
 import '../models/response/order_shipping_firestore_model.dart';
 import '../models/response/pending_orders_response_model.dart';
+import '../models/response/route_response_model.dart';
 import '../models/response/update_order_state_response_model.dart';
 
 abstract interface class TrackingRemoteDataSourceContract {
@@ -21,6 +23,8 @@ abstract interface class TrackingRemoteDataSourceContract {
   Future<BaseResponse<PendingOrdersResponseModel>> getPendingOrders({
     int? page,
   });
+
+  Future<BaseResponse<RouteResponseModel>> getRoute(LatLng start, LatLng end);
 
   Future<OrderShippingFirestoreModel?> getOrderShipping(String orderId);
 

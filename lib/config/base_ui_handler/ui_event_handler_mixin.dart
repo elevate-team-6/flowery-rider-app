@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 
 import '../../core/widgets/custom_flower_loading.dart';
 import '../../core/widgets/custom_snack_bar.dart';
@@ -43,6 +44,10 @@ mixin UiEventHandler<T extends StatefulWidget> on State<T> {
         onFillTextField(event.text);
       case ShowConfirmationDialogEvent():
         onShowConfirmationDialog();
+      case MoveCameraEvent():
+        onMoveCamera(event.target, event.zoom);
+      case FitCameraEvent():
+        onFitCamera(event.points);
     }
   }
 
@@ -51,4 +56,10 @@ mixin UiEventHandler<T extends StatefulWidget> on State<T> {
 
   /// Override in screens that need to show a confirmation dialog.
   void onShowConfirmationDialog() {}
+
+  /// Override in map-hosting screens to recenter the camera on [target].
+  void onMoveCamera(LatLng target, double zoom) {}
+
+  /// Override in map-hosting screens to fit the camera to the [points] route.
+  void onFitCamera(List<LatLng> points) {}
 }

@@ -1,3 +1,4 @@
+import 'package:flowery_rider_app/features/tracking/domain/entities/cached_active_order.dart';
 import 'package:flowery_rider_app/features/tracking/domain/repo/tracking_repo_contract.dart';
 import 'package:injectable/injectable.dart';
 
@@ -7,7 +8,7 @@ class GetActiveOrderUseCase {
 
   GetActiveOrderUseCase(this._repository);
 
-  Future<Map<String, dynamic>?> call() {
+  Future<CachedActiveOrder?> call() {
     return _repository.getCachedActiveOrder();
   }
 }

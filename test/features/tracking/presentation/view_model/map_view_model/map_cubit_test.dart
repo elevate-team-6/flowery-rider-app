@@ -1,9 +1,11 @@
+import 'dart:async';
+
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/services/location_service.dart';
-import 'package:flowery_rider_app/config/services/osrm_routing_service.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_route_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_rider_location_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/map_view_model/map_cubit.dart';
@@ -20,7 +22,7 @@ import 'map_cubit_test.mocks.dart';
 @GenerateMocks([
   LocationService,
   OpenCommunicationUseCase,
-  OsrmRoutingService,
+  GetRouteUseCase,
   GetOrderShippingUseCase,
   UpdateRiderLocationUseCase,
 ])
@@ -28,7 +30,7 @@ void main() {
   late MapCubit cubit;
   late MockLocationService mockLocationService;
   late MockOpenCommunicationUseCase mockOpenCommunicationUseCase;
-  late MockOsrmRoutingService mockRoutingService;
+  late MockGetRouteUseCase mockGetRouteUseCase;
   late MockGetOrderShippingUseCase mockGetOrderShippingUseCase;
   late MockUpdateRiderLocationUseCase mockUpdateRiderLocationUseCase;
 
@@ -98,12 +100,15 @@ void main() {
     when(
       mockLocationService.getCurrentPosition(settings: anyNamed('settings')),
     ).thenAnswer((_) async => makePosition(29.0, 30.0));
+    when(
+      mockLocationService.getPositionStream(settings: anyNamed('settings')),
+    ).thenAnswer((_) => const Stream<Position>.empty());
   }
 
   setUp(() {
     mockLocationService = MockLocationService();
     mockOpenCommunicationUseCase = MockOpenCommunicationUseCase();
-    mockRoutingService = MockOsrmRoutingService();
+    mockGetRouteUseCase = MockGetRouteUseCase();
     mockGetOrderShippingUseCase = MockGetOrderShippingUseCase();
     mockUpdateRiderLocationUseCase = MockUpdateRiderLocationUseCase();
     // Default: Firestore has no address, so the map keeps the backend one.
@@ -118,7 +123,7 @@ void main() {
     cubit = MapCubit(
       mockLocationService,
       mockOpenCommunicationUseCase,
-      mockRoutingService,
+      mockGetRouteUseCase,
       mockGetOrderShippingUseCase,
       mockUpdateRiderLocationUseCase,
     );
@@ -141,7 +146,7 @@ void main() {
       verifyNever(
         mockLocationService.getCurrentPosition(settings: anyNamed('settings')),
       );
-      verifyNever(mockRoutingService.getRoute(any, any));
+      verifyNever(mockGetRouteUseCase(any, any));
     });
 
     test('permission denied → locationError, never reads position', () async {
@@ -183,7 +188,7 @@ void main() {
       expect(cubit.state.target, isNull);
       expect(cubit.state.routeError, true);
       expect(cubit.state.currentLocation, isNotNull);
-      verifyNever(mockRoutingService.getRoute(any, any));
+      verifyNever(mockGetRouteUseCase(any, any));
     });
 
     test('Firestore address wins over the backend for the user leg', () async {
@@ -268,7 +273,7 @@ void main() {
   group('routing', () {
     test('happy path loads the OSRM road route', () async {
       stubLocationGranted();
-      when(mockRoutingService.getRoute(any, any)).thenAnswer(
+      when(mockGetRouteUseCase(any, any)).thenAnswer(
         (_) async => const [LatLng(29, 30), LatLng(29.5, 30.5), LatLng(30, 31)],
       );
 
@@ -279,14 +284,12 @@ void main() {
       expect(cubit.state.routePoints.length, 3);
       expect(cubit.state.usingFallback, false);
       expect(cubit.state.routeLoading, false);
-      verify(mockRoutingService.getRoute(any, any)).called(1);
+      verify(mockGetRouteUseCase(any, any)).called(1);
     });
 
     test('empty OSRM result → straight-line fallback', () async {
       stubLocationGranted();
-      when(
-        mockRoutingService.getRoute(any, any),
-      ).thenAnswer((_) async => const []);
+      when(mockGetRouteUseCase(any, any)).thenAnswer((_) async => const []);
 
       cubit.doEvent(initEvent());
       await Future<void>.delayed(const Duration(milliseconds: 50));
@@ -298,15 +301,87 @@ void main() {
 
     test('OSRM error → straight-line fallback', () async {
       stubLocationGranted();
-      when(
-        mockRoutingService.getRoute(any, any),
-      ).thenThrow(Exception('network'));
+      when(mockGetRouteUseCase(any, any)).thenThrow(Exception('network'));
 
       cubit.doEvent(initEvent());
       await Future<void>.delayed(const Duration(milliseconds: 50));
 
       expect(cubit.state.usingFallback, true);
       expect(cubit.state.routePoints.length, 2);
+    });
+  });
+
+  group('camera side effects', () {
+    test(
+      'first GPS fix emits MoveCameraEvent to center on the rider',
+      () async {
+        stubLocationGranted();
+        when(mockGetRouteUseCase(any, any)).thenAnswer((_) async => const []);
+
+        expectLater(
+          cubit.eventStream,
+          emitsThrough(
+            isA<MoveCameraEvent>().having(
+              (e) => e.target,
+              'target',
+              const LatLng(29.0, 30.0),
+            ),
+          ),
+        );
+
+        cubit.doEvent(initEvent());
+        await Future<void>.delayed(const Duration(milliseconds: 50));
+      },
+    );
+
+    test('a loaded route emits FitCameraEvent with the route points', () async {
+      stubLocationGranted();
+      when(mockGetRouteUseCase(any, any)).thenAnswer(
+        (_) async => const [LatLng(29, 30), LatLng(29.5, 30.5), LatLng(30, 31)],
+      );
+
+      expectLater(
+        cubit.eventStream,
+        emitsThrough(
+          isA<FitCameraEvent>().having((e) => e.points.length, 'points', 3),
+        ),
+      );
+
+      cubit.doEvent(initEvent());
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+    });
+  });
+
+  group('live tracking', () {
+    test('a stream fix updates the marker without re-centering', () async {
+      final controller = StreamController<Position>();
+      addTearDown(controller.close);
+      stubLocationGranted();
+      when(
+        mockLocationService.getPositionStream(settings: anyNamed('settings')),
+      ).thenAnswer((_) => controller.stream);
+      when(mockGetRouteUseCase(any, any)).thenAnswer((_) async => const []);
+
+      cubit.doEvent(initEvent());
+      await Future<void>.delayed(const Duration(milliseconds: 50));
+
+      // First fix (getCurrentPosition) already centered the camera once.
+      controller.add(makePosition(31.0, 32.0));
+      await Future<void>.delayed(const Duration(milliseconds: 10));
+
+      expect(cubit.state.currentLocation, const LatLng(31.0, 32.0));
+      // Live ticks must not snap the camera back onto the rider.
+      expect(
+        cubit.eventStream,
+        neverEmits(
+          isA<MoveCameraEvent>().having(
+            (e) => e.target,
+            'target',
+            const LatLng(31.0, 32.0),
+          ),
+        ),
+      );
+      await cubit.close();
     });
   });
 

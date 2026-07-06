@@ -2,11 +2,11 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
-import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
 import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/cached_active_order.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/cache_active_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/clear_active_order_use_case.dart';
@@ -148,10 +148,10 @@ void main() {
       'loads from cache and skips startOrder API if cached order matches',
       build: () {
         when(mockGetActiveOrderUseCase()).thenAnswer(
-          (_) async => {
-            AppKeys.order: tOrder.copyWith(state: 'inProgress').toJson(),
-            AppKeys.uiStep: 2,
-          },
+          (_) async => CachedActiveOrder(
+            order: tOrder.copyWith(state: 'inProgress'),
+            uiStep: 2,
+          ),
         );
         return cubit;
       },

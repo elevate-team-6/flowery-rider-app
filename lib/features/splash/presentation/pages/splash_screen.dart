@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,14 +6,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/utils/app_assets.dart';
 import '../../../../../core/utils/app_colors.dart';
-import '../../../../../core/utils/app_keys.dart';
 import '../../../../../core/utils/app_routes.dart';
 import '../../../../../core/utils/app_strings.dart';
 import '../../../../../core/utils/app_text_styles.dart';
-import '../../../../config/cache/hive_helper.dart';
 import '../../../../config/di/di.dart';
 import '../../../../config/services/auth_service.dart';
 import '../../../tracking/domain/entities/order_entity.dart';
+import '../../../tracking/domain/use_cases/get_active_order_use_case.dart';
 import '../../../tracking/presentation/screens/order_details_screen.dart';
 import '../widgets/petals_painter.dart';
 
@@ -154,15 +152,10 @@ class _SplashScreenState extends State<SplashScreen>
     int? cachedStep;
 
     if (isLoggedIn) {
-      final hiveHelper = getIt<HiveHelper>();
-      final String? cachedJson = await hiveHelper.getData(
-        boxName: AppKeys.activeOrderBox,
-        key: AppKeys.activeOrderKey,
-      );
-      if (cachedJson != null) {
-        final Map<String, dynamic> data = jsonDecode(cachedJson);
-        cachedOrder = OrderEntity.fromJson(data[AppKeys.order]);
-        cachedStep = data[AppKeys.uiStep];
+      final cached = await getIt<GetActiveOrderUseCase>()();
+      if (cached != null) {
+        cachedOrder = cached.order;
+        cachedStep = cached.uiStep;
       }
     }
 

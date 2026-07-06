@@ -57,25 +57,6 @@ class OrderEntity extends Equatable {
     required this.shippingAddress,
   });
 
-  factory OrderEntity.fromJson(Map<String, dynamic> json) {
-    return OrderEntity(
-      id: json['id'] as String,
-      orderNumber: json['orderNumber'] as String,
-      totalPrice: json['totalPrice'] as num,
-      state: json['state'] as String,
-      createdAt: json['createdAt'] as String,
-      paymentType: json['paymentType'] as String,
-      user: UserEntity.fromJson(json['user'] as Map<String, dynamic>),
-      store: StoreEntity.fromJson(json['store'] as Map<String, dynamic>),
-      orderItems: (json['orderItems'] as List)
-          .map((e) => OrderItemEntity.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      shippingAddress: ShippingAddressEntity.fromJson(
-        json['shippingAddress'] as Map<String, dynamic>,
-      ),
-    );
-  }
-
   OrderEntity copyWith({
     String? id,
     String? orderNumber,
@@ -129,19 +110,6 @@ class OrderEntity extends Equatable {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'orderNumber': orderNumber,
-    'totalPrice': totalPrice,
-    'state': state,
-    'createdAt': createdAt,
-    'paymentType': paymentType,
-    'user': user.toJson(),
-    'store': store.toJson(),
-    'orderItems': orderItems.map((e) => e.toJson()).toList(),
-    'shippingAddress': shippingAddress.toJson(),
-  };
-
   @override
   List<Object?> get props => [
     id,
@@ -170,22 +138,6 @@ class UserEntity extends Equatable {
     required this.photo,
   });
 
-  factory UserEntity.fromJson(Map<String, dynamic> json) {
-    return UserEntity(
-      id: json['id'] as String,
-      fullName: json['fullName'] as String,
-      phone: json['phone'] as String,
-      photo: json['photo'] as String,
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    'id': id,
-    'fullName': fullName,
-    'phone': phone,
-    'photo': photo,
-  };
-
   @override
   List<Object?> get props => [id, fullName, phone, photo];
 }
@@ -207,26 +159,6 @@ class StoreEntity extends Equatable {
     required this.long,
   });
 
-  factory StoreEntity.fromJson(Map<String, dynamic> json) {
-    return StoreEntity(
-      name: json['name'] as String,
-      image: json['image'] as String,
-      address: json['address'] as String,
-      phoneNumber: json['phoneNumber'] as String,
-      lat: json['lat'] as String,
-      long: json['long'] as String,
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    'name': name,
-    'image': image,
-    'address': address,
-    'phoneNumber': phoneNumber,
-    'lat': lat,
-    'long': long,
-  };
-
   @override
   List<Object?> get props => [name, image, address, phoneNumber, lat, long];
 }
@@ -243,22 +175,6 @@ class OrderItemEntity extends Equatable {
     required this.price,
     required this.quantity,
   });
-
-  factory OrderItemEntity.fromJson(Map<String, dynamic> json) {
-    return OrderItemEntity(
-      productName: json['productName'] as String,
-      productImage: json['productImage'] as String,
-      price: json['price'] as num,
-      quantity: json['quantity'] as int,
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-    'productName': productName,
-    'productImage': productImage,
-    'price': price,
-    'quantity': quantity,
-  };
 
   @override
   List<Object?> get props => [productName, productImage, price, quantity];
@@ -279,16 +195,6 @@ class ShippingAddressEntity extends Equatable {
     required this.long,
   });
 
-  factory ShippingAddressEntity.fromJson(Map<String, dynamic> json) {
-    return ShippingAddressEntity(
-      street: json['street'] as String,
-      city: json['city'] as String,
-      phone: json['phone'] as String,
-      lat: json['lat'] as String,
-      long: json['long'] as String,
-    );
-  }
-
   /// Overlays [other] (e.g. a Firestore address) on top of this one, keeping
   /// this value for any field [other] left empty.
   ShippingAddressEntity mergeWith(ShippingAddressEntity? other) {
@@ -303,14 +209,6 @@ class ShippingAddressEntity extends Equatable {
       long: pick(other.long, long),
     );
   }
-
-  Map<String, dynamic> toJson() => {
-    'street': street,
-    'city': city,
-    'phone': phone,
-    'lat': lat,
-    'long': long,
-  };
 
   @override
   List<Object?> get props => [street, city, phone, lat, long];

@@ -3,10 +3,10 @@ import 'dart:async';
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/services/location_service.dart';
-import 'package:flowery_rider_app/config/services/osrm_routing_service.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/utils/map_constants.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_route_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_rider_location_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart'
@@ -22,19 +22,19 @@ import 'map_states.dart';
 class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
   final LocationService _locationService;
   final OpenCommunicationUseCase _openCommunicationUseCase;
-  final OsrmRoutingService _routingService;
+  final GetRouteUseCase _getRouteUseCase;
   final GetOrderShippingUseCase _getOrderShippingUseCase;
   final UpdateRiderLocationUseCase _updateRiderLocationUseCase;
 
   MapCubit(
     this._locationService,
     this._openCommunicationUseCase,
-    this._routingService,
+    this._getRouteUseCase,
     this._getOrderShippingUseCase,
     this._updateRiderLocationUseCase,
   ) : super(const MapState());
 
-  Timer? _locationTimer;
+  StreamSubscription<Position>? _locationSubscription;
 
   void doEvent(MapEvents event) {
     switch (event) {
@@ -140,13 +140,20 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
   }
 
   void _applyLocation(Position position) {
+    final location = LatLng(position.latitude, position.longitude);
+    final isFirstFix = state.currentLocation == null;
     emit(
       state.copyWith(
-        currentLocation: LatLng(position.latitude, position.longitude),
+        currentLocation: location,
         locating: false,
         clearLocationError: true,
       ),
     );
+    // Center on the very first fix only; live ticks afterwards must not snap
+    // the camera back and fight the rider panning the map.
+    if (isFirstFix) {
+      emitUiEvent(MoveCameraEvent(location, MapConstants.defaultZoom));
+    }
     _publishRiderLocation(position);
   }
 
@@ -167,18 +174,25 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
   }
 
   void _startLiveTracking() {
-    _locationTimer?.cancel();
-    _locationTimer = Timer.periodic(MapConstants.liveUpdateInterval, (_) async {
-      try {
-        final position = await _locationService.getCurrentPosition(
-          settings: const LocationSettings(accuracy: LocationAccuracy.high),
+    _locationSubscription?.cancel();
+    // Listen to Geolocator's position stream instead of polling on a timer: it
+    // pushes a fix only when the rider actually moves past the distance filter,
+    // so a stationary rider costs nothing and a moving one updates live.
+    _locationSubscription = _locationService
+        .getPositionStream(
+          settings: const LocationSettings(
+            accuracy: LocationAccuracy.high,
+            distanceFilter: MapConstants.liveDistanceFilter,
+          ),
+        )
+        .listen(
+          (position) {
+            if (isClosed) return;
+            _applyLocation(position);
+          },
+          // Ignore a stream error; it stays subscribed and the next fix retries.
+          onError: (_) {},
         );
-        if (isClosed) return;
-        _applyLocation(position);
-      } catch (_) {
-        // Ignore a failed tick; the next one will try again.
-      }
-    });
   }
 
   Future<void> _loadRoute(LatLng start, LatLng end) async {
@@ -190,13 +204,14 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
       ),
     );
     try {
-      final points = await _routingService.getRoute(start, end);
+      final points = await _getRouteUseCase(start, end);
       if (isClosed) return;
       if (points.isEmpty) {
         _applyFallbackRoute(start, end);
         return;
       }
       emit(state.copyWith(routePoints: points, routeLoading: false));
+      if (points.length >= 2) emitUiEvent(FitCameraEvent(points));
     } catch (_) {
       if (isClosed) return;
       _applyFallbackRoute(start, end);
@@ -211,6 +226,7 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
         usingFallback: true,
       ),
     );
+    emitUiEvent(FitCameraEvent([start, end]));
   }
 
   void _retryRoute() {
@@ -244,7 +260,7 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
 
   @override
   Future<void> close() {
-    _locationTimer?.cancel();
+    _locationSubscription?.cancel();
     return super.close();
   }
 }

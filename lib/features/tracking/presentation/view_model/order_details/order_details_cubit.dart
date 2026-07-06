@@ -13,12 +13,12 @@ import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_active_
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/start_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_order_state_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/screens/map_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_states.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../../config/base_state/base_state.dart';
-import '../../../../../core/utils/app_keys.dart';
 
 @injectable
 class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
@@ -66,14 +66,13 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     // Check Cache first
     final cachedData = await _getActiveOrderUseCase();
     if (cachedData != null) {
-      final cachedOrder = OrderEntity.fromJson(cachedData[AppKeys.order]);
+      final cachedOrder = cachedData.order;
       if (cachedOrder.id == order.id) {
-        final cachedStep = cachedData[AppKeys.uiStep] as int;
         emit(
           state.copyWith(
             orderDetailsState: BaseState(data: cachedOrder),
             orderStatus: OrderStatus.fromString(cachedOrder.state),
-            uiStep: cachedStep,
+            uiStep: cachedData.uiStep,
           ),
         );
         return; // Don't call startOrder API if cached
@@ -231,12 +230,12 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       emitUiEvent(
         NavigateEvent(
           AppRoutes.mapScreen,
-          arguments: {
-            'targetLat': lat,
-            'targetLong': long,
-            'locationType': type,
-            'order': order,
-          },
+          arguments: MapArgs(
+            order: order,
+            locationType: type,
+            targetLat: lat,
+            targetLong: long,
+          ),
         ),
       );
     }

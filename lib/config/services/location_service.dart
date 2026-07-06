@@ -24,4 +24,11 @@ class LocationService {
   Future<Position> getCurrentPosition({LocationSettings? settings}) {
     return Geolocator.getCurrentPosition(locationSettings: settings);
   }
+
+  /// Live position stream. Emits a new fix only when the device moves past the
+  /// [LocationSettings.distanceFilter], so a stationary rider costs nothing and
+  /// a moving one updates as it happens — no fixed-interval polling.
+  Stream<Position> getPositionStream({LocationSettings? settings}) {
+    return Geolocator.getPositionStream(locationSettings: settings);
+  }
 }

@@ -1,9 +1,9 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/services/location_service.dart';
-import 'package:flowery_rider_app/config/services/osrm_routing_service.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_route_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_rider_location_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/map_screen.dart';
@@ -16,6 +16,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -35,7 +36,7 @@ class _InMemoryAssetLoader extends AssetLoader {
 @GenerateMocks([
   LocationService,
   OpenCommunicationUseCase,
-  OsrmRoutingService,
+  GetRouteUseCase,
   GetOrderShippingUseCase,
   UpdateRiderLocationUseCase,
 ])
@@ -43,7 +44,7 @@ void main() {
   late MapCubit cubit;
   late MockLocationService mockLocationService;
   late MockOpenCommunicationUseCase mockOpenCommunicationUseCase;
-  late MockOsrmRoutingService mockRoutingService;
+  late MockGetRouteUseCase mockGetRouteUseCase;
   late MockGetOrderShippingUseCase mockGetOrderShippingUseCase;
   late MockUpdateRiderLocationUseCase mockUpdateRiderLocationUseCase;
   late Map<String, Map<String, dynamic>> translations;
@@ -92,6 +93,7 @@ void main() {
         AppStrings.pickupAddress: 'Pickup address',
         AppStrings.userAddress: 'User address',
         AppStrings.retry: 'Retry',
+        AppStrings.yourLocation: 'Your location',
         AppStrings.locationPermissionRequired:
             'Location permission is required to show your location.',
       },
@@ -101,7 +103,7 @@ void main() {
   setUp(() {
     mockLocationService = MockLocationService();
     mockOpenCommunicationUseCase = MockOpenCommunicationUseCase();
-    mockRoutingService = MockOsrmRoutingService();
+    mockGetRouteUseCase = MockGetRouteUseCase();
     mockGetOrderShippingUseCase = MockGetOrderShippingUseCase();
     mockUpdateRiderLocationUseCase = MockUpdateRiderLocationUseCase();
     when(mockGetOrderShippingUseCase(any)).thenAnswer((_) async => null);
@@ -128,13 +130,48 @@ void main() {
     cubit = MapCubit(
       mockLocationService,
       mockOpenCommunicationUseCase,
-      mockRoutingService,
+      mockGetRouteUseCase,
       mockGetOrderShippingUseCase,
       mockUpdateRiderLocationUseCase,
     );
   });
 
   tearDown(() => cubit.close());
+
+  Position makePosition(double lat, double lng) => Position(
+    latitude: lat,
+    longitude: lng,
+    timestamp: DateTime(2024, 1, 1),
+    accuracy: 1,
+    altitude: 0,
+    altitudeAccuracy: 0,
+    heading: 0,
+    headingAccuracy: 0,
+    speed: 0,
+    speedAccuracy: 0,
+  );
+
+  // Re-stubs the location service for the happy path: permission granted, a
+  // known position available, and an empty live stream (so no fix ever arrives
+  // after the first and the test stays free of pending timers). Call before
+  // pumpMapScreen to exercise the map/route rendering instead of the error card.
+  void stubGrantedLocation() {
+    when(
+      mockLocationService.checkPermission(),
+    ).thenAnswer((_) async => LocationPermission.whileInUse);
+    when(
+      mockLocationService.getLastKnownPosition(),
+    ).thenAnswer((_) async => makePosition(29.0, 30.0));
+    when(
+      mockLocationService.getCurrentPosition(settings: anyNamed('settings')),
+    ).thenAnswer((_) async => makePosition(29.0, 30.0));
+    when(
+      mockLocationService.getPositionStream(settings: anyNamed('settings')),
+    ).thenAnswer((_) => const Stream<Position>.empty());
+    when(
+      mockGetRouteUseCase(any, any),
+    ).thenAnswer((_) async => const [LatLng(29.0, 30.0), LatLng(30.1, 31.1)]);
+  }
 
   Future<void> pumpMapScreen(WidgetTester tester) async {
     tester.view.physicalSize = surface;
@@ -159,10 +196,12 @@ void main() {
               home: BlocProvider<MapCubit>.value(
                 value: cubit,
                 child: MapScreen(
-                  order: tOrder,
-                  locationType: LocationType.user,
-                  targetLat: tOrder.shippingAddress.lat,
-                  targetLong: tOrder.shippingAddress.long,
+                  args: MapArgs(
+                    order: tOrder,
+                    locationType: LocationType.user,
+                    targetLat: tOrder.shippingAddress.lat,
+                    targetLong: tOrder.shippingAddress.long,
+                  ),
                 ),
               ),
             ),
@@ -177,13 +216,23 @@ void main() {
     await tester.pump();
   }
 
-  testWidgets('renders the map and the address cards', (tester) async {
+  testWidgets('renders the map and both address cards', (tester) async {
     await pumpMapScreen(tester);
 
     expect(find.byType(FlutterMap), findsOneWidget);
-    // Names can appear both on the map marker and the address card.
-    expect(find.text('Flowery store'), findsAtLeastNWidgets(1));
-    expect(find.text('Nour mohamed'), findsAtLeastNWidgets(1));
+    // Locate the cards by key: the store/rider names also render on the map
+    // markers, so matching on the text would be ambiguous.
+    expect(find.byKey(MapScreen.storeAddressCardKey), findsOneWidget);
+    expect(find.byKey(MapScreen.userAddressCardKey), findsOneWidget);
+  });
+
+  testWidgets('renders the pickup and user address sections', (tester) async {
+    await pumpMapScreen(tester);
+
+    expect(find.text('Pickup address'), findsOneWidget);
+    expect(find.text('User address'), findsOneWidget);
+    expect(find.text('Store Addr'), findsOneWidget);
+    expect(find.text('Street, Giza'), findsOneWidget);
   });
 
   testWidgets('shows the location error card when permission is denied', (
@@ -198,6 +247,49 @@ void main() {
     );
   });
 
+  testWidgets('tapping retry on the error card re-runs the location flow', (
+    tester,
+  ) async {
+    await pumpMapScreen(tester);
+
+    // One resolve attempt happened on init; tapping retry triggers another.
+    await tester.tap(find.widgetWithText(ElevatedButton, 'Retry'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    verify(
+      mockLocationService.checkPermission(),
+    ).called(greaterThanOrEqualTo(2));
+  });
+
+  testWidgets('draws the route and live pill once location is granted', (
+    tester,
+  ) async {
+    stubGrantedLocation();
+
+    await pumpMapScreen(tester);
+
+    expect(find.byType(LocationErrorCard), findsNothing);
+    expect(find.text('Your location'), findsOneWidget);
+    expect(find.byType(PolylineLayer), findsOneWidget);
+  });
+
+  testWidgets('publishes the rider location while heading to the customer', (
+    tester,
+  ) async {
+    stubGrantedLocation();
+
+    await pumpMapScreen(tester);
+
+    verify(
+      mockUpdateRiderLocationUseCase(
+        orderId: '1',
+        lat: anyNamed('lat'),
+        long: anyNamed('long'),
+      ),
+    ).called(greaterThanOrEqualTo(1));
+  });
+
   testWidgets('tapping the phone icon triggers a contact call', (tester) async {
     when(mockOpenCommunicationUseCase(any, any)).thenAnswer((_) async => true);
 
@@ -210,6 +302,23 @@ void main() {
 
     verify(
       mockOpenCommunicationUseCase('01000000000', CommunicationType.phone),
+    ).called(1);
+  });
+
+  testWidgets('tapping the WhatsApp icon triggers a WhatsApp contact', (
+    tester,
+  ) async {
+    when(mockOpenCommunicationUseCase(any, any)).thenAnswer((_) async => true);
+
+    await pumpMapScreen(tester);
+
+    final whatsappIcon = find.byIcon(Icons.chat_outlined).first;
+    await tester.ensureVisible(whatsappIcon);
+    await tester.tap(whatsappIcon);
+    await tester.pump();
+
+    verify(
+      mockOpenCommunicationUseCase('01000000000', CommunicationType.whatsapp),
     ).called(1);
   });
 }

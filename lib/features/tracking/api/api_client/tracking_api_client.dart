@@ -8,6 +8,7 @@ import 'package:injectable/injectable.dart';
 import 'package:retrofit/retrofit.dart';
 
 import '../../data/models/response/pending_orders_response_model.dart';
+import '../../data/models/response/route_response_model.dart';
 
 part 'tracking_api_client.g.dart';
 
@@ -38,4 +39,11 @@ abstract class TrackingApiClient {
 
   @GET(AppEndPoints.logout)
   Future<void> logout();
+
+  @GET('${AppEndPoints.osrmRoute}{coords}')
+  Future<RouteResponseModel> getRoute(
+    @Path('coords') String coords, {
+    @Query('overview') String overview = 'full',
+    @Query('geometries') String geometries = 'geojson',
+  });
 }
