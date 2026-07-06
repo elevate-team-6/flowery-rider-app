@@ -13,6 +13,8 @@ class AddressInfoCard extends StatelessWidget {
   final String? imageUrl;
   final String? title;
   final String? address;
+  final TextStyle? titleStyle;
+  final TextStyle? addressStyle;
   final VoidCallback? onTap;
   final VoidCallback? onPhoneTap;
   final VoidCallback? onWhatsappTap;
@@ -23,6 +25,8 @@ class AddressInfoCard extends StatelessWidget {
     this.imageUrl,
     this.title,
     this.address,
+    this.titleStyle,
+    this.addressStyle,
     this.onTap,
     this.onPhoneTap,
     this.onWhatsappTap,
@@ -59,9 +63,11 @@ class AddressInfoCard extends StatelessWidget {
                     children: [
                       Text(
                         title ?? '',
-                        style: AppTextStyles.black14400.copyWith(
-                          color: AppColors.white90,
-                        ),
+                        style:
+                            titleStyle ??
+                            AppTextStyles.black14400.copyWith(
+                              color: AppColors.white90,
+                            ),
                       ),
                       SizedBox(height: 4.h),
                       Row(
@@ -75,9 +81,11 @@ class AddressInfoCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               address ?? '',
-                              style: AppTextStyles.black12400.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
+                              style:
+                                  addressStyle ??
+                                  AppTextStyles.black12400.copyWith(
+                                    fontWeight: FontWeight.w500,
+                                  ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
