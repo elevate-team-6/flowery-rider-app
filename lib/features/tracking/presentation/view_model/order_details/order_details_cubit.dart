@@ -1,6 +1,7 @@
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
+import 'package:flowery_rider_app/config/services/location_service.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
@@ -13,9 +14,11 @@ import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_active_
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/start_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_order_state_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_rider_location_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/map_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_states.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../../config/base_state/base_state.dart';
@@ -29,6 +32,8 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   final GetActiveOrderUseCase _getActiveOrderUseCase;
   final ClearActiveOrderUseCase _clearActiveOrderUseCase;
   final UpdateOrderProgressUseCase _updateOrderProgressUseCase;
+  final LocationService _locationService;
+  final UpdateRiderLocationUseCase _updateRiderLocationUseCase;
 
   OrderDetailsCubit(
     this._updateOrderStateUseCase,
@@ -38,6 +43,8 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     this._getActiveOrderUseCase,
     this._clearActiveOrderUseCase,
     this._updateOrderProgressUseCase,
+    this._locationService,
+    this._updateRiderLocationUseCase,
   ) : super(const OrderDetailsState());
 
   void doEvent(OrderDetailsEvents event) {
@@ -158,6 +165,14 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
           _updateProgress(notifyState);
         }
 
+        // On the out-for-delivery transition write the rider's first live
+        // position onto the order doc alongside the "onWay" status, so the
+        // customer can render the marker the moment the status flips — without
+        // waiting for the rider to open the delivery map.
+        if (nextStep == 4) {
+          _publishFirstRiderLocation(orderId);
+        }
+
         if (nextStep == 6) {
           await _clearActiveOrderUseCase();
           emitUiEvent(
@@ -183,6 +198,49 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       orderId: order.id!,
       state: notifyState,
     );
+  }
+
+  /// Publishes the rider's first live position onto the order doc once, at the
+  /// out-for-delivery ("onWay") transition. Best-effort: any GPS/permission
+  /// failure is swallowed so it can never disrupt the delivery flow, and the
+  /// delivery map keeps the position updating live afterwards.
+  Future<void> _publishFirstRiderLocation(String orderId) async {
+    if (orderId.isEmpty) return;
+    try {
+      final serviceEnabled = await _locationService.isLocationServiceEnabled();
+      if (!serviceEnabled) return;
+
+      var permission = await _locationService.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await _locationService.requestPermission();
+      }
+      if (permission == LocationPermission.denied ||
+          permission == LocationPermission.deniedForever) {
+        return;
+      }
+
+      // Prefer a fresh fix; fall back to the last cached one if it times out.
+      Position? position = await _locationService.getLastKnownPosition();
+      try {
+        position = await _locationService.getCurrentPosition(
+          settings: const LocationSettings(
+            accuracy: LocationAccuracy.medium,
+            timeLimit: Duration(seconds: 15),
+          ),
+        );
+      } catch (_) {
+        // Keep the last known fix if the fresh lookup fails.
+      }
+      if (position == null) return;
+
+      await _updateRiderLocationUseCase(
+        orderId: orderId,
+        lat: position.latitude.toString(),
+        long: position.longitude.toString(),
+      );
+    } catch (_) {
+      // Best-effort: never let a location hiccup disrupt the delivery flow.
+    }
   }
 
   void _onBackButtonPressed() {
