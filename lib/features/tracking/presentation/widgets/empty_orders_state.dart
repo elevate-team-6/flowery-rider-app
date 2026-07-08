@@ -53,6 +53,12 @@ class EmptyOrdersState extends StatelessWidget {
                     textAlign: TextAlign.center,
                     style: AppTextStyles.black18600,
                   ),
+                  SizedBox(height: 8.h),
+                  Text(
+                    AppStrings.noPendingOrdersSubtitle.tr(),
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.gray14400,
+                  ),
                 ],
               ),
             ),

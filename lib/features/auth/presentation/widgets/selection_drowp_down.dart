@@ -1,5 +1,6 @@
 import 'package:flowery_rider_app/core/utils/app_colors.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppDropdownField<T> extends StatelessWidget {
   final String label;
@@ -31,7 +32,7 @@ class AppDropdownField<T> extends StatelessWidget {
       validator: validator,
       icon: Icon(
         Icons.keyboard_arrow_down_outlined,
-        size: 30,
+        size: 30.sp,
         color: AppColors.black30,
       ),
     );

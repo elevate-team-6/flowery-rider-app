@@ -2,6 +2,7 @@ import 'package:flowery_rider_app/core/utils/app_assets.dart';
 import 'package:flowery_rider_app/core/utils/app_colors.dart';
 import 'package:flowery_rider_app/core/utils/app_text_styles.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class NotificationBadge extends StatelessWidget {
@@ -21,12 +22,12 @@ class NotificationBadge extends StatelessWidget {
       child: Badge(
         label: Text(
           count,
-          style: AppTextStyles.white16500.copyWith(fontSize: 11),
+          style: AppTextStyles.white16500.copyWith(fontSize: 11.sp),
         ),
         backgroundColor: AppColors.red,
-        largeSize: 18,
-        padding: const EdgeInsets.symmetric(horizontal: 4),
-        child: SvgPicture.asset(AppIcons.bell, width: 28, height: 28),
+        largeSize: 18.r,
+        padding: EdgeInsets.symmetric(horizontal: 4.w),
+        child: SvgPicture.asset(AppIcons.bell, width: 28.r, height: 28.r),
       ),
     );
   }

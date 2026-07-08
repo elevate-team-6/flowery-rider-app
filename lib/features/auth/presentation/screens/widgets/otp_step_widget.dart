@@ -5,6 +5,7 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_p
 import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 
 import '../../../../../core/utils/app_colors.dart';
@@ -18,25 +19,25 @@ class OtpStepWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Column(
         children: [
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           Text(
             AppStrings.emailVerification.tr(),
             style: AppTextStyles.black18500,
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 44),
+            padding: EdgeInsets.symmetric(horizontal: 44.w),
             child: Text(
               AppStrings.emailVerificationSubtitle.tr(),
               style: AppTextStyles.black13400,
               textAlign: TextAlign.center,
             ),
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
           BlocBuilder<ForgetPasswordCubit, ForgetPasswordState>(
             buildWhen: (previous, current) {
               return previous.verifyResetCodeState !=
@@ -63,9 +64,9 @@ class OtpStepWidget extends StatelessWidget {
                     textStyle: AppTextStyles.black20500,
                     pinTheme: PinTheme(
                       shape: PinCodeFieldShape.box,
-                      borderRadius: BorderRadius.circular(10),
-                      fieldHeight: 55,
-                      fieldWidth: 55,
+                      borderRadius: BorderRadius.circular(10.r),
+                      fieldHeight: 55.h,
+                      fieldWidth: 55.w,
                       activeFillColor: AppColors.white60,
                       inactiveFillColor: AppColors.white60,
                       selectedFillColor: AppColors.white,
@@ -84,18 +85,18 @@ class OtpStepWidget extends StatelessWidget {
                     cursorColor: AppColors.primary,
                   ),
                   if (isError) ...[
-                    const SizedBox(height: 8),
+                    SizedBox(height: 8.h),
                     Align(
                       alignment: Alignment.centerRight,
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(
+                          Icon(
                             Icons.error_outline,
                             color: AppColors.error,
-                            size: 16,
+                            size: 16.sp,
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: 4.w),
                           Text(
                             state.verifyResetCodeState.errorMessage!,
                             style: AppTextStyles.black13400.copyWith(
@@ -110,7 +111,7 @@ class OtpStepWidget extends StatelessWidget {
               );
             },
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           CustomRichTextWithLink(
             normalText: AppStrings.didntReceiveCode.tr(),
             linkText: AppStrings.resend.tr(),

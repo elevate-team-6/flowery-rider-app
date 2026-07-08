@@ -107,6 +107,6 @@ class EditVehicleCubit extends BaseCubit<EditVehicleState, BaseUiEvent> {
   void _submit() {
     emit(state.copyWith(hasChanges: false));
 
-    emitUiEvent(DisplaySuccessEvent(AppStrings.editVehicleSuccessfly.tr()));
+    emitUiEvent(DisplaySuccessEvent(AppStrings.editVehicleSuccessfully.tr()));
   }
 }

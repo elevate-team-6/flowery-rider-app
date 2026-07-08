@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/utils/app_text_styles.dart';
 
@@ -23,8 +24,16 @@ class ProfileMenuItem extends StatelessWidget {
     return ListTile(
       leading: leading,
       title: Text(title, style: titleStyle ?? AppTextStyles.black13400),
-      trailing: trailing,
+      trailing: _buildTrailing(),
       onTap: onTap,
     );
+  }
+
+  Widget _buildTrailing() {
+    if (trailing is Icon) {
+      final icon = trailing as Icon;
+      return Icon(icon.icon, size: (icon.size ?? 24).r, color: icon.color);
+    }
+    return trailing;
   }
 }
