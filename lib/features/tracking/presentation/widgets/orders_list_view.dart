@@ -17,6 +17,9 @@ class OrdersListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild this widget's texts when the locale changes (no state reset).
+    context.locale;
+
     return BlocBuilder<OrderScreenCubit, OrderScreenState>(
       buildWhen: (previous, current) =>
           previous.ordersState != current.ordersState,

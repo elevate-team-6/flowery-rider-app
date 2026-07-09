@@ -29,6 +29,9 @@ class OrderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild this widget's texts when the locale changes (no state reset).
+    context.locale;
+
     final store = order.store;
     final user = order.user;
 

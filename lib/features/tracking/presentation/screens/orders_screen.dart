@@ -44,6 +44,8 @@ class _OrdersScreenState extends State<OrdersScreen> with UiEventHandler {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild this screen's texts when the locale changes (no state reset).
+    context.locale;
     return BlocProvider(
       create: (context) {
         final cubit = getIt<OrderScreenCubit>();
