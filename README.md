@@ -1,9 +1,6 @@
 # 🌸 Flowery Rider App
 
-Flowery Rider App is a modern Flutter mobile application built for delivery riders to manage orders, track deliveries in real time, update order status, and handle profile settings with a polished user experience.
-
-## Overview
-This app provides a complete rider experience for flower delivery operations. It includes secure authentication, order management, live delivery tracking, notifications, and profile tools, all designed to be simple, fast, and reliable for daily use.
+A delivery-rider app to manage orders, track deliveries, update order status, and handle profile settings, with full English/Arabic support. Built with Clean Architecture and a feature-based structure, BLoC/Cubit for state management, GetIt/Injectable for DI, and Hive for local storage. Integrated Firebase (Firestore, Crashlytics, Remote Config) and REST APIs via Dio/Retrofit with location-based delivery tracking.
 
 ## ✨ Key Features
 - Secure authentication flow for riders
