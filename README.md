@@ -1,11 +1,11 @@
-# Flowery Rider App
+# 🌸 Flowery Rider App
 
 Flowery Rider App is a modern Flutter mobile application built for delivery riders to manage orders, track deliveries in real time, update order status, and handle profile settings with a polished user experience.
 
 ## Overview
 This app provides a complete rider experience for flower delivery operations. It includes secure authentication, order management, live delivery tracking, notifications, and profile tools, all designed to be simple, fast, and reliable for daily use.
 
-## Key Features
+## ✨ Key Features
 - Secure authentication flow for riders
 - Splash and onboarding experience
 - Order list and detailed order views
@@ -15,35 +15,50 @@ This app provides a complete rider experience for flower delivery operations. It
 - Multilingual support for English and Arabic
 - Firebase-backed services for remote configuration, crash reporting, and cloud data
 
-## Tech Stack
-- Flutter & Dart
-- BLoC / Cubit for state management
-- GetIt + Injectable for dependency injection
-- Dio + Retrofit for API communication
-- Hive for local cache/storage
-- Firebase Core, Crashlytics, Remote Config, and Firestore
-- Easy Localization, ScreenUtil, BotToast, Lottie, and Geolocator
+## 🧰 Tech Stack
 
-## Architecture
-The project follows a modular feature-based structure with clear separation between:
-- Features: authentication, tracking, profile, notifications, and splash flows
-- Core: shared utilities, themes, routes, constants, and reusable components
-- Config: dependency injection, services, error handling, and app-level setup
+| Category | Packages |
+| --- | --- |
+| **State Management** | `flutter_bloc`, `bloc`, `bloc_test`, `equatable` |
+| **Networking** | `dio`, `retrofit`, `dio_cache_interceptor` |
+| **Dependency Injection** | `get_it`, `injectable` |
+| **Serialization** | `json_annotation`, `json_serializable`, `retrofit_generator` |
+| **Local Storage** | `hive`, `hive_flutter`, `flutter_secure_storage`, `path_provider` |
+| **Firebase** | `firebase_core`, `cloud_firestore`, `firebase_crashlytics`, `firebase_remote_config` |
+| **Maps & Location** | `flutter_map`, `geolocator`, `geocoding`, `latlong2` |
+| **Localization** | `easy_localization`, `intl` |
+| **UI & UX** | `flutter_screenutil`, `google_fonts`, `flutter_svg`, `cached_network_image`, `lottie`, `bot_toast`, `pin_code_fields`, `image_picker`, `url_launcher`, `webview_flutter` |
+| **Utilities** | `logger`, `stream_transform` |
+| **Tooling** | `build_runner`, `flutter_lints`, `mockito`, `test`, `flutter_native_splash`, `flutter_launcher_icons` |
 
-## Project Structure
+## 🏗️ Architecture
+
+The project follows Clean Architecture, organized feature-first. Each feature is split into independent layers, keeping business logic decoupled from the UI and the data sources.
+
 ```text
-flowery_rider_app/
-├── android/
-├── ios/
-├── lib/
-│   ├── config/
-│   ├── core/
-│   ├── features/
-│   └── main.dart
-├── assets/
-├── test/
-├── pubspec.yaml
-└── README.md
+lib/
+├── main.dart                  # App entry point (DI, localization, Firebase, Hive)
+├── config/                    # Cross-cutting infrastructure
+│   ├── di/                    # Dependency injection (get_it + injectable)
+│   ├── dio/                   # Dio HTTP client module
+│   ├── interceptors/          # Auth / logging / cache interceptors
+│   ├── cache/                 # Hive helper & local storage
+│   ├── services/              # Auth, Firebase, Location, Remote Config, etc.
+│   ├── error_handler/         # Centralized failure handling
+│   ├── base_response/         # Generic API response wrappers
+│   ├── base_state/            # Shared state primitives
+│   └── validations/           # Form & input validations
+├── core/                      # Shared building blocks
+│   ├── entities/ · models/    # Shared domain & data models
+│   ├── extensions/            # Dart/Flutter extensions
+│   ├── widgets/               # Reusable widgets
+│   └── utils/                 # Theme, colors, routes, endpoints, constants
+└── features/                  # Feature modules
+    └── <feature>/
+        ├── api/               # Retrofit API clients & remote data sources
+        ├── data/              # Models (request/response), data sources, repo impl
+        ├── domain/            # Entities, repo contracts, use cases
+        └── presentation/      # Screens, widgets, BLoC/Cubit view models
 ```
 
 ## Prerequisites
