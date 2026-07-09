@@ -2,15 +2,27 @@
 
 A delivery-rider app to manage orders, track deliveries, update order status, and handle profile settings, with full English/Arabic support. Built with Clean Architecture and a feature-based structure, BLoC/Cubit for state management, GetIt/Injectable for DI, and Hive for local storage. Integrated Firebase (Firestore, Crashlytics, Remote Config) and REST APIs via Dio/Retrofit with location-based delivery tracking.
 
-## ✨ Key Features
-- Secure authentication flow for riders
-- Splash and onboarding experience
-- Order list and detailed order views
-- Live tracking and map-based delivery flow
-- Order status updates and cancellation handling
-- Profile management and vehicle details
-- Multilingual support for English and Arabic
-- Firebase-backed services for remote configuration, crash reporting, and cloud data
+## ✨ Features
+
+- 🔐 Secure Login & Signup
+- 🎁 Customize Your Gift
+- 📍 Live Order Tracking with Maps
+- 📣 Real-time Push Notifications
+- 🤖 Driver Auto-Registration via AI OCR (License / ID Recognition using Google ML Kit)
+- 🗺️ Google Maps SDK Integration
+- 🔑 Password Recovery
+- 🧑‍💼 Profile Management (Photo + Data Update)
+
+---
+## 📸 Screenshots
+
+Below are the app's screenshots that highlight its functionality:
+
+<p align="center">
+<img width="160" src="https://github.com/user-attachments/assets/c2726ff6-f370-4713-b001-6b70e3d38ef3" /> <img width="160" src="https://github.com/user-attachments/assets/dc6b060f-8b98-4a4e-a719-5c5f93cdeb68" /> <img width="160" src="https://github.com/user-attachments/assets/1d127308-6a0a-4c3d-aa3f-f847a8089e79" /> <img width="160" src="https://github.com/user-attachments/assets/bef7f5b8-02d8-470b-84ff-ec6702d88225" /> <img width="160" src="https://github.com/user-attachments/assets/c460a01a-8c1a-451c-b22b-15f4147018bd" />
+</p>
+
+---
 
 ## 🧰 Tech Stack
 
