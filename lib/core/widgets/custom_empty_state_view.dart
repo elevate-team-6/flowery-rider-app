@@ -1,6 +1,5 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/utils/app_assets.dart';
-import 'package:flowery_rider_app/core/utils/app_colors.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/utils/app_text_styles.dart';
 import 'package:flutter/material.dart';
@@ -60,16 +59,6 @@ class CustomEmptyStateView extends StatelessWidget {
               SizedBox(height: 24.h),
               ElevatedButton(
                 onPressed: onRetry,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 32.w,
-                    vertical: 12.h,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.r),
-                  ),
-                ),
                 child: Text(
                   retryText ?? AppStrings.retry.tr(),
                   style: AppTextStyles.white16600,
