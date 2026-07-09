@@ -4,14 +4,14 @@ A delivery-rider app to manage orders, track deliveries, update order status, an
 
 ## ✨ Features
 
-- 🔐 Secure Login & Signup
-- 🎁 Customize Your Gift
-- 📍 Live Order Tracking with Maps
-- 📣 Real-time Push Notifications
-- 🤖 Driver Auto-Registration via AI OCR (License / ID Recognition using Google ML Kit)
-- 🗺️ Google Maps SDK Integration
-- 🔑 Password Recovery
-- 🧑‍💼 Profile Management (Photo + Data Update)
+- 🔐 Secure login, signup, and password recovery flows
+- 🚀 Onboarding experience for new riders
+- 📦 Order management and delivery status updates
+- 📍 Order tracking screens with map-based delivery flow
+- 🔔 Notification handling for order progress updates
+- 🧑‍💼 Profile and vehicle information management
+- 🌐 English and Arabic localization support
+
 
 ---
 ## 📸 Screenshots
