@@ -8,7 +8,6 @@ import 'package:flowery_rider_app/core/utils/map_constants.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_route_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
-import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_rider_location_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart'
     show LocationType;
 import 'package:geolocator/geolocator.dart';
@@ -18,20 +17,22 @@ import 'package:latlong2/latlong.dart';
 import 'map_events.dart';
 import 'map_states.dart';
 
+/// Display-only cubit for the delivery map: resolves the rider's location,
+/// draws the route, and follows the rider live on-screen. It does NOT write the
+/// rider's position to Firestore — that is owned by [OrderDetailsCubit] and runs
+/// for the whole active order, independent of whether this map is open.
 @injectable
 class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
   final LocationService _locationService;
   final OpenCommunicationUseCase _openCommunicationUseCase;
   final GetRouteUseCase _getRouteUseCase;
   final GetOrderShippingUseCase _getOrderShippingUseCase;
-  final UpdateRiderLocationUseCase _updateRiderLocationUseCase;
 
   MapCubit(
     this._locationService,
     this._openCommunicationUseCase,
     this._getRouteUseCase,
     this._getOrderShippingUseCase,
-    this._updateRiderLocationUseCase,
   ) : super(const MapState());
 
   StreamSubscription<Position>? _locationSubscription;
@@ -154,30 +155,14 @@ class MapCubit extends BaseCubit<MapState, BaseUiEvent> {
     if (isFirstFix) {
       emitUiEvent(MoveCameraEvent(location, MapConstants.defaultZoom));
     }
-    _publishRiderLocation(position);
-  }
-
-  /// Mirrors the rider's live position onto the order doc in Firestore so the
-  /// customer app can show the rider moving on the map. Only published while
-  /// navigating to the customer ([LocationType.user] == out for delivery /
-  /// "onWay"); the store leg is the rider's own business. Fire-and-forget: the
-  /// repo swallows failures, so a dropped tick never disrupts the map.
-  void _publishRiderLocation(Position position) {
-    if (state.locationType != LocationType.user) return;
-    final orderId = state.order?.id;
-    if (orderId == null || orderId.isEmpty) return;
-    _updateRiderLocationUseCase(
-      orderId: orderId,
-      lat: position.latitude.toString(),
-      long: position.longitude.toString(),
-    );
   }
 
   void _startLiveTracking() {
     _locationSubscription?.cancel();
     // Listen to Geolocator's position stream instead of polling on a timer: it
     // pushes a fix only when the rider actually moves past the distance filter,
-    // so a stationary rider costs nothing and a moving one updates live.
+    // so a stationary rider costs nothing and a moving one updates live. Used
+    // here purely to keep the on-screen marker following the rider.
     _locationSubscription = _locationService
         .getPositionStream(
           settings: const LocationSettings(

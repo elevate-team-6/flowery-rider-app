@@ -1,9 +1,12 @@
+import 'dart:async';
+
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/services/location_service.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'package:flowery_rider_app/core/utils/map_constants.dart';
 import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
 import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
@@ -22,6 +25,11 @@ import 'package:geolocator/geolocator.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../../../../config/base_state/base_state.dart';
+
+// UI step at which the order is out for delivery ("onWay"). Live location
+// tracking to Firestore runs from this step until the order is delivered or
+// canceled.
+const int _outForDeliveryStep = 4;
 
 @injectable
 class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
@@ -46,6 +54,11 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     this._locationService,
     this._updateRiderLocationUseCase,
   ) : super(const OrderDetailsState());
+
+  // Live location tracking runs while the order is out for delivery, regardless
+  // of whether the delivery map screen is open. This keeps Firestore updated so
+  // the customer always sees the rider moving.
+  StreamSubscription<Position>? _locationSubscription;
 
   void doEvent(OrderDetailsEvents event) {
     switch (event) {
@@ -82,6 +95,9 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
             uiStep: cachedData.uiStep,
           ),
         );
+        // Resume live tracking if the order was already out for delivery when
+        // the app was reopened.
+        _syncLocationTracking(cachedOrder.id, cachedData.uiStep);
         return; // Don't call startOrder API if cached
       }
     }
@@ -116,6 +132,9 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
         ),
       );
       await _cacheActiveOrderUseCase(mergedOrder, state.uiStep);
+      // Resume tracking if this order is already at/after the out-for-delivery
+      // step.
+      _syncLocationTracking(mergedOrder.id, state.uiStep);
       // Notify User: Step 1 (Accepted)
       _updateProgress(UserNotificationState.accepted);
     }
@@ -165,15 +184,14 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
           _updateProgress(notifyState);
         }
 
-        // On the out-for-delivery transition write the rider's first live
-        // position onto the order doc alongside the "onWay" status, so the
-        // customer can render the marker the moment the status flips — without
-        // waiting for the rider to open the delivery map.
-        if (nextStep == 4) {
-          _publishFirstRiderLocation(orderId);
+        // Start live location tracking the moment the order goes out for
+        // delivery, so Firestore updates even if the rider never opens the map.
+        if (nextStep == _outForDeliveryStep) {
+          _startLocationTracking(orderId);
         }
 
         if (nextStep == 6) {
+          _stopLocationTracking();
           await _clearActiveOrderUseCase();
           emitUiEvent(
             NavigateEvent(
@@ -200,12 +218,24 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     );
   }
 
-  /// Publishes the rider's first live position onto the order doc once, at the
-  /// out-for-delivery ("onWay") transition. Best-effort: any GPS/permission
-  /// failure is swallowed so it can never disrupt the delivery flow, and the
-  /// delivery map keeps the position updating live afterwards.
-  Future<void> _publishFirstRiderLocation(String orderId) async {
+  /// Starts (or resumes) live location tracking only if the order is at/after
+  /// the out-for-delivery step. Safe to call multiple times; it is idempotent.
+  void _syncLocationTracking(String orderId, int step) {
+    if (step >= _outForDeliveryStep && step < 6) {
+      _startLocationTracking(orderId);
+    }
+  }
+
+  /// Streams the rider's live position and mirrors each fix onto the order doc
+  /// in Firestore, so the customer app shows the rider moving on the map — even
+  /// when the rider hasn't opened the delivery map. Runs from out-for-delivery
+  /// until the order is delivered or canceled. Best-effort: permission/GPS
+  /// hiccups are swallowed and never disrupt the delivery flow.
+  Future<void> _startLocationTracking(String orderId) async {
     if (orderId.isEmpty) return;
+    // Already tracking → don't start a second stream.
+    if (_locationSubscription != null) return;
+
     try {
       final serviceEnabled = await _locationService.isLocationServiceEnabled();
       if (!serviceEnabled) return;
@@ -219,28 +249,45 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
         return;
       }
 
-      // Prefer a fresh fix; fall back to the last cached one if it times out.
-      Position? position = await _locationService.getLastKnownPosition();
-      try {
-        position = await _locationService.getCurrentPosition(
-          settings: const LocationSettings(
-            accuracy: LocationAccuracy.medium,
-            timeLimit: Duration(seconds: 15),
-          ),
-        );
-      } catch (_) {
-        // Keep the last known fix if the fresh lookup fails.
-      }
-      if (position == null) return;
+      // Publish an immediate first fix so the customer sees the rider right
+      // away, without waiting for the first movement past the distance filter.
+      final last = await _locationService.getLastKnownPosition();
+      if (last != null) _publishRiderLocation(orderId, last);
 
-      await _updateRiderLocationUseCase(
-        orderId: orderId,
-        lat: position.latitude.toString(),
-        long: position.longitude.toString(),
-      );
+      _locationSubscription = _locationService
+          .getPositionStream(
+            settings: const LocationSettings(
+              accuracy: LocationAccuracy.high,
+              distanceFilter: MapConstants.liveDistanceFilter,
+            ),
+          )
+          .listen(
+            (position) {
+              if (isClosed) return;
+              _publishRiderLocation(orderId, position);
+            },
+            // Ignore a stream error; it stays subscribed and the next fix
+            // retries.
+            onError: (_) {},
+          );
     } catch (_) {
       // Best-effort: never let a location hiccup disrupt the delivery flow.
     }
+  }
+
+  void _stopLocationTracking() {
+    _locationSubscription?.cancel();
+    _locationSubscription = null;
+  }
+
+  /// Fire-and-forget write of the rider's position to Firestore. The repo
+  /// swallows failures, so a dropped tick never disrupts the delivery flow.
+  void _publishRiderLocation(String orderId, Position position) {
+    _updateRiderLocationUseCase(
+      orderId: orderId,
+      lat: position.latitude.toString(),
+      long: position.longitude.toString(),
+    );
   }
 
   void _onBackButtonPressed() {
@@ -256,6 +303,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     emit(state.copyWith(canselOrderState: BaseState()));
     switch (result) {
       case SuccessBaseResponse<OrderEntity>():
+        _stopLocationTracking();
         await _clearActiveOrderUseCase();
         emitUiEvent(
           NavigateEvent(
@@ -317,5 +365,11 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     if (!success) {
       emitUiEvent(DisplayErrorEvent(AppStrings.couldNotLaunchUrl));
     }
+  }
+
+  @override
+  Future<void> close() {
+    _stopLocationTracking();
+    return super.close();
   }
 }

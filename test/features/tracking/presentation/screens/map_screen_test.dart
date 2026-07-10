@@ -5,7 +5,6 @@ import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_route_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
-import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_rider_location_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/map_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/map_view_model/map_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart';
@@ -38,7 +37,6 @@ class _InMemoryAssetLoader extends AssetLoader {
   OpenCommunicationUseCase,
   GetRouteUseCase,
   GetOrderShippingUseCase,
-  UpdateRiderLocationUseCase,
 ])
 void main() {
   late MapCubit cubit;
@@ -46,7 +44,6 @@ void main() {
   late MockOpenCommunicationUseCase mockOpenCommunicationUseCase;
   late MockGetRouteUseCase mockGetRouteUseCase;
   late MockGetOrderShippingUseCase mockGetOrderShippingUseCase;
-  late MockUpdateRiderLocationUseCase mockUpdateRiderLocationUseCase;
   late Map<String, Map<String, dynamic>> translations;
 
   const surface = Size(700, 1400);
@@ -105,15 +102,7 @@ void main() {
     mockOpenCommunicationUseCase = MockOpenCommunicationUseCase();
     mockGetRouteUseCase = MockGetRouteUseCase();
     mockGetOrderShippingUseCase = MockGetOrderShippingUseCase();
-    mockUpdateRiderLocationUseCase = MockUpdateRiderLocationUseCase();
     when(mockGetOrderShippingUseCase(any)).thenAnswer((_) async => null);
-    when(
-      mockUpdateRiderLocationUseCase(
-        orderId: anyNamed('orderId'),
-        lat: anyNamed('lat'),
-        long: anyNamed('long'),
-      ),
-    ).thenAnswer((_) async {});
 
     // Permission denied → the cubit fails fast and never starts the live
     // tracking timer, keeping the widget test free of pending timers.
@@ -132,7 +121,6 @@ void main() {
       mockOpenCommunicationUseCase,
       mockGetRouteUseCase,
       mockGetOrderShippingUseCase,
-      mockUpdateRiderLocationUseCase,
     );
   });
 
@@ -272,22 +260,6 @@ void main() {
     expect(find.byType(LocationErrorCard), findsNothing);
     expect(find.text('Your location'), findsOneWidget);
     expect(find.byType(PolylineLayer), findsOneWidget);
-  });
-
-  testWidgets('publishes the rider location while heading to the customer', (
-    tester,
-  ) async {
-    stubGrantedLocation();
-
-    await pumpMapScreen(tester);
-
-    verify(
-      mockUpdateRiderLocationUseCase(
-        orderId: '1',
-        lat: anyNamed('lat'),
-        long: anyNamed('long'),
-      ),
-    ).called(greaterThanOrEqualTo(1));
   });
 
   testWidgets('tapping the phone icon triggers a contact call', (tester) async {
