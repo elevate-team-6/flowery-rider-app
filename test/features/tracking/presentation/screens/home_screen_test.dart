@@ -218,7 +218,8 @@ void main() {
       );
 
       await pumpHomeScreen(tester);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.byType(CustomEmptyStateView), findsOneWidget);
       expect(find.text(AppStrings.noPendingOrders.tr()), findsOneWidget);
@@ -235,7 +236,8 @@ void main() {
       ).thenAnswer((_) async => ErrorBaseResponse('network error'));
 
       await pumpHomeScreen(tester);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.byType(CustomErrorState), findsOneWidget);
       expect(find.text('network error'), findsOneWidget);
@@ -256,7 +258,8 @@ void main() {
       ).thenAnswer((_) async => SuccessBaseResponse(ordersEntity));
 
       await pumpHomeScreen(tester);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.byType(OrderCard), findsNWidgets(2));
       expect(find.text('Flower Store'), findsOneWidget);
@@ -270,7 +273,8 @@ void main() {
       ).thenAnswer((_) async => SuccessBaseResponse(ordersEntity));
 
       await pumpHomeScreen(tester);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.byType(OrderCard), findsNWidgets(2));
 
