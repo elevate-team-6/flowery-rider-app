@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flowery_rider_app/config/base_cubit/base_cubit.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
@@ -29,6 +32,9 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   final GetActiveOrderUseCase _getActiveOrderUseCase;
   final ClearActiveOrderUseCase _clearActiveOrderUseCase;
   final UpdateOrderProgressUseCase _updateOrderProgressUseCase;
+  final FirebaseFirestore _firestore;
+  StreamSubscription<DocumentSnapshot<Map<String, dynamic>>>?
+  _confirmationSubscription;
 
   OrderDetailsCubit(
     this._updateOrderStateUseCase,
@@ -38,6 +44,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     this._getActiveOrderUseCase,
     this._clearActiveOrderUseCase,
     this._updateOrderProgressUseCase,
+    this._firestore,
   ) : super(const OrderDetailsState());
 
   void doEvent(OrderDetailsEvents event) {
@@ -62,6 +69,10 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
   Future<void> _onInitialize(OrderEntity order, {int? initialStep}) async {
     final initialBackendStatus = OrderStatus.fromString(order.state);
     int step = initialStep ?? 1;
+
+    _confirmationSubscription?.cancel();
+    _confirmationSubscription = null;
+    _listenToOrderConfirmation(order.id);
 
     // Check Cache first
     final cachedData = await _getActiveOrderUseCase();
@@ -115,9 +126,27 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     }
   }
 
+  void _listenToOrderConfirmation(String? orderId) {
+    if (orderId == null || orderId.isEmpty) {
+      emit(state.copyWith(isUserConfirmedDeliverd: null));
+      return;
+    }
+
+    _confirmationSubscription = _firestore
+        .collection('orders')
+        .doc(orderId)
+        .snapshots()
+        .listen((snapshot) {
+          final value = snapshot.data()?['isUserConfirmedDeliverd'];
+          final confirmed = value is bool ? value : null;
+          emit(state.copyWith(isUserConfirmedDeliverd: confirmed));
+        });
+  }
+
   Future<void> _onNextStep() async {
     final currentStep = state.uiStep;
     if (currentStep >= 6 || state.updateStepState.isLoading) return;
+    if (currentStep == 5 && state.isUserConfirmedDeliverd != true) return;
 
     final currentOrder = state.orderDetailsState.data;
     if (currentOrder == null) return;
@@ -160,6 +189,8 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
         }
 
         if (nextStep == 6) {
+          await _confirmationSubscription?.cancel();
+          _confirmationSubscription = null;
           await _clearActiveOrderUseCase();
           emitUiEvent(
             NavigateEvent(
@@ -173,6 +204,13 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
       case ErrorBaseResponse<OrderEntity>():
         emitUiEvent(DisplayErrorEvent(result.errorMessage));
     }
+  }
+
+  @override
+  Future<void> close() async {
+    await _confirmationSubscription?.cancel();
+    _confirmationSubscription = null;
+    await super.close();
   }
 
   Future<void> _updateProgress(UserNotificationState notifyState) async {

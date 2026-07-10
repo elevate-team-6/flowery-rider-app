@@ -201,23 +201,39 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                 ),
                 Padding(
                   padding: EdgeInsets.all(16.w),
-                  child: BlocBuilder<OrderDetailsCubit, OrderDetailsState>(
-                    buildWhen: (previous, current) =>
-                        previous.uiStep != current.uiStep ||
-                        previous.updateStepState.isLoading !=
-                            current.updateStepState.isLoading,
-                    builder: (context, state) {
-                      return OrderActionButton(
-                        uiStep: state.uiStep,
-                        isLoading: state.updateStepState.isLoading,
-                        onPressed: () {
-                          context.read<OrderDetailsCubit>().doEvent(
-                            OrderDetailsNextStepEvent(),
+                  child:
+                      BlocSelector<OrderDetailsCubit, OrderDetailsState, bool?>(
+                        selector: (state) => state.isUserConfirmedDeliverd,
+                        builder: (context, isUserConfirmedDeliverd) {
+                          return BlocBuilder<
+                            OrderDetailsCubit,
+                            OrderDetailsState
+                          >(
+                            buildWhen: (previous, current) =>
+                                previous.uiStep != current.uiStep ||
+                                previous.updateStepState.isLoading !=
+                                    current.updateStepState.isLoading ||
+                                previous.isUserConfirmedDeliverd !=
+                                    current.isUserConfirmedDeliverd,
+                            builder: (context, state) {
+                              final isFinalActionEnabled = state.uiStep == 5
+                                  ? isUserConfirmedDeliverd == true
+                                  : true;
+
+                              return OrderActionButton(
+                                uiStep: state.uiStep,
+                                isLoading: state.updateStepState.isLoading,
+                                isEnabled: isFinalActionEnabled,
+                                onPressed: () {
+                                  context.read<OrderDetailsCubit>().doEvent(
+                                    OrderDetailsNextStepEvent(),
+                                  );
+                                },
+                              );
+                            },
                           );
                         },
-                      );
-                    },
-                  ),
+                      ),
                 ),
               ],
             );

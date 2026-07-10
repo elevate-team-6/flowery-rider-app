@@ -6,6 +6,7 @@ class OrderDetailsState extends Equatable {
   final OrderStatus? orderStatus;
   final int
   uiStep; // 1: Accepted, 2: ArrivedAtPickup, 3: Picked, 4: OutForDelivery, 5: Arrived, 6: Delivered
+  final bool? isUserConfirmedDeliverd;
   final BaseState canselOrderState;
   final BaseState orderDetailsState;
   final BaseState updateStepState;
@@ -13,6 +14,7 @@ class OrderDetailsState extends Equatable {
   const OrderDetailsState({
     this.orderStatus,
     this.uiStep = 1,
+    this.isUserConfirmedDeliverd,
     this.canselOrderState = const BaseState(),
     this.orderDetailsState = const BaseState(),
     this.updateStepState = const BaseState(),
@@ -22,6 +24,7 @@ class OrderDetailsState extends Equatable {
   List<Object?> get props => [
     orderStatus,
     uiStep,
+    isUserConfirmedDeliverd,
     canselOrderState,
     orderDetailsState,
     updateStepState,
@@ -30,6 +33,7 @@ class OrderDetailsState extends Equatable {
   OrderDetailsState copyWith({
     OrderStatus? orderStatus,
     int? uiStep,
+    bool? isUserConfirmedDeliverd,
     BaseState? canselOrderState,
     BaseState? orderDetailsState,
     BaseState? updateStepState,
@@ -37,6 +41,8 @@ class OrderDetailsState extends Equatable {
     return OrderDetailsState(
       orderStatus: orderStatus ?? this.orderStatus,
       uiStep: uiStep ?? this.uiStep,
+      isUserConfirmedDeliverd:
+          isUserConfirmedDeliverd ?? this.isUserConfirmedDeliverd,
       canselOrderState: canselOrderState ?? this.canselOrderState,
       orderDetailsState: orderDetailsState ?? this.orderDetailsState,
       updateStepState: updateStepState ?? this.updateStepState,

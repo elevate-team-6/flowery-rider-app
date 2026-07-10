@@ -9,12 +9,14 @@ import '../../../../core/utils/app_text_styles.dart';
 class OrderActionButton extends StatelessWidget {
   final int uiStep;
   final bool isLoading;
+  final bool isEnabled;
   final VoidCallback onPressed;
 
   const OrderActionButton({
     super.key,
     required this.uiStep,
     this.isLoading = false,
+    this.isEnabled = true,
     required this.onPressed,
   });
 
@@ -38,7 +40,7 @@ class OrderActionButton extends StatelessWidget {
     }
 
     return ElevatedButton(
-      onPressed: isLoading ? null : onPressed,
+      onPressed: isLoading || !isEnabled ? null : onPressed,
       child: isLoading
           ? SizedBox(
               height: 20.h,
