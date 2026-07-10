@@ -4,6 +4,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/di/di.dart';
+import 'package:flowery_rider_app/core/widgets/custom_empty_state_view.dart';
 import 'package:flowery_rider_app/features/mainLayout/presentation/view_model/main_layout_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/orders_screen.dart';
@@ -17,7 +18,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:lottie/lottie.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -191,7 +191,9 @@ void main() {
       expect(skeletonizer.enabled, isTrue);
     });
 
-    testWidgets('shows Lottie empty state when list is empty', (tester) async {
+    testWidgets('shows CustomEmptyStateView when list is empty', (
+      tester,
+    ) async {
       final state = const OrderScreenState(ordersState: BaseState(data: []));
 
       when(mockCubit.state).thenReturn(state);
@@ -200,7 +202,7 @@ void main() {
       await tester.pump();
       await tester.pump(const Duration(seconds: 1));
 
-      expect(find.byType(Lottie), findsOneWidget);
+      expect(find.byType(CustomEmptyStateView), findsOneWidget);
     });
 
     testWidgets('shows Orders list and summary when data is loaded', (

@@ -71,8 +71,9 @@ abstract class AppStrings {
   static const String versionPlaceholder = 'versionPlaceholder';
   static const String welcomeTo = 'welcomeTo';
   static const String floweryRiderApp = 'floweryRiderApp';
-  static const String floweryRider = 'floweryRider';
-  static const String splashSubtitle = 'splashSubtitle';
+  // not translated //
+  static const String floweryRider = 'Flowery Rider';
+  static const String splashSubtitle = 'Your flower delivery partner';
 
   // Forget Password Screen
   static const String forgetPasswordTitle = 'forgetPasswordTitle';

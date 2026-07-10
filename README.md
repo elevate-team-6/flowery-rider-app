@@ -1,17 +1,128 @@
-# flowery_rider_app
+# 🌸🛵 Flowery Rider App
 
-A new Flutter project.
+A delivery-rider app to manage orders, track deliveries, update order status, and handle profile settings, with full English/Arabic support. Built with Clean Architecture and a feature-based structure, BLoC/Cubit for state management, GetIt/Injectable for DI, and Hive for local storage. Integrated Firebase (Firestore, Crashlytics, Remote Config) and REST APIs via Dio/Retrofit with location-based delivery tracking.
 
-## Getting Started
+## ✨ Features
 
-This project is a starting point for a Flutter application.
+- 🔐 Secure login, signup, and password recovery flows
+- 🚀 Onboarding experience for new riders
+- 📦 Order management and delivery status updates
+- 📍 Order tracking screens with map-based delivery flow
+- 🔔 Notification handling for order progress updates
+- 🧑‍💼 Profile and vehicle information management
+- 🌐 English and Arabic localization support
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+---
+## 📸 Screenshots
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Below are the app's screenshots that highlight its functionality:
+
+<img width="1392" height="599" alt="Image" src="https://github.com/user-attachments/assets/ceebcbda-af5a-4599-8dd2-c5b383a54c43" />
+
+---
+
+## 🧰 Tech Stack
+
+| Category | Packages |
+| --- | --- |
+| **State Management** | `flutter_bloc`, `bloc`, `bloc_test`, `equatable` |
+| **Networking** | `dio`, `retrofit`, `dio_cache_interceptor` |
+| **Dependency Injection** | `get_it`, `injectable` |
+| **Serialization** | `json_annotation`, `json_serializable`, `retrofit_generator` |
+| **Local Storage** | `hive`, `hive_flutter`, `flutter_secure_storage`, `path_provider` |
+| **Firebase** | `firebase_core`, `cloud_firestore`, `firebase_crashlytics`, `firebase_remote_config` |
+| **Maps & Location** | `flutter_map`, `geolocator`, `geocoding`, `latlong2` |
+| **Localization** | `easy_localization`, `intl` |
+| **UI & UX** | `flutter_screenutil`, `google_fonts`, `flutter_svg`, `cached_network_image`, `lottie`, `bot_toast`, `pin_code_fields`, `image_picker`, `url_launcher`, `webview_flutter` |
+| **Utilities** | `logger`, `stream_transform` |
+| **Tooling** | `build_runner`, `flutter_lints`, `mockito`, `test`, `flutter_native_splash`, `flutter_launcher_icons` |
+
+## 🏗️ Architecture
+
+The project follows Clean Architecture, organized feature-first. Each feature is split into independent layers, keeping business logic decoupled from the UI and the data sources.
+
+```text
+lib/
+├── main.dart                  # App entry point (DI, localization, Firebase, Hive)
+├── config/                    # Cross-cutting infrastructure
+│   ├── di/                    # Dependency injection (get_it + injectable)
+│   ├── dio/                   # Dio HTTP client module
+│   ├── interceptors/          # Auth / logging / cache interceptors
+│   ├── cache/                 # Hive helper & local storage
+│   ├── services/              # Auth, Firebase, Location, Remote Config, etc.
+│   ├── error_handler/         # Centralized failure handling
+│   ├── base_response/         # Generic API response wrappers
+│   ├── base_state/            # Shared state primitives
+│   └── validations/           # Form & input validations
+├── core/                      # Shared building blocks
+│   ├── entities/ · models/    # Shared domain & data models
+│   ├── extensions/            # Dart/Flutter extensions
+│   ├── widgets/               # Reusable widgets
+│   └── utils/                 # Theme, colors, routes, endpoints, constants
+└── features/                  # Feature modules
+    └── <feature>/
+        ├── api/               # Retrofit API clients & remote data sources
+        ├── data/              # Models (request/response), data sources, repo impl
+        ├── domain/            # Entities, repo contracts, use cases
+        └── presentation/      # Screens, widgets, BLoC/Cubit view models
+```
+
+## Prerequisites
+Before running the app, make sure you have:
+- Flutter SDK 3.11 or newer
+- Dart SDK compatible with your Flutter version
+- Android Studio or Xcode installed
+- A configured Firebase project
+
+## Installation
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd flowery-rider-app
+   ```
+2. Install dependencies:
+   ```bash
+   flutter pub get
+   ```
+3. Configure Firebase:
+   - Make sure Firebase is initialized correctly for Android/iOS.
+   - Verify that the required Firebase configuration files are present.
+4. Run the application:
+   ```bash
+   flutter run
+   ```
+
+## Development Commands
+- Format the code:
+  ```bash
+  flutter format .
+  ```
+- Analyze the project:
+  ```bash
+  flutter analyze
+  ```
+- Run tests:
+  ```bash
+  flutter test
+  ```
+
+## Usage
+After launching the app, riders can:
+- Sign in or continue through the onboarding flow
+- View assigned orders
+- Open order details and tracking screens
+- Update order status during delivery
+- Manage profile and vehicle information
+
+## License
+This project is currently intended for internal/private use. Please contact the project maintainer for licensing details.
+
+## 👨‍💻 Team
+
+| Name | GitHub |
+|---|---|
+| Ahmed Emam | [@ahmedemam55](https://github.com/ahmedemam55) |
+| Abanoub | [@abanoub6](https://github.com/abanoub6) |
+| Abdekmalek Mokhtar | [@abdalmlk5](https://github.com/abdalmlk5) |
+| Yousef Abdelghdar | [@yousefsinger](https://github.com/yousefsinger) |

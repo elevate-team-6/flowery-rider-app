@@ -10,7 +10,9 @@
       "Bash(git rev-list *)",
       "Bash(git stash *)",
       "Bash(git merge *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(shorebird --version)",
+      "Bash(flutter --version)"
     ]
   }
 }

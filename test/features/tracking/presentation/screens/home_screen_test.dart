@@ -7,13 +7,13 @@ import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/di/di.dart';
 import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
+import 'package:flowery_rider_app/core/widgets/custom_empty_state_view.dart';
 import 'package:flowery_rider_app/core/widgets/custom_error_state.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_pending_orders_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/home_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_cubit.dart';
-import 'package:flowery_rider_app/features/tracking/presentation/widgets/empty_orders_state.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/widgets/order_card.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/widgets/pagination_bar.dart';
 import 'package:flutter/material.dart';
@@ -203,7 +203,7 @@ void main() {
 
       verify(mockUseCase.call(page: anyNamed('page'))).called(1);
       expect(find.byType(OrderCard), findsNothing);
-      expect(find.byType(EmptyOrdersState), findsNothing);
+      expect(find.byType(CustomEmptyStateView), findsNothing);
     });
   });
 
@@ -220,7 +220,7 @@ void main() {
       await pumpHomeScreen(tester);
       await tester.pumpAndSettle();
 
-      expect(find.byType(EmptyOrdersState), findsOneWidget);
+      expect(find.byType(CustomEmptyStateView), findsOneWidget);
       expect(find.text(AppStrings.noPendingOrders.tr()), findsOneWidget);
       expect(find.byType(OrderCard), findsNothing);
     });
