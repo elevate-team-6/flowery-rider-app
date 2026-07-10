@@ -80,9 +80,12 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
 
   @override
   Widget build(BuildContext context) {
+    // Make the screen reactive to locale changes
+    context.locale;
+
     return Scaffold(
       appBar: AppBar(
-        actionsPadding: const EdgeInsets.symmetric(horizontal: 12),
+        actionsPadding: EdgeInsets.symmetric(horizontal: 12.w),
         title: Text(AppStrings.profile.tr(), style: AppTextStyles.black20500),
         leading: Icon(Icons.arrow_back_ios_new_outlined),
         actions: [
@@ -109,13 +112,13 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                     child: driver?.photo != null && driver!.photo.isNotEmpty
                         ? Image.network(
                             driver.photo,
-                            width: 48,
-                            height: 48,
+                            width: 48.r,
+                            height: 48.r,
                             fit: BoxFit.cover,
                           )
                         : Container(
-                            width: 48,
-                            height: 48,
+                            width: 48.r,
+                            height: 48.r,
                             color: Colors.grey.shade300,
                             child: const Icon(Icons.person),
                           ),
@@ -136,7 +139,7 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                SizedBox(height: 20.h),
 
                 ProfileTile(
                   onTap: () => _onEditVehicle(driver),
@@ -147,21 +150,21 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                         AppStrings.vehicleInfo.tr(),
                         style: AppTextStyles.black18500,
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(driver?.vehicleType ?? ''),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4.h),
                       Text(driver?.vehicleNumber ?? ''),
                     ],
                   ),
                 ),
 
-                const SizedBox(height: 10),
+                SizedBox(height: 10.h),
                 ProfileMenuItem(
                   title: AppStrings.language.tr(),
                   leading: SvgPicture.asset(
                     AppIcons.language,
-                    width: 24,
-                    height: 24,
+                    width: 24.r,
+                    height: 24.r,
                   ),
                   trailing: Text(
                     context.locale.languageCode == 'ar'
@@ -170,29 +173,30 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
                     style: AppTextStyles.primary12400,
                   ),
                   onTap: () {
+                    final cubit = context.read<ProfileCubit>();
                     showModalBottomSheet(
                       context: context,
                       builder: (innerContext) => BlocProvider.value(
-                        value: context.read<ProfileCubit>(),
+                        value: cubit,
                         child: const LanguageBottomSheet(),
                       ),
                     );
                   },
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10.h),
 
                 ProfileMenuItem(
                   leading: SvgPicture.asset(
                     AppIcons.logout,
-                    width: 24,
-                    height: 24,
+                    width: 24.r,
+                    height: 24.r,
                   ),
 
                   title: AppStrings.logout.tr(),
                   trailing: SvgPicture.asset(
                     AppIcons.logout,
-                    width: 28,
-                    height: 28,
+                    width: 28.r,
+                    height: 28.r,
                     colorFilter: const ColorFilter.mode(
                       AppColors.gray,
                       BlendMode.srcIn,

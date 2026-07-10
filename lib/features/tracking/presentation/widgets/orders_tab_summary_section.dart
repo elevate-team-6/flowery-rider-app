@@ -13,6 +13,9 @@ class OrdersTabSummarySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild this widget's texts when the locale changes (no state reset).
+    context.locale;
+
     return BlocBuilder<OrderScreenCubit, OrderScreenState>(
       buildWhen: (previous, current) =>
           previous.cancelledCount != current.cancelledCount ||
@@ -82,14 +85,18 @@ class _SummaryBox extends StatelessWidget {
           SizedBox(height: 8.h),
           Row(
             children: [
-              Icon(icon, size: 16.sp, color: color),
+              Icon(icon, size: 14.sp, color: color),
               SizedBox(width: 4.w),
               Expanded(
-                child: Text(
-                  label,
-                  style: AppTextStyles.black14400.copyWith(
-                    color: AppColors.black60,
-                    fontSize: 12.sp,
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  alignment: AlignmentDirectional.centerStart,
+                  child: Text(
+                    label,
+                    style: AppTextStyles.black14400.copyWith(
+                      color: AppColors.black60,
+                      fontSize: 12.sp,
+                    ),
                   ),
                 ),
               ),

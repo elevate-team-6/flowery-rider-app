@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/utils/app_colors.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/change_password/change_password_cubit.dart';
@@ -44,7 +45,7 @@ class UpdatePasswordButton extends StatelessWidget {
         ),
         child: isLoading
             ? const CircularProgressIndicator()
-            : Text(AppStrings.update),
+            : Text(AppStrings.update.tr()),
       ),
     );
   }

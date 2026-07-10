@@ -8,6 +8,7 @@ import 'package:flowery_rider_app/features/tracking/presentation/screens/home_sc
 import 'package:flowery_rider_app/features/tracking/presentation/screens/orders_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 import '../../profile/presentation/screens/profile_screen.dart';
@@ -37,9 +38,9 @@ class _MainLayoutState extends State<MainLayout> {
           return Scaffold(
             body: IndexedStack(index: currentIndex, children: _pages),
             bottomNavigationBar: Container(
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 border: Border(
-                  top: BorderSide(color: AppColors.black10, width: 1),
+                  top: BorderSide(color: AppColors.black10, width: 1.w),
                 ),
               ),
               child: NavigationBar(
@@ -64,7 +65,7 @@ class _MainLayoutState extends State<MainLayout> {
                         BlendMode.srcIn,
                       ),
                     ),
-                    label: AppStrings.home.tr(),
+                    label: AppStrings.home.tr(context: context),
                   ),
                   NavigationDestination(
                     icon: SvgPicture.asset(
@@ -81,7 +82,7 @@ class _MainLayoutState extends State<MainLayout> {
                         BlendMode.srcIn,
                       ),
                     ),
-                    label: AppStrings.orders.tr(),
+                    label: AppStrings.orders.tr(context: context),
                   ),
                   NavigationDestination(
                     icon: SvgPicture.asset(
@@ -98,7 +99,7 @@ class _MainLayoutState extends State<MainLayout> {
                         BlendMode.srcIn,
                       ),
                     ),
-                    label: AppStrings.profile.tr(),
+                    label: AppStrings.profile.tr(context: context),
                   ),
                 ],
               ),

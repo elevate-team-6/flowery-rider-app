@@ -119,7 +119,9 @@ class EditProfileCubit extends BaseCubit<EditProfileStates, BaseUiEvent> {
             editState: BaseState(data: response.data),
           ),
         );
-        emitUiEvent(DisplaySuccessEvent(AppStrings.editProfileSuccessfly.tr()));
+        emitUiEvent(
+          DisplaySuccessEvent(AppStrings.editProfileSuccessfully.tr()),
+        );
         emitUiEvent(
           NavigateEvent(
             '',

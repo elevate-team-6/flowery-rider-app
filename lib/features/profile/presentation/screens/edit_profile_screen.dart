@@ -5,6 +5,7 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/entities/driver_entity.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../../../config/base_ui_event/base_ui_event.dart';
@@ -113,7 +114,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     return Scaffold(
       appBar: AppBar(titleSpacing: 0, title: Text(AppStrings.editProfile.tr())),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+        padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 24.h),
         child: Form(
           key: _formKey,
           child: Column(
@@ -123,7 +124,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 fallbackPhotoUrl: widget.driver.photo,
                 onPickPhoto: _pickPhoto,
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -135,7 +136,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                       validator: AppValidations.validateFirstName,
                     ),
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: 12.w),
                   Expanded(
                     child: CustomTextField(
                       controller: _lastNameController,
@@ -146,7 +147,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               CustomTextField(
                 controller: _emailController,
                 labelText: AppStrings.email.tr(),
@@ -154,7 +155,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 textInputAction: TextInputAction.next,
                 validator: AppValidations.validateEmail,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               CustomTextField(
                 controller: _phoneController,
                 labelText: AppStrings.phoneNumber.tr(),
@@ -162,12 +163,12 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                 textInputAction: TextInputAction.done,
                 validator: AppValidations.validatePhoneNumber,
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               PasswordChangeField(
                 onChangePressed: () =>
                     Navigator.pushNamed(context, AppRoutes.changePassword),
               ),
-              const SizedBox(height: 24),
+              SizedBox(height: 24.h),
               BlocBuilder<EditProfileCubit, EditProfileStates>(
                 buildWhen: (previous, current) =>
                     previous.gender != current.gender,
@@ -181,7 +182,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                   );
                 },
               ),
-              const SizedBox(height: 32),
+              SizedBox(height: 32.h),
               BlocBuilder<EditProfileCubit, EditProfileStates>(
                 buildWhen: (previous, current) =>
                     previous.isFormChanged != current.isFormChanged,

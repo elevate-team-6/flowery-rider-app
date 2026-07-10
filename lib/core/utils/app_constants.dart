@@ -5,10 +5,14 @@ abstract class AppConstants {
 
   // api images base url
   static const String imageBaseUrl = 'https://flower.elevateegy.com/uploads/';
+
   // Firestore Collections
   static const String usersCollection = "users";
   static const String ordersCollection = "orders";
   static const String appConfigsCollection = "app_configs";
+
+  // Firestore Documents
+  static const String fcmDoc = "fcm";
 
   // Firestore Fields
   static const String fcmTokenField = "fcmToken";
@@ -17,28 +21,35 @@ abstract class AppConstants {
   static const String riderIdField = "riderId";
   static const String riderNameField = "riderName";
   static const String riderPhoneField = "riderPhone";
-
-  // Firestore Documents
-  static const String fcmDoc = "fcm";
   static const String privateKeyField = "privateKey";
   static const String clientEmailField = "clientEmail";
   static const String projectIdField = "projectId";
   static const String serverKeyField = "serverKey";
-
-  // Notification Fields
+  static const String typeField = "type";
+  static const String clientIdField = "client_id";
   static const String notificationsField = "notifications";
   static const String titleField = "title";
   static const String bodyField = "body";
   static const String sentTimeField = "sentTime";
   static const String dataField = "data";
   static const String clickActionField = "click_action";
-  static const String clickActionValue = "FLUTTER_NOTIFICATION_CLICK";
-  static const String typeField = "type";
-  static const String orderUpdateValue = "order_update";
   static const String orderIdField = "orderId";
   static const String messageField = "message";
   static const String tokenField = "token";
   static const String notificationField = "notification";
+  static const String stateField = "state";
+
+  // Firestore Values
+  static const String serviceAccountValue = "service_account";
+  static const String clickActionValue = "FLUTTER_NOTIFICATION_CLICK";
+  static const String orderUpdateValue = "order_update";
+  static const String defaultClientId = "118258260233682735322";
+
+  // PEM Formatting
+  static const String pemHeader = "-----BEGIN PRIVATE KEY-----";
+  static const String pemFooter = "-----END PRIVATE KEY-----";
+  static const String newline = "\n";
+  static const String escapedNewline = "\\n";
 
   // Headers
   static const String contentTypeHeader = "Content-Type";

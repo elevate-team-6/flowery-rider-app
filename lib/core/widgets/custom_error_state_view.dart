@@ -28,7 +28,7 @@ class CustomErrorStateView extends StatelessWidget {
             Icon(icon, size: 72.sp, color: AppColors.black30),
             SizedBox(height: 16.h),
             Text(
-              message,
+              message.tr(),
               textAlign: TextAlign.center,
               style: AppTextStyles.black16400.copyWith(fontSize: 16.sp),
             ),

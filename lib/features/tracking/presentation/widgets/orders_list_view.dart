@@ -2,15 +2,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/utils/app_colors.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/utils/app_text_styles.dart';
+import 'package:flowery_rider_app/core/widgets/custom_empty_state_view.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_events.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/orders_view_model/order_screen_states.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:lottie/lottie.dart';
 
-import '../../../../core/utils/app_assets.dart';
 import 'order_card_item.dart';
 
 class OrdersListView extends StatelessWidget {
@@ -18,6 +17,9 @@ class OrdersListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild this widget's texts when the locale changes (no state reset).
+    context.locale;
+
     return BlocBuilder<OrderScreenCubit, OrderScreenState>(
       buildWhen: (previous, current) =>
           previous.ordersState != current.ordersState,
@@ -50,7 +52,7 @@ class OrdersListView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    ordersState.errorMessage!,
+                    ordersState.errorMessage!.tr(),
                     style: AppTextStyles.black14400,
                   ),
                   SizedBox(height: 16.h),
@@ -72,23 +74,10 @@ class OrdersListView extends StatelessWidget {
         if (orders.isEmpty) {
           return SliverFillRemaining(
             hasScrollBody: false,
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Lottie.asset(
-                    AppLottie.empty,
-                    width: 200.w,
-                    height: 200.h,
-                    repeat: true,
-                  ),
-                  SizedBox(height: 16.h),
-                  Text(
-                    AppStrings.noCompletedOrders.tr(),
-                    style: AppTextStyles.black16600,
-                  ),
-                ],
+            child: CustomEmptyStateView(
+              message: AppStrings.noCompletedOrders.tr(),
+              onRetry: () => context.read<OrderScreenCubit>().doEvent(
+                GetDriverOrdersEvent(),
               ),
             ),
           );

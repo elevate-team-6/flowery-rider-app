@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:math' as math;
 
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -280,7 +279,7 @@ class _SplashScreenState extends State<SplashScreen>
                   FadeTransition(
                     opacity: _subtitleFadeAnimation,
                     child: Text(
-                      AppStrings.splashSubtitle.tr(),
+                      AppStrings.splashSubtitle,
                       style: AppTextStyles.gray14400PoppinsSpacing,
                     ),
                   ),

@@ -13,11 +13,11 @@ import '../../../../config/di/di.dart';
 import '../../../../core/utils/app_assets.dart';
 import '../../../../core/utils/app_strings.dart';
 import '../../../../core/utils/app_text_styles.dart';
+import '../../../../core/widgets/custom_empty_state_view.dart';
 import '../../../../core/widgets/custom_error_state.dart';
 import '../view_model/home_view_model/home_cubit.dart';
 import '../view_model/home_view_model/home_events.dart';
 import '../view_model/home_view_model/home_states.dart';
-import '../widgets/empty_orders_state.dart';
 import '../widgets/order_card.dart';
 import '../widgets/pagination_bar.dart';
 
@@ -62,6 +62,8 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild this screen's texts when the locale changes (no state reset).
+    context.locale;
     return Scaffold(
       appBar: AppBar(
         titleSpacing: 16.w,
@@ -100,8 +102,13 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
 
           final orders = ordersState.data?.orders ?? [];
           if (orders.isEmpty) {
-            return EmptyOrdersState(onRefresh: _loadOrders);
+            return CustomEmptyStateView(
+              message: AppStrings.noPendingOrders.tr(),
+              subtitle: AppStrings.noPendingOrdersSubtitle.tr(),
+              onRetry: _loadOrders,
+            );
           }
+          final cubit = context.read<HomeCubit>();
 
           return Column(
             children: [
@@ -120,14 +127,11 @@ class _HomeBodyState extends State<_HomeBody> with UiEventHandler {
                           currentPage: ordersState.data!.currentPage ?? 1,
                           totalPages: ordersState.data!.totalPages!,
                           onPageChanged: (page) {
-                            context.read<HomeCubit>().doEvent(
-                              GetPendingOrdersEvent(page: page),
-                            );
+                            cubit.doEvent(GetPendingOrdersEvent(page: page));
                           },
                         );
                       }
                       final order = orders[index];
-                      final cubit = context.read<HomeCubit>();
                       return OrderCard(
                         order: order,
                         onAccept: () => cubit.doEvent(AcceptOrderEvent(order)),

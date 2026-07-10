@@ -93,7 +93,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
 
     // Fallback if no cache
     if (initialStep == null) {
-      if (initialBackendStatus == OrderStatus.delivered) {
+      if (initialBackendStatus == OrderStatus.completed) {
         step = 6;
       } else if (initialBackendStatus == OrderStatus.inProgress) {
         step = 1;
@@ -155,7 +155,7 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
     final orderId = currentOrder.id;
 
     OrderStatus backendStatus = (nextStep == 6)
-        ? OrderStatus.delivered
+        ? OrderStatus.completed
         : OrderStatus.inProgress;
 
     emitUiEvent(ShowLoadingEvent());

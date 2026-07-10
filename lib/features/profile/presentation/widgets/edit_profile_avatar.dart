@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../core/utils/app_colors.dart';
 import '../view_model/edit_profile_view_model/edit_profile_cubit.dart';
@@ -26,16 +27,16 @@ class EditProfileAvatar extends StatelessWidget {
           return Stack(
             alignment: Alignment.bottomRight,
             children: [
-              ProfileAvatar(photoUrl: photoUrl, radius: 44),
+              ProfileAvatar(photoUrl: photoUrl, radius: 44.r),
               InkWell(
                 onTap: onPickPhoto,
                 customBorder: const CircleBorder(),
-                child: const CircleAvatar(
-                  radius: 14,
+                child: CircleAvatar(
+                  radius: 14.r,
                   backgroundColor: AppColors.black,
                   child: Icon(
                     Icons.camera_alt,
-                    size: 16,
+                    size: 16.sp,
                     color: AppColors.white,
                   ),
                 ),

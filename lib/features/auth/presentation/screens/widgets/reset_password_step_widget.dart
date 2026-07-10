@@ -4,6 +4,7 @@ import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_p
 import 'package:flowery_rider_app/features/auth/presentation/view_model/forget_password_view_model/forget_password_events.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../config/validations/app_validations.dart';
 import '../../../../../core/utils/app_strings.dart';
@@ -33,30 +34,27 @@ class _ResetPasswordStepWidgetState extends State<ResetPasswordStepWidget> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
+      padding: EdgeInsets.symmetric(horizontal: 24.w),
       child: Form(
         key: resetFormKey,
         child: Column(
           children: [
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             Text(
               AppStrings.resetPasswordTitle.tr(),
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.w500),
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            SizedBox(height: 8.h),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: EdgeInsets.symmetric(horizontal: 10.w),
               child: Text(
                 AppStrings.resetPasswordSubtitle.tr(),
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400,
-                ),
+                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w400),
                 textAlign: TextAlign.center,
               ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32.h),
             CustomTextField(
               controller: passwordController,
               labelText: AppStrings.newPassword.tr(),
@@ -65,7 +63,7 @@ class _ResetPasswordStepWidgetState extends State<ResetPasswordStepWidget> {
               textInputAction: TextInputAction.next,
               validator: (value) => AppValidations.validatePassword(value),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             CustomTextField(
               controller: confirmPasswordController,
               labelText: AppStrings.confirmPassword.tr(),
@@ -77,7 +75,7 @@ class _ResetPasswordStepWidgetState extends State<ResetPasswordStepWidget> {
                 passwordController.text,
               ),
             ),
-            const SizedBox(height: 40),
+            SizedBox(height: 40.h),
             ElevatedButton(
               onPressed: () {
                 if (resetFormKey.currentState!.validate()) {
