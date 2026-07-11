@@ -10,7 +10,7 @@ class NotificationStrings {
       'ar': 'جاري التجهيز',
       'en': 'Preparing Order',
     },
-    UserNotificationState.onWay: {
+    UserNotificationState.outForDelivery: {
       'ar': 'طلبك في الطريق',
       'en': 'Out for Delivery',
     },
@@ -33,7 +33,7 @@ class NotificationStrings {
       'ar': 'المندوب وصل للمتجر ويقوم باستلام طلبك.',
       'en': 'The rider reached the store and is picking up your order.',
     },
-    UserNotificationState.onWay: {
+    UserNotificationState.outForDelivery: {
       'ar': 'المندوب استلم الطلب وهو في طريقه إليك.',
       'en': 'The rider picked up your order and is on the way.',
     },

@@ -179,8 +179,8 @@ class OrderDetailsCubit extends BaseCubit<OrderDetailsState, BaseUiEvent> {
         // Notification logic for specific user-facing steps
         final notifyState = switch (nextStep) {
           2 => UserNotificationState.preparing,
-          4 => UserNotificationState.onWay,
-          6 => UserNotificationState.delivered,
+          4 => UserNotificationState.outForDelivery,
+          5 => UserNotificationState.delivered,
           _ => null,
         };
 

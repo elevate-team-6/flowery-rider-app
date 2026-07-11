@@ -1,1 +1,7 @@
-enum UserNotificationState { accepted, preparing, onWay, delivered, canceled }
+enum UserNotificationState {
+  accepted,
+  preparing,
+  outForDelivery,
+  delivered,
+  canceled,
+}
