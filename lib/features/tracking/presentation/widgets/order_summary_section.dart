@@ -52,7 +52,8 @@ class _SummaryTile extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: AppTextStyles.black16600),
+          Expanded(child: Text(label, style: AppTextStyles.black16600)),
+          SizedBox(width: 8.w),
           Text(value, style: AppTextStyles.black14400),
         ],
       ),

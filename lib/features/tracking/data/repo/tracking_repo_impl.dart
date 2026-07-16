@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/cache/hive_helper.dart';
+import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/core/utils/app_keys.dart';
 import 'package:flowery_rider_app/features/tracking/data/data_sources/tracking_remote_data_source_contract.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
@@ -16,22 +18,29 @@ import 'package:injectable/injectable.dart';
 class TrackingRepoImpl implements TrackingRepoContract {
   final TrackingRemoteDataSourceContract _remoteDataSource;
   final HiveHelper _hiveHelper;
+  final FirebaseFirestore _firestore;
 
-  TrackingRepoImpl(this._remoteDataSource, this._hiveHelper);
+  TrackingRepoImpl(this._remoteDataSource, this._hiveHelper, this._firestore);
 
   @override
   Future<BaseResponse<DriverOrdersEntity>> getDriverOrders({int? page}) async {
     final response = await _remoteDataSource.getDriverOrders(page: page);
     return switch (response) {
-      SuccessBaseResponse<AllDriverOrdersResponseModel>() => _handleMapping(() {
-        final orders =
-            response.data?.orders?.map((e) => e.toEntity()).toList() ?? [];
-        return DriverOrdersEntity(
-          orders: orders,
-          currentPage: response.data?.metadata?.currentPage ?? 1,
-          totalPages: response.data?.metadata?.totalPages ?? 1,
-        );
-      }),
+      SuccessBaseResponse<AllDriverOrdersResponseModel>() =>
+        await _handleMappingAsync(() async {
+          final orders = <OrderEntity>[];
+          if (response.data?.orders != null) {
+            for (final orderModel in response.data!.orders!) {
+              final entity = orderModel.toEntity();
+              orders.add(await _enrichOrderWithFirestoreAddress(entity));
+            }
+          }
+          return DriverOrdersEntity(
+            orders: orders,
+            currentPage: response.data?.metadata?.currentPage ?? 1,
+            totalPages: response.data?.metadata?.totalPages ?? 1,
+          );
+        }),
       ErrorBaseResponse<AllDriverOrdersResponseModel>() => ErrorBaseResponse(
         response.errorMessage,
       ),
@@ -42,9 +51,12 @@ class TrackingRepoImpl implements TrackingRepoContract {
   Future<BaseResponse<OrderEntity>> startOrder(String id) async {
     final response = await _remoteDataSource.startOrder(id);
     return switch (response) {
-      SuccessBaseResponse<UpdateOrderStateResponseModel>() => _handleMapping(
-        () => response.data?.order?.toEntity(),
-      ),
+      SuccessBaseResponse<UpdateOrderStateResponseModel>() =>
+        await _handleMappingAsync(() async {
+          final entity = response.data?.order?.toEntity();
+          if (entity == null) return null;
+          return await _enrichOrderWithFirestoreAddress(entity);
+        }),
       ErrorBaseResponse<UpdateOrderStateResponseModel>() => ErrorBaseResponse(
         response.errorMessage,
       ),
@@ -58,9 +70,12 @@ class TrackingRepoImpl implements TrackingRepoContract {
   ) async {
     final response = await _remoteDataSource.updateOrderState(id, state);
     return switch (response) {
-      SuccessBaseResponse<UpdateOrderStateResponseModel>() => _handleMapping(
-        () => response.data?.order?.toEntity(),
-      ),
+      SuccessBaseResponse<UpdateOrderStateResponseModel>() =>
+        await _handleMappingAsync(() async {
+          final entity = response.data?.order?.toEntity();
+          if (entity == null) return null;
+          return await _enrichOrderWithFirestoreAddress(entity);
+        }),
       ErrorBaseResponse<UpdateOrderStateResponseModel>() => ErrorBaseResponse(
         response.errorMessage,
       ),
@@ -73,9 +88,23 @@ class TrackingRepoImpl implements TrackingRepoContract {
   }) async {
     final response = await _remoteDataSource.getPendingOrders(page: page);
     return switch (response) {
-      SuccessBaseResponse<PendingOrdersResponseModel>() => _handleMapping(
-        () => response.data?.toEntity(),
-      ),
+      SuccessBaseResponse<PendingOrdersResponseModel>() =>
+        await _handleMappingAsync(() async {
+          final orders = <OrderEntity>[];
+          if (response.data?.orders != null) {
+            for (final orderModel in response.data!.orders!) {
+              final entity = orderModel.toEntity();
+              orders.add(await _enrichOrderWithFirestoreAddress(entity));
+            }
+          }
+          final pendingOrders = response.data?.toEntity();
+          return PendingOrdersEntity(
+            message: pendingOrders?.message ?? '',
+            orders: orders,
+            currentPage: pendingOrders?.currentPage,
+            totalPages: pendingOrders?.totalPages,
+          );
+        }),
       ErrorBaseResponse<PendingOrdersResponseModel>() => ErrorBaseResponse(
         response.errorMessage,
       ),
@@ -111,10 +140,56 @@ class TrackingRepoImpl implements TrackingRepoContract {
     );
   }
 
-  /// Helper to catch mapping exceptions while using switch expressions
-  BaseResponse<T> _handleMapping<T>(T? Function() mapper) {
+  /// Fetches missing address from Firestore if API address is incomplete
+  Future<OrderEntity> _enrichOrderWithFirestoreAddress(
+    OrderEntity order,
+  ) async {
+    // Current mapping uses '_' as fallback for missing street/city
+    final isAddressMissing =
+        order.shippingAddress.street == '_' ||
+        order.shippingAddress.street.isEmpty ||
+        order.shippingAddress.city == '_' ||
+        order.shippingAddress.city.isEmpty;
+
+    if (!isAddressMissing) return order;
+
     try {
-      final result = mapper();
+      final doc = await _firestore
+          .collection(AppConstants.ordersCollection)
+          .doc(order.id)
+          .get();
+
+      if (doc.exists && doc.data() != null) {
+        final data = doc.data()!;
+        final shipping = data['shippingAddress'] as Map<String, dynamic>?;
+
+        if (shipping != null) {
+          return order.copyWith(
+            shippingAddress: ShippingAddressEntity(
+              street:
+                  shipping['street']?.toString() ??
+                  order.shippingAddress.street,
+              city: shipping['city']?.toString() ?? order.shippingAddress.city,
+              phone:
+                  shipping['phone']?.toString() ?? order.shippingAddress.phone,
+              lat: shipping['lat']?.toString() ?? order.shippingAddress.lat,
+              long: shipping['long']?.toString() ?? order.shippingAddress.long,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      // In case of error, we keep the original order data
+    }
+    return order;
+  }
+
+  /// Async version of mapping helper
+  Future<BaseResponse<T>> _handleMappingAsync<T>(
+    Future<T?> Function() mapper,
+  ) async {
+    try {
+      final result = await mapper();
       if (result == null) return ErrorBaseResponse('Empty data received');
       return SuccessBaseResponse(result);
     } catch (e) {

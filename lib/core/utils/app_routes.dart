@@ -17,6 +17,8 @@ import 'package:flowery_rider_app/features/profile/presentation/view_model/chang
 import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_profile_view_model/edit_profile_cubit.dart';
 import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_vehicle/edit_vehicle_cubit.dart';
 import 'package:flowery_rider_app/features/splash/presentation/pages/splash_screen.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/screens/driver_order_details_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_success_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_cubit.dart';
@@ -136,6 +138,13 @@ abstract class AppRoutes {
         case orderSuccess:
           return MaterialPageRoute(
             builder: (_) => const OrderSuccessScreen(),
+            settings: settings,
+          );
+
+        case driverOrderDetails:
+          final order = settings.arguments as OrderEntity;
+          return MaterialPageRoute(
+            builder: (_) => DriverOrderDetailsScreen(order: order),
             settings: settings,
           );
 
