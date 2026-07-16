@@ -110,6 +110,7 @@ flutter:
     - assets/lottie_files/
     - assets/translations/
     - assets/json/
+    - shorebird.yaml
 
 flutter_native_splash:
   color: "#FAFAFA"

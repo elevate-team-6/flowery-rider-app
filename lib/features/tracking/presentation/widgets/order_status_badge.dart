@@ -22,6 +22,9 @@ class OrderStatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Rebuild this widget's texts when the locale changes (no state reset).
+    context.locale;
+
     final state = DriverOrderState.fromString(status);
 
     Color color;

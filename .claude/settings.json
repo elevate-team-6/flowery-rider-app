@@ -2,7 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(flutter test *)",
-      "Bash(flutter pub *)"
+      "Bash(flutter pub *)",
+      "Bash(shorebird --version)",
+      "Bash(flutter --version)"
     ]
   }
 }
