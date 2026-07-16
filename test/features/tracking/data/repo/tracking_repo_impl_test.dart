@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/cache/hive_helper.dart';
 import 'package:flowery_rider_app/features/tracking/data/data_sources/tracking_remote_data_source_contract.dart';
@@ -23,7 +24,14 @@ import 'package:mockito/mockito.dart';
 
 import 'tracking_repo_impl_test.mocks.dart';
 
-@GenerateMocks([TrackingRemoteDataSourceContract, HiveHelper])
+@GenerateMocks([
+  TrackingRemoteDataSourceContract,
+  HiveHelper,
+  FirebaseFirestore,
+  CollectionReference,
+  DocumentReference,
+  DocumentSnapshot,
+])
 void main() {
   provideDummy<BaseResponse<PendingOrdersResponseModel>>(
     ErrorBaseResponse('dummy'),
@@ -38,11 +46,30 @@ void main() {
   late TrackingRepoImpl repo;
   late MockTrackingRemoteDataSourceContract mockRemoteDataSource;
   late MockHiveHelper mockHiveHelper;
+  late MockFirebaseFirestore mockFirestore;
+  late MockCollectionReference<Map<String, dynamic>> mockCollection;
+  late MockDocumentReference<Map<String, dynamic>> mockDocument;
+  late MockDocumentSnapshot<Map<String, dynamic>> mockSnapshot;
 
   setUp(() {
     mockRemoteDataSource = MockTrackingRemoteDataSourceContract();
     mockHiveHelper = MockHiveHelper();
-    repo = TrackingRepoImpl(mockRemoteDataSource, mockHiveHelper);
+    mockFirestore = MockFirebaseFirestore();
+    mockCollection = MockCollectionReference();
+    mockDocument = MockDocumentReference();
+    mockSnapshot = MockDocumentSnapshot();
+
+    repo = TrackingRepoImpl(
+      mockRemoteDataSource,
+      mockHiveHelper,
+      mockFirestore,
+    );
+
+    // Default firestore mock setup
+    when(mockFirestore.collection(any)).thenReturn(mockCollection);
+    when(mockCollection.doc(any)).thenReturn(mockDocument);
+    when(mockDocument.get()).thenAnswer((_) async => mockSnapshot);
+    when(mockSnapshot.exists).thenReturn(false);
   });
 
   group('getDriverOrders', () {
@@ -154,6 +181,41 @@ void main() {
         expect(order.user.fullName, 'John Doe');
         expect(order.store.name, 'Store');
         expect(order.store.phoneNumber, '123');
+      },
+    );
+
+    test(
+      'enriches order with Firestore address when API address is missing',
+      () async {
+        const missingAddressResponse = PendingOrdersResponseModel(
+          orders: [
+            TrackingOrderModel(
+              id: 'enrich_id',
+              shippingAddress: ShippingAddressModel(street: '_', city: '_'),
+            ),
+          ],
+        );
+
+        when(
+          mockRemoteDataSource.getPendingOrders(page: 1),
+        ).thenAnswer((_) async => SuccessBaseResponse(missingAddressResponse));
+
+        when(mockSnapshot.exists).thenReturn(true);
+        when(mockSnapshot.data()).thenReturn({
+          'shippingAddress': {
+            'street': 'Firestore Street',
+            'city': 'Firestore City',
+          },
+        });
+
+        final result = await repo.getPendingOrders(page: 1);
+
+        final order = (result as SuccessBaseResponse<PendingOrdersEntity>)
+            .data!
+            .orders
+            .first;
+        expect(order.shippingAddress.street, 'Firestore Street');
+        expect(order.shippingAddress.city, 'Firestore City');
       },
     );
   });
