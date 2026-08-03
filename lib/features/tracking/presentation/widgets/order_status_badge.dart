@@ -8,8 +8,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OrderStatusBadge extends StatelessWidget {
   final String status;
+  final bool isPlain;
+  final double? iconSize;
+  final TextStyle? textStyle;
 
-  const OrderStatusBadge({super.key, required this.status});
+  const OrderStatusBadge({
+    super.key,
+    required this.status,
+    this.isPlain = false,
+    this.iconSize,
+    this.textStyle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -37,6 +46,27 @@ class OrderStatusBadge extends StatelessWidget {
         label = status.tr();
     }
 
+    final labelStyle =
+        textStyle ??
+        AppTextStyles.black14400.copyWith(
+          color: color,
+          fontSize: 12.sp,
+          fontWeight: FontWeight.w500,
+        );
+
+    final statusIcon = Icon(icon, size: iconSize ?? 14.sp, color: color);
+
+    if (isPlain) {
+      return Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          statusIcon,
+          SizedBox(width: 8.w),
+          Text(label, style: labelStyle),
+        ],
+      );
+    }
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 6.h),
       decoration: BoxDecoration(
@@ -47,16 +77,9 @@ class OrderStatusBadge extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14.sp, color: color),
+          Icon(icon, size: iconSize ?? 14.sp, color: color),
           SizedBox(width: 4.w),
-          Text(
-            label,
-            style: AppTextStyles.black14400.copyWith(
-              color: color,
-              fontSize: 12.sp,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
+          Text(label, style: labelStyle),
         ],
       ),
     );

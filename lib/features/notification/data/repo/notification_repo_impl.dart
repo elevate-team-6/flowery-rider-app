@@ -125,12 +125,11 @@ class NotificationRepoImpl implements NotificationRepoContract {
       }
 
       final accountCredentials = ServiceAccountCredentials.fromJson({
-        AppConstants.privateKeyField: formattedPrivateKey,
-        AppConstants.clientEmailField: clientEmail,
-        AppConstants.projectIdField: projectId,
-        AppConstants.typeField: AppConstants.serviceAccountValue,
-        AppConstants.clientIdField:
-            config.clientId ?? AppConstants.defaultClientId,
+        'private_key': formattedPrivateKey,
+        'client_email': clientEmail,
+        'project_id': projectId,
+        'type': AppConstants.serviceAccountValue,
+        'client_id': config.clientId ?? AppConstants.defaultClientId,
       });
 
       final scopes = [AppConstants.fcmScope];

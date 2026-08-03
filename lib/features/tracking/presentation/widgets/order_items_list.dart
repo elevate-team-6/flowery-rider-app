@@ -10,8 +10,15 @@ import '../../domain/entities/order_entity.dart';
 
 class OrderItemsList extends StatelessWidget {
   final List<OrderItemEntity> items;
+  final TextStyle? nameStyle;
+  final TextStyle? priceStyle;
 
-  const OrderItemsList({super.key, required this.items});
+  const OrderItemsList({
+    super.key,
+    required this.items,
+    this.nameStyle,
+    this.priceStyle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -51,16 +58,18 @@ class OrderItemsList extends StatelessWidget {
                       children: [
                         Text(
                           item.productName,
-                          style: AppTextStyles.black14400.copyWith(
-                            color: AppColors.white90,
-                          ),
+                          style:
+                              nameStyle ??
+                              AppTextStyles.black14400.copyWith(
+                                color: AppColors.white90,
+                              ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
                         SizedBox(height: 4.h),
                         Text(
                           '${AppStrings.egp.tr()} ${item.price}',
-                          style: AppTextStyles.black14600,
+                          style: priceStyle ?? AppTextStyles.black14600,
                         ),
                       ],
                     ),
