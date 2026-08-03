@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
 import 'package:flowery_rider_app/config/di/di.dart';
@@ -19,9 +20,23 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mockito/annotations.dart';
 import 'package:mockito/mockito.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 import 'orders_screen_test.mocks.dart';
+
+/// Serves translations from memory so `.tr()` is deterministic without hitting
+/// the asset bundle. An empty map makes `.tr()` echo the key back, which is
+/// what the widget-type assertions here rely on.
+class _InMemoryAssetLoader extends AssetLoader {
+  const _InMemoryAssetLoader(this._data);
+
+  final Map<String, Map<String, dynamic>> _data;
+
+  @override
+  Future<Map<String, dynamic>> load(String path, Locale locale) async =>
+      _data[locale.languageCode] ?? const {};
+}
 
 @GenerateMocks([OrderScreenCubit])
 void main() {
@@ -29,6 +44,11 @@ void main() {
   late MainLayoutCubit mainLayoutCubit;
   late StreamController<BaseUiEvent> eventController;
   late StreamController<OrderScreenState> stateController;
+
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues({});
+    await EasyLocalization.ensureInitialized();
+  });
 
   setUp(() {
     mockCubit = MockOrderScreenCubit();
@@ -62,15 +82,27 @@ void main() {
   Widget createWidget({int mainIndex = 1}) {
     mainLayoutCubit.changeIndex(mainIndex);
 
-    return MaterialApp(
-      home: Scaffold(
-        body: ScreenUtilInit(
-          designSize: const Size(360, 690),
-          minTextAdapt: true,
-          splitScreenMode: true,
-          builder: (context, child) => BlocProvider<MainLayoutCubit>.value(
-            value: mainLayoutCubit,
-            child: const OrdersScreen(),
+    return EasyLocalization(
+      supportedLocales: const [Locale('en')],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('en'),
+      startLocale: const Locale('en'),
+      assetLoader: const _InMemoryAssetLoader({'en': <String, dynamic>{}}),
+      child: Builder(
+        builder: (context) => MaterialApp(
+          localizationsDelegates: context.localizationDelegates,
+          supportedLocales: context.supportedLocales,
+          locale: context.locale,
+          home: Scaffold(
+            body: ScreenUtilInit(
+              designSize: const Size(360, 690),
+              minTextAdapt: true,
+              splitScreenMode: true,
+              builder: (context, child) => BlocProvider<MainLayoutCubit>.value(
+                value: mainLayoutCubit,
+                child: const OrdersScreen(),
+              ),
+            ),
           ),
         ),
       ),
@@ -108,6 +140,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(createWidget(mainIndex: 1));
+      await tester.pump();
       verify(mockCubit.doEvent(argThat(isA<GetDriverOrdersEvent>()))).called(1);
     });
 
@@ -115,6 +148,7 @@ void main() {
       'does not call GetDriverOrdersEvent when index is not 1 on init',
       (tester) async {
         await tester.pumpWidget(createWidget(mainIndex: 0));
+        await tester.pump();
         verifyNever(mockCubit.doEvent(any));
       },
     );
@@ -123,6 +157,7 @@ void main() {
       tester,
     ) async {
       await tester.pumpWidget(createWidget(mainIndex: 0));
+      await tester.pump();
       verifyNever(mockCubit.doEvent(any));
 
       // Simulate index change

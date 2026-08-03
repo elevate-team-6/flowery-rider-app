@@ -15,7 +15,20 @@ class LocationService {
     return Geolocator.requestPermission();
   }
 
-  Future<Position> getCurrentPosition() {
-    return Geolocator.getCurrentPosition();
+  /// Last cached fix — instant, and reliable on emulators that already have a
+  /// location set. Returns null if there is no cached position.
+  Future<Position?> getLastKnownPosition() {
+    return Geolocator.getLastKnownPosition();
+  }
+
+  Future<Position> getCurrentPosition({LocationSettings? settings}) {
+    return Geolocator.getCurrentPosition(locationSettings: settings);
+  }
+
+  /// Live position stream. Emits a new fix only when the device moves past the
+  /// [LocationSettings.distanceFilter], so a stationary rider costs nothing and
+  /// a moving one updates as it happens — no fixed-interval polling.
+  Stream<Position> getPositionStream({LocationSettings? settings}) {
+    return Geolocator.getPositionStream(locationSettings: settings);
   }
 }

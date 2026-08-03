@@ -11,9 +11,6 @@ abstract class AppConstants {
   static const String ordersCollection = "orders";
   static const String appConfigsCollection = "app_configs";
 
-  // Firestore Documents
-  static const String fcmDoc = "fcm";
-
   // Firestore Fields
   static const String fcmTokenField = "fcmToken";
   static const String languageField = "language";
@@ -21,6 +18,17 @@ abstract class AppConstants {
   static const String riderIdField = "riderId";
   static const String riderNameField = "riderName";
   static const String riderPhoneField = "riderPhone";
+  static const String shippingAddressField = "shippingAddress";
+  static const String riderLocationField = "riderLocation";
+  static const String updatedAtField = "updatedAt";
+  static const String streetField = "street";
+  static const String cityField = "city";
+  static const String phoneField = "phone";
+  static const String latField = "lat";
+  static const String longField = "long";
+
+  // Firestore Documents
+  static const String fcmDoc = "fcm";
   static const String privateKeyField = "privateKey";
   static const String clientEmailField = "clientEmail";
   static const String projectIdField = "projectId";

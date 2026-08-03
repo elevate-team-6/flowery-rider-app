@@ -32,7 +32,8 @@ migrate_working_dir/
 .pub/
 /build/
 /coverage/
-pubspec.lock
+# pubspec.lock is committed on purpose: this is an application, so locking exact
+# dependency versions keeps CI reproducible and matching local runs.
 
 # Symbolication and Obfuscation related
 app.*.symbols

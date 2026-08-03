@@ -27,6 +27,10 @@ abstract class AppEndPoints {
   // Orders:
   static const String pendingOrders = "$baseUrl/orders/pending-orders";
 
+  // Routing:
+  static const String osrmBaseUrl = "https://router.project-osrm.org";
+  static const String osrmRoute = "$osrmBaseUrl/route/v1/driving/";
+
   // General:
   static const String addresses = "$baseUrl/addresses";
 

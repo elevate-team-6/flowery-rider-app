@@ -207,14 +207,19 @@ class _OrderDetailsScreenState extends State<OrderDetailsScreen>
                         previous.updateStepState.isLoading !=
                             current.updateStepState.isLoading,
                     builder: (context, state) {
-                      return OrderActionButton(
-                        uiStep: state.uiStep,
-                        isLoading: state.updateStepState.isLoading,
-                        onPressed: () {
-                          context.read<OrderDetailsCubit>().doEvent(
-                            OrderDetailsNextStepEvent(),
-                          );
-                        },
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          OrderActionButton(
+                            uiStep: state.uiStep,
+                            isLoading: state.updateStepState.isLoading,
+                            onPressed: () {
+                              context.read<OrderDetailsCubit>().doEvent(
+                                OrderDetailsNextStepEvent(),
+                              );
+                            },
+                          ),
+                        ],
                       );
                     },
                   ),

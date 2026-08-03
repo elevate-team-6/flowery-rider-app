@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
+import 'package:flowery_rider_app/config/services/location_service.dart';
 import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/widgets/custom_flower_loading.dart';
 import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
@@ -13,6 +14,7 @@ import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_active_
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/start_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_order_state_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_rider_location_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/widgets/confirm_cancel_dialog.dart';
@@ -45,6 +47,8 @@ class _InMemoryAssetLoader extends AssetLoader {
   GetActiveOrderUseCase,
   ClearActiveOrderUseCase,
   UpdateOrderProgressUseCase,
+  LocationService,
+  UpdateRiderLocationUseCase,
 ])
 void main() {
   late MockUpdateOrderStateUseCase mockUpdateUseCase;
@@ -54,6 +58,8 @@ void main() {
   late MockCacheActiveOrderUseCase mockCacheUseCase;
   late MockGetActiveOrderUseCase mockGetUseCase;
   late MockClearActiveOrderUseCase mockClearUseCase;
+  late MockLocationService mockLocationService;
+  late MockUpdateRiderLocationUseCase mockUpdateRiderLocationUseCase;
   late OrderDetailsCubit cubit;
   late Map<String, Map<String, dynamic>> translations;
 
@@ -130,6 +136,8 @@ void main() {
     mockGetUseCase = MockGetActiveOrderUseCase();
     mockClearUseCase = MockClearActiveOrderUseCase();
     mockUpdateProgressUseCase = MockUpdateOrderProgressUseCase();
+    mockLocationService = MockLocationService();
+    mockUpdateRiderLocationUseCase = MockUpdateRiderLocationUseCase();
 
     provideDummy<BaseResponse<OrderEntity>>(ErrorBaseResponse('dummy'));
     provideDummy<BaseResponse<void>>(SuccessBaseResponse(null));
@@ -156,6 +164,8 @@ void main() {
       mockGetUseCase,
       mockClearUseCase,
       mockUpdateProgressUseCase,
+      mockLocationService,
+      mockUpdateRiderLocationUseCase,
     );
   });
 

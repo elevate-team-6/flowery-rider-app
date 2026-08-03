@@ -2,11 +2,12 @@ import 'package:bloc_test/bloc_test.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
 import 'package:flowery_rider_app/config/base_state/base_state.dart';
 import 'package:flowery_rider_app/config/base_ui_event/base_ui_event.dart';
-import 'package:flowery_rider_app/core/utils/app_keys.dart';
+import 'package:flowery_rider_app/config/services/location_service.dart';
 import 'package:flowery_rider_app/core/utils/app_routes.dart';
 import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
 import 'package:flowery_rider_app/features/notification/domain/use_cases/update_order_progress_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
+import 'package:flowery_rider_app/features/tracking/domain/entities/cached_active_order.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/cache_active_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/clear_active_order_use_case.dart';
@@ -14,6 +15,7 @@ import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_active_
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/open_communication_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/start_order_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_order_state_use_case.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/update_rider_location_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_events.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_states.dart';
@@ -31,6 +33,8 @@ import 'order_details_cubit_test.mocks.dart';
   GetActiveOrderUseCase,
   ClearActiveOrderUseCase,
   UpdateOrderProgressUseCase,
+  LocationService,
+  UpdateRiderLocationUseCase,
 ])
 void main() {
   provideDummy<BaseResponse<OrderEntity>>(ErrorBaseResponse('dummy'));
@@ -44,6 +48,8 @@ void main() {
   late MockGetActiveOrderUseCase mockGetActiveOrderUseCase;
   late MockClearActiveOrderUseCase mockClearActiveOrderUseCase;
   late MockUpdateOrderProgressUseCase mockUpdateOrderProgressUseCase;
+  late MockLocationService mockLocationService;
+  late MockUpdateRiderLocationUseCase mockUpdateRiderLocationUseCase;
 
   setUp(() {
     mockUpdateOrderStateUseCase = MockUpdateOrderStateUseCase();
@@ -53,6 +59,14 @@ void main() {
     mockGetActiveOrderUseCase = MockGetActiveOrderUseCase();
     mockClearActiveOrderUseCase = MockClearActiveOrderUseCase();
     mockUpdateOrderProgressUseCase = MockUpdateOrderProgressUseCase();
+    mockLocationService = MockLocationService();
+    mockUpdateRiderLocationUseCase = MockUpdateRiderLocationUseCase();
+
+    // Location publishing is best-effort; default to services-off so the
+    // helper returns early and existing step-transition tests stay focused.
+    when(
+      mockLocationService.isLocationServiceEnabled(),
+    ).thenAnswer((_) async => false);
 
     when(
       mockUpdateOrderProgressUseCase(
@@ -70,6 +84,8 @@ void main() {
       mockGetActiveOrderUseCase,
       mockClearActiveOrderUseCase,
       mockUpdateOrderProgressUseCase,
+      mockLocationService,
+      mockUpdateRiderLocationUseCase,
     );
   });
 
@@ -148,10 +164,10 @@ void main() {
       'loads from cache and skips startOrder API if cached order matches',
       build: () {
         when(mockGetActiveOrderUseCase()).thenAnswer(
-          (_) async => {
-            AppKeys.order: tOrder.copyWith(state: 'inProgress').toJson(),
-            AppKeys.uiStep: 2,
-          },
+          (_) async => CachedActiveOrder(
+            order: tOrder.copyWith(state: 'inProgress'),
+            uiStep: 2,
+          ),
         );
         return cubit;
       },

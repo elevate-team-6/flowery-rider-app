@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dio/dio.dart';
 import 'package:flowery_rider_app/config/base_response/base_response.dart';
+import 'package:flowery_rider_app/core/utils/app_constants.dart';
 import 'package:flowery_rider_app/features/tracking/api/api_client/tracking_api_client.dart';
 import 'package:flowery_rider_app/features/tracking/api/data_sources/tracking_remote_data_source_impl.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/request/update_order_state_request_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/all_driver_orders_response_model.dart';
+import 'package:flowery_rider_app/features/tracking/data/models/response/order_shipping_firestore_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/pending_orders_response_model.dart';
 import 'package:flowery_rider_app/features/tracking/data/models/response/update_order_state_response_model.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -12,14 +15,27 @@ import 'package:mockito/mockito.dart';
 
 import 'tracking_remote_data_source_impl_test.mocks.dart';
 
-@GenerateMocks([TrackingApiClient])
+@GenerateMocks(
+  [TrackingApiClient, FirebaseFirestore],
+  customMocks: [
+    MockSpec<CollectionReference<Map<String, dynamic>>>(
+      as: #MockCollectionReference,
+    ),
+    MockSpec<DocumentReference<Map<String, dynamic>>>(
+      as: #MockDocumentReference,
+    ),
+    MockSpec<DocumentSnapshot<Map<String, dynamic>>>(as: #MockDocumentSnapshot),
+  ],
+)
 void main() {
   late MockTrackingApiClient mockApiClient;
+  late MockFirebaseFirestore mockFirestore;
   late TrackingRemoteDataSourceImpl dataSource;
 
   setUp(() {
     mockApiClient = MockTrackingApiClient();
-    dataSource = TrackingRemoteDataSourceImpl(mockApiClient);
+    mockFirestore = MockFirebaseFirestore();
+    dataSource = TrackingRemoteDataSourceImpl(mockApiClient, mockFirestore);
   });
 
   group('getDriverOrders', () {
@@ -212,6 +228,53 @@ void main() {
         );
       },
     );
+  });
+
+  group('getOrderShipping', () {
+    late MockCollectionReference mockCollection;
+    late MockDocumentReference mockDoc;
+    late MockDocumentSnapshot mockSnapshot;
+
+    setUp(() {
+      mockCollection = MockCollectionReference();
+      mockDoc = MockDocumentReference();
+      mockSnapshot = MockDocumentSnapshot();
+      when(mockFirestore.collection(any)).thenReturn(mockCollection);
+      when(mockCollection.doc(any)).thenReturn(mockDoc);
+      when(mockDoc.get()).thenAnswer((_) async => mockSnapshot);
+    });
+
+    test('returns the shipping model from the order document', () async {
+      when(mockSnapshot.exists).thenReturn(true);
+      when(mockSnapshot.data()).thenReturn({
+        AppConstants.shippingAddressField: {
+          AppConstants.streetField: 'Nasr City',
+          AppConstants.cityField: 'Cairo',
+          AppConstants.phoneField: '0122',
+          AppConstants.latField: 30.1,
+          AppConstants.longField: 31.2,
+        },
+      });
+
+      final result = await dataSource.getOrderShipping('order1');
+
+      expect(result, isA<OrderShippingFirestoreModel>());
+      expect(result?.street, 'Nasr City');
+      expect(result?.city, 'Cairo');
+      expect(result?.lat, '30.1');
+      expect(result?.long, '31.2');
+      verify(mockFirestore.collection(AppConstants.ordersCollection)).called(1);
+      verify(mockCollection.doc('order1')).called(1);
+    });
+
+    test('returns null when the document does not exist', () async {
+      when(mockSnapshot.exists).thenReturn(false);
+      when(mockSnapshot.data()).thenReturn(null);
+
+      final result = await dataSource.getOrderShipping('order1');
+
+      expect(result, isNull);
+    });
   });
 
   group('updateOrderState', () {

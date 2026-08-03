@@ -19,7 +19,9 @@ import 'package:flowery_rider_app/features/profile/presentation/view_model/edit_
 import 'package:flowery_rider_app/features/splash/presentation/pages/splash_screen.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/driver_order_details_screen.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/screens/map_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_details_screen.dart';
+import 'package:flowery_rider_app/features/tracking/presentation/view_model/map_view_model/map_cubit.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/order_success_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/order_details/order_details_cubit.dart';
 import 'package:flutter/material.dart';
@@ -138,6 +140,16 @@ abstract class AppRoutes {
         case orderSuccess:
           return MaterialPageRoute(
             builder: (_) => const OrderSuccessScreen(),
+            settings: settings,
+          );
+
+        case mapScreen:
+          final args = settings.arguments as MapArgs;
+          return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+              create: (_) => getIt<MapCubit>(),
+              child: MapScreen(args: args),
+            ),
             settings: settings,
           );
 

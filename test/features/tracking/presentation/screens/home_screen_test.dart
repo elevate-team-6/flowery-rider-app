@@ -10,6 +10,7 @@ import 'package:flowery_rider_app/core/utils/app_strings.dart';
 import 'package:flowery_rider_app/core/widgets/custom_empty_state_view.dart';
 import 'package:flowery_rider_app/core/widgets/custom_error_state.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
+import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_order_shipping_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/domain/use_cases/get_pending_orders_use_case.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/home_screen.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/view_model/home_view_model/home_cubit.dart';
@@ -37,9 +38,10 @@ class _InMemoryAssetLoader extends AssetLoader {
       _data[locale.languageCode] ?? const {};
 }
 
-@GenerateMocks([GetPendingOrdersUseCase])
+@GenerateMocks([GetPendingOrdersUseCase, GetOrderShippingUseCase])
 void main() {
   late MockGetPendingOrdersUseCase mockUseCase;
+  late MockGetOrderShippingUseCase mockGetOrderShippingUseCase;
   late Map<String, Map<String, dynamic>> translations;
 
   const surface = Size(700, 1400);
@@ -133,6 +135,8 @@ void main() {
 
   setUp(() {
     mockUseCase = MockGetPendingOrdersUseCase();
+    mockGetOrderShippingUseCase = MockGetOrderShippingUseCase();
+    when(mockGetOrderShippingUseCase(any)).thenAnswer((_) async => null);
 
     provideDummy<BaseResponse<PendingOrdersEntity>>(ErrorBaseResponse('dummy'));
 
@@ -141,7 +145,9 @@ void main() {
     if (getIt.isRegistered<HomeCubit>()) {
       getIt.unregister<HomeCubit>();
     }
-    getIt.registerFactory<HomeCubit>(() => HomeCubit(mockUseCase));
+    getIt.registerFactory<HomeCubit>(
+      () => HomeCubit(mockUseCase, mockGetOrderShippingUseCase),
+    );
   });
 
   tearDown(() {
@@ -212,7 +218,8 @@ void main() {
       );
 
       await pumpHomeScreen(tester);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.byType(CustomEmptyStateView), findsOneWidget);
       expect(find.text(AppStrings.noPendingOrders.tr()), findsOneWidget);
@@ -229,7 +236,8 @@ void main() {
       ).thenAnswer((_) async => ErrorBaseResponse('network error'));
 
       await pumpHomeScreen(tester);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.byType(CustomErrorState), findsOneWidget);
       expect(find.text('network error'), findsOneWidget);
@@ -250,7 +258,8 @@ void main() {
       ).thenAnswer((_) async => SuccessBaseResponse(ordersEntity));
 
       await pumpHomeScreen(tester);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.byType(OrderCard), findsNWidgets(2));
       expect(find.text('Flower Store'), findsOneWidget);
@@ -264,7 +273,8 @@ void main() {
       ).thenAnswer((_) async => SuccessBaseResponse(ordersEntity));
 
       await pumpHomeScreen(tester);
-      await tester.pumpAndSettle();
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 200));
 
       expect(find.byType(OrderCard), findsNWidgets(2));
 

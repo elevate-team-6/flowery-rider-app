@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -7,14 +6,15 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../../../core/utils/app_assets.dart';
 import '../../../../../core/utils/app_colors.dart';
-import '../../../../../core/utils/app_keys.dart';
 import '../../../../../core/utils/app_routes.dart';
 import '../../../../../core/utils/app_strings.dart';
 import '../../../../../core/utils/app_text_styles.dart';
-import '../../../../config/cache/hive_helper.dart';
 import '../../../../config/di/di.dart';
 import '../../../../config/services/auth_service.dart';
 import '../../../tracking/domain/entities/order_entity.dart';
+import '../../../tracking/domain/use_cases/clear_active_order_use_case.dart';
+import '../../../tracking/domain/use_cases/get_active_order_from_backend_use_case.dart';
+import '../../../tracking/domain/use_cases/get_active_order_use_case.dart';
 import '../../../tracking/presentation/screens/order_details_screen.dart';
 import '../widgets/petals_painter.dart';
 
@@ -150,39 +150,47 @@ class _SplashScreenState extends State<SplashScreen>
 
   void _navigateToNext() async {
     final isLoggedIn = await AuthService.isLoggedIn();
-    OrderEntity? cachedOrder;
-    int? cachedStep;
+
+    OrderEntity? activeOrder;
+    int? resumeStep;
 
     if (isLoggedIn) {
-      final hiveHelper = getIt<HiveHelper>();
-      final String? cachedJson = await hiveHelper.getData(
-        boxName: AppKeys.activeOrderBox,
-        key: AppKeys.activeOrderKey,
-      );
-      if (cachedJson != null) {
-        final Map<String, dynamic> data = jsonDecode(cachedJson);
-        cachedOrder = OrderEntity.fromJson(data[AppKeys.order]);
-        cachedStep = data[AppKeys.uiStep];
+      // Source of truth: confirm with the backend whether the driver actually
+      // has an active (inProgress) order. We do NOT trust the local cache for
+      // this decision, because it can be stale (e.g. the order was completed or
+      // canceled from another device) and would cause wrong navigation.
+      activeOrder = await getIt<GetActiveOrderFromBackendUseCase>()();
+
+      if (activeOrder != null) {
+        // There IS an active order. Use the local cache only to restore the UI
+        // step so the driver resumes exactly where they left off.
+        final cached = await getIt<GetActiveOrderUseCase>()();
+        if (cached != null && cached.order.id == activeOrder.id) {
+          resumeStep = cached.uiStep;
+        }
+      } else {
+        // No active order on the server → any cached order is stale, clear it.
+        await getIt<ClearActiveOrderUseCase>()();
       }
     }
 
     await Future.delayed(const Duration(milliseconds: 4000));
-    if (mounted) {
-      if (cachedOrder != null) {
-        Navigator.pushReplacementNamed(
-          context,
-          AppRoutes.orderDetails,
-          arguments: OrderDetailsArgs(
-            order: cachedOrder,
-            initialStep: cachedStep,
-          ),
-        );
-      } else {
-        Navigator.pushReplacementNamed(
-          context,
-          isLoggedIn ? AppRoutes.mainLayout : AppRoutes.onboarding,
-        );
-      }
+    if (!mounted) return;
+
+    if (activeOrder != null) {
+      Navigator.pushReplacementNamed(
+        context,
+        AppRoutes.orderDetails,
+        arguments: OrderDetailsArgs(
+          order: activeOrder,
+          initialStep: resumeStep,
+        ),
+      );
+    } else {
+      Navigator.pushReplacementNamed(
+        context,
+        isLoggedIn ? AppRoutes.mainLayout : AppRoutes.onboarding,
+      );
     }
   }
 

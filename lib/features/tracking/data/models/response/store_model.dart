@@ -27,7 +27,6 @@ class StoreModel extends Equatable {
   Map<String, dynamic> toJson() => _$StoreModelToJson(this);
 
   StoreEntity toEntity() {
-    List<String>? latLngList = latLong?.split(',');
     return StoreEntity(
       name: name ?? (throw Exception('Store Name is required')),
       image: (image != null && image!.isNotEmpty)
@@ -37,8 +36,11 @@ class StoreModel extends Equatable {
           : '',
       address: address ?? '',
       phoneNumber: phoneNumber ?? '',
-      lat: (latLngList != null && latLngList.isNotEmpty) ? latLngList[0] : '',
-      long: (latLngList != null && latLngList.length > 1) ? latLngList[1] : '',
+      // TODO: temporary — the backend returns a fixed dummy store location
+      // (San Francisco, US). Pin it to Sheikh Zayed, Giza so routing works for
+      // Egyptian testing. Remove once the API sends real store coordinates.
+      lat: '30.0716',
+      long: '30.9754',
     );
   }
 

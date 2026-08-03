@@ -1,3 +1,4 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flowery_rider_app/core/utils/app_colors.dart';
 import 'package:flowery_rider_app/features/tracking/domain/entities/order_entity.dart';
 import 'package:flowery_rider_app/features/tracking/presentation/screens/driver_order_details_screen.dart';
@@ -8,8 +9,38 @@ import 'package:flowery_rider_app/features/tracking/presentation/widgets/order_s
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+/// Serves empty translations so `.tr()` falls back to the raw key, which is
+/// what these tests assert on.
+class _InMemoryAssetLoader extends AssetLoader {
+  const _InMemoryAssetLoader();
+
+  @override
+  Future<Map<String, dynamic>> load(String path, Locale locale) async => {};
+}
+
+/// The tracking widgets read `context.locale` to rebuild on locale changes, so
+/// they need an [EasyLocalization] ancestor.
+Widget _localized(Widget child) {
+  return EasyLocalization(
+    supportedLocales: const [Locale('en')],
+    path: 'assets/translations',
+    fallbackLocale: const Locale('en'),
+    startLocale: const Locale('en'),
+    assetLoader: const _InMemoryAssetLoader(),
+    child: Builder(builder: (_) => child),
+  );
+}
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() async {
+    SharedPreferences.setMockInitialValues({});
+    await EasyLocalization.ensureInitialized();
+  });
+
   const tOrder = OrderEntity(
     id: '1',
     orderNumber: '123456',
@@ -80,15 +111,17 @@ void main() {
   );
 
   Widget createWidget(OrderEntity order) {
-    return MaterialApp(
-      home: ScreenUtilInit(
-        designSize: const Size(
-          1000,
-          2000,
-        ), // Larger size to prevent overflow in tests
-        minTextAdapt: true,
-        splitScreenMode: true,
-        builder: (context, child) => DriverOrderDetailsScreen(order: order),
+    return _localized(
+      MaterialApp(
+        home: ScreenUtilInit(
+          designSize: const Size(
+            1000,
+            2000,
+          ), // Larger size to prevent overflow in tests
+          minTextAdapt: true,
+          splitScreenMode: true,
+          builder: (context, child) => DriverOrderDetailsScreen(order: order),
+        ),
       ),
     );
   }
@@ -176,10 +209,12 @@ void main() {
       };
 
       await tester.pumpWidget(
-        ScreenUtilInit(
-          designSize: const Size(1000, 2000),
-          builder: (context, child) =>
-              MaterialApp(initialRoute: '/', routes: routes),
+        _localized(
+          ScreenUtilInit(
+            designSize: const Size(1000, 2000),
+            builder: (context, child) =>
+                MaterialApp(initialRoute: '/', routes: routes),
+          ),
         ),
       );
 
