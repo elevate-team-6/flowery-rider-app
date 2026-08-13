@@ -48,7 +48,7 @@ The codebase is built on **Clean Architecture** with a strict feature-first, 4-l
 
 ## 📸 Screenshots
 
-<img width="1778" height="885" alt="Image" src="https://github.com/user-attachments/assets/21248720-96a7-4ef3-b6b3-d903a2467e4b" />
+<img width="1824" height="862" alt="Image" src="https://github.com/user-attachments/assets/48793e2b-31c7-497f-a240-b90a92d14c73" />
 
 ---
 
