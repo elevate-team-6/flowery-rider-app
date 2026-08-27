@@ -1,0 +1,15 @@
+{
+  "projects": {
+    "default": "flowers-app-f2600"
+  },
+  "targets": {
+    "flowers-app-f2600": {
+      "hosting": {
+        "rider-target": [
+          "flowery-rider-web"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}

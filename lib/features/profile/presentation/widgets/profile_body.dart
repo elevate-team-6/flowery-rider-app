@@ -87,7 +87,7 @@ class _ProfileBodyState extends State<ProfileBody> with UiEventHandler {
       appBar: AppBar(
         actionsPadding: EdgeInsets.symmetric(horizontal: 12.w),
         title: Text(AppStrings.profile.tr(), style: AppTextStyles.black20500),
-        leading: Icon(Icons.arrow_back_ios_new_outlined),
+        automaticallyImplyLeading: false,
         actions: [
           NotificationBadge(
             count: '3',

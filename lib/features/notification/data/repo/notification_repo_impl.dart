@@ -12,6 +12,7 @@ import 'package:flowery_rider_app/features/notification/data/models/fcm_config_m
 import 'package:flowery_rider_app/features/notification/data/models/order_firestore_model.dart';
 import 'package:flowery_rider_app/features/notification/domain/entities/user_notification_state.dart';
 import 'package:flowery_rider_app/features/notification/domain/repo/notification_repo_contract.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:injectable/injectable.dart';
 
@@ -99,7 +100,7 @@ class NotificationRepoImpl implements NotificationRepoContract {
           return SuccessBaseResponse(null);
       }
     } catch (e, s) {
-      _crashlytics.recordError(e, s, reason: 'Sync/Notify failed for $orderId');
+      _recordError(e, s, reason: 'Sync/Notify failed for $orderId');
       return SuccessBaseResponse(null);
     }
   }
@@ -140,7 +141,7 @@ class NotificationRepoImpl implements NotificationRepoContract {
 
       return accessToken;
     } catch (e, s) {
-      _crashlytics.recordError(e, s, reason: 'AccessToken generation failed');
+      _recordError(e, s, reason: 'AccessToken generation failed');
       return null;
     }
   }
@@ -187,11 +188,28 @@ class NotificationRepoImpl implements NotificationRepoContract {
   }
 
   void _logError(String reason, String userId, String orderId) {
-    _crashlytics.recordError(
+    _recordError(
       Exception(reason),
       StackTrace.current,
       reason: 'Notification failed for $userId on $orderId',
-      fatal: false,
     );
+  }
+
+  /// Firebase Crashlytics has no web SDK/plugin — every call to its native
+  /// methods throws (e.g. "isCrashlyticsCollectionEnabled" assertion
+  /// failures) when running on the web. Since every error-recording call in
+  /// this class goes through this one method, guarding it here protects all
+  /// callers without touching each call site individually.
+  void _recordError(
+    dynamic exception,
+    StackTrace stack, {
+    required String reason,
+  }) {
+    if (kIsWeb) {
+      // ignore: avoid_print
+      print('[NotificationRepoImpl] Skipped on web — $exception ($reason)');
+      return;
+    }
+    _crashlytics.recordError(exception, stack, reason: reason, fatal: false);
   }
 }
