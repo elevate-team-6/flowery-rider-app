@@ -48,7 +48,7 @@ The codebase is built on **Clean Architecture** with a strict feature-first, 4-l
 
 ## 📸 Screenshots
 
-<img width="1392" height="599" alt="Flowery Rider screens" src="https://github.com/user-attachments/assets/ceebcbda-af5a-4599-8dd2-c5b383a54c43" />
+<img width="1824" height="862" alt="Image" src="https://github.com/user-attachments/assets/48793e2b-31c7-497f-a240-b90a92d14c73" />
 
 ---
 
